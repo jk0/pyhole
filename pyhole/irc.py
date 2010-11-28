@@ -1,4 +1,4 @@
-""" Event-based IRC class """
+""" Event-based IRC Class """
 
 
 import irclib
@@ -26,6 +26,13 @@ class IRC(irclib.SimpleIRCClient):
             self.nick))
         self.connect(self.server, self.port, self.nick)
 
+    def poll_messages(self, message):
+        commands = ["foo", "bar", "test"]
+        for command in commands:
+            if message.startswith("%s%s" % (self.command_prefix, command)) \
+            or message.startswith("%s: %s" % (self.nick, command)):
+                return True
+
     def on_nicknameinuse(self, connection, event):
         """ Ensure the use of unique IRC nick """
         self.log.info("IRC nick '%s' is currently in use" % self.nick)
@@ -52,7 +59,8 @@ class IRC(irclib.SimpleIRCClient):
 
         if nick != self.nick:
             self.log.info("<%s> %s" % (nick, msg))
-            #connection.privmsg(nick, "[%s] %s" % (nick, msg))
+            if self.poll_messages(msg):
+                connection.privmsg(nick, "bar")
 
     def on_pubmsg(self, connection, event):
         """ Handle public messages """
@@ -62,5 +70,5 @@ class IRC(irclib.SimpleIRCClient):
 
         if target == self.channel:
             self.log.info("%s <%s> %s" % (target, nick, msg))
-            if msg.startswith("%sfoo" % self.command_prefix):
+            if self.poll_messages(msg):
                 connection.privmsg(target, "bar")

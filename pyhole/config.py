@@ -1,4 +1,4 @@
-""" An intelligent configuration library """
+""" Intelligent Configuration Library """
 
 
 import argparse
