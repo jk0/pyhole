@@ -1,8 +1,12 @@
 """ Event-based IRC Class """
 
 
+import inspect
 import irclib
+import pkgutil
 import time
+
+import modules
 
 
 class IRC(irclib.SimpleIRCClient):
@@ -19,6 +23,9 @@ class IRC(irclib.SimpleIRCClient):
         self.nick = config.get("nick")
         self.channel = config.get("channel")
         self.command_prefix = config.get("command_prefix")
+        self.commands = []
+        self.modules = []
+        self.load_modules()
 
         self.log.info("Connecting to %s:%d as %s" % (
             self.server,
@@ -26,12 +33,26 @@ class IRC(irclib.SimpleIRCClient):
             self.nick))
         self.connect(self.server, self.port, self.nick)
 
+    def load_modules(self):
+        """ Load modules and their classes respectively """
+        for importer, name, ispkg in pkgutil.iter_modules(modules.__path__):
+            module = "global %s\n%s = modules.%s.%s(self)" % (
+                name, name, name, name.capitalize())
+            exec(module)
+            self.modules.append(name)
+            for k, v in inspect.getmembers(eval(name), inspect.ismethod):
+                if not k.startswith("__"):
+                    self.commands.append("%s.%s" % (name, k))
+        self.log.info("Loaded Modules: %s" % ", ".join(self.modules))
+
     def poll_messages(self, message):
-        commands = ["foo", "bar", "test"]
-        for command in commands:
-            if message.startswith("%s%s" % (self.command_prefix, command)) \
-            or message.startswith("%s: %s" % (self.nick, command)):
-                return True
+        """ Watch for known commands """
+        for command in self.commands:
+            command = command.split(".", 1)
+            if message.startswith("%s%s" % (self.command_prefix, command[1])) \
+            or message.startswith("%s: %s" % (self.nick, command[1])):
+                self.log.debug("Evaluating: %s()" % ".".join(command))
+                eval("%s()" % ".".join(command))
 
     def on_nicknameinuse(self, connection, event):
         """ Ensure the use of unique IRC nick """
@@ -59,8 +80,7 @@ class IRC(irclib.SimpleIRCClient):
 
         if nick != self.nick:
             self.log.info("<%s> %s" % (nick, msg))
-            if self.poll_messages(msg):
-                connection.privmsg(nick, "bar")
+            self.poll_messages(msg)
 
     def on_pubmsg(self, connection, event):
         """ Handle public messages """
@@ -70,5 +90,4 @@ class IRC(irclib.SimpleIRCClient):
 
         if target == self.channel:
             self.log.info("%s <%s> %s" % (target, nick, msg))
-            if self.poll_messages(msg):
-                connection.privmsg(target, "bar")
+            self.poll_messages(msg)

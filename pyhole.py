@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-""" pyhole - A simple, yet modular IRC bot written in Python. """
+""" pyhole - A modular IRC bot for Python developers. """
 
 
 import logging
