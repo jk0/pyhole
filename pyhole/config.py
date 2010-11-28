@@ -1,34 +1,25 @@
-"""
-Configuration Class 
-"""
+""" An intelligent configuration library """
 
 
+import argparse
 import ConfigParser
 
 
-class Config():
-    """Configuration Class"""
+class Config(object):
+    """ A configuration object """
+
     def __init__(self, file, section):
-        """Constructor
+        self.parser = argparse.ArgumentParser()
+        self.args = self.parser.parse_args()
 
-        Args:
-            file
-            section
-
-        Returns:
-            Configuration parameters
-        """
         self.config = ConfigParser.ConfigParser()
-        self.config.readfp(open(file))
+        with open(file) as f:
+            self.config.readfp(f)
+        f.closed
         self.section = section
 
     def get(self, key, type="string"):
-        """Retrieve configuration values
-
-        Args:
-            key
-            type (optional)
-        """
+        """ Retrieve configuration values """
         if type == "int":
             return self.config.getint(self.section, key)
         elif type == "bool":

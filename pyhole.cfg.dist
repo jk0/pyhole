@@ -1,0 +1,7 @@
+[pyhole]
+server: irc.freenode.net
+port: 6667
+nick: mynick
+channel: #mychannel
+command_prefix: .
+debug: False

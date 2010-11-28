@@ -1,33 +1,28 @@
 #!/usr/bin/env python
-"""
-pyhole - A simple, yet modular IRC bot written in Python.
-"""
+""" pyhole - A simple, yet modular IRC bot written in Python. """
 
 
 import logging
 import time
 
 from pyhole import config
-from pyhole import irc 
+from pyhole import irc
 
 
 conf = config.Config("pyhole.cfg", "pyhole")
 
-def logger(name):
-    """Log handler
 
-    Args:
-        name
-    """
+def logger(name):
+    """ Log handler """
     debug = conf.get("debug", "bool")
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
-        format="%(asctime)s [%(name)s:%(levelname)s] %(message)s"
-    )
+        format="%(asctime)s [%(name)s:%(levelname)s] %(message)s")
     return logging.getLogger(name)
 
+
 def main():
-    """Main Loop"""
+    """ Main Loop """
     log = logger("MAIN")
 
     while True:
