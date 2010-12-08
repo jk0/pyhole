@@ -23,9 +23,6 @@ class IRC(irclib.SimpleIRCClient):
         self.nick = config.get("nick")
         self.channel = config.get("channel")
         self.command_prefix = config.get("command_prefix")
-        self.commands = []
-        self.modules = []
-        self.target = ""
         self.load_modules()
 
         self.log.info("Connecting to %s:%d as %s" % (
@@ -36,6 +33,9 @@ class IRC(irclib.SimpleIRCClient):
 
     def load_modules(self):
         """Load modules and their classes respectively"""
+        self.modules = []
+        self.commands = []
+
         for name in dir(modules):
             if not name.startswith("__"):
                 module = "global %s\n%s = modules.%s.%s(self)" % (
@@ -133,7 +133,10 @@ class IRC(irclib.SimpleIRCClient):
 
         if self.target != self.nick:
             self.log.info("<%s> %s" % (self.target, msg))
-            self.poll_messages(msg, privmsg=True)
+            try:
+                self.poll_messages(msg, privmsg=True)
+            except Exception as e:
+                self.log.error(e)
 
     def on_pubmsg(self, connection, event):
         """Handle public messages"""
@@ -143,4 +146,7 @@ class IRC(irclib.SimpleIRCClient):
 
         if self.target == self.channel:
             self.log.info("%s <%s> %s" % (self.target, nick, msg))
-            self.poll_messages(msg)
+            try:
+                self.poll_messages(msg)
+            except Exception as e:
+                self.log.error(e)

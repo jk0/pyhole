@@ -11,7 +11,6 @@ from pyhole import irc
 
 conf = config.Config("pyhole.cfg", "pyhole")
 
-
 def logger(name):
     """Log handler"""
     debug = conf.get("debug", "bool")
@@ -20,29 +19,21 @@ def logger(name):
         format="%(asctime)s [%(name)s:%(levelname)s] %(message)s")
     return logging.getLogger(name)
 
-
 def main():
     """Main Loop"""
     log = logger("MAIN")
+    reconnect_delay = conf.get("reconnect_delay", "int")
 
     while True:
         try:
             connection = irc.IRC(conf, logger("IRC"))
-        except Exception, e:
+        except Exception as e:
             log.error(e)
-            log.info("Unable to connect -- trying again in 60 seconds")
-            time.sleep(60)
+            log.error("Retrying in %d seconds" % reconnect_delay)
+            time.sleep(reconnect_delay)
             continue
 
-        try:
-            while True:
-                connection.ircobj.process_once()
-        except Exception, e:
-            log.error(e)
-            pass
-
-        time.sleep(30)
-
+        connection.ircobj.process_forever()
 
 if __name__ == "__main__":
     main()

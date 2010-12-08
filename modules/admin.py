@@ -32,7 +32,8 @@ class Admin(object):
 
     def reload(self):
         """Reload all modules"""
-        pass
+        self.irc.load_modules()
+        self.irc.send_msg("Loaded Modules: %s" % ", ".join(self.irc.modules))
 
     def join(self, params):
         """Join a channel"""
