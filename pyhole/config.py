@@ -1,4 +1,4 @@
-""" Intelligent Configuration Library """
+"""Intelligent Configuration Library"""
 
 
 import argparse
@@ -6,7 +6,7 @@ import ConfigParser
 
 
 class Config(object):
-    """ A configuration object """
+    """A configuration object"""
 
     def __init__(self, file, section):
         self.parser = argparse.ArgumentParser()
@@ -19,7 +19,7 @@ class Config(object):
         self.section = section
 
     def get(self, key, type="string"):
-        """ Retrieve configuration values """
+        """Retrieve configuration values"""
         if type == "int":
             return self.config.getint(self.section, key)
         elif type == "bool":

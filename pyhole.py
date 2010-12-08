@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-""" pyhole - A modular IRC bot for Python developers. """
+"""pyhole - A modular IRC bot for Python developers."""
 
 
 import logging
@@ -13,7 +13,7 @@ conf = config.Config("pyhole.cfg", "pyhole")
 
 
 def logger(name):
-    """ Log handler """
+    """Log handler"""
     debug = conf.get("debug", "bool")
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
@@ -22,7 +22,7 @@ def logger(name):
 
 
 def main():
-    """ Main Loop """
+    """Main Loop"""
     log = logger("MAIN")
 
     while True:
