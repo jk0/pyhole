@@ -24,5 +24,7 @@ class Config(object):
             return self.config.getint(self.section, key)
         elif type == "bool":
             return self.config.getboolean(self.section, key)
+        elif type == "list":
+            return self.config.get(self.section, key).split(",")
         else:
             return self.config.get(self.section, key)

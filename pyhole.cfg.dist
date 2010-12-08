@@ -2,7 +2,7 @@
 server: irc.freenode.net
 port: 6667
 nick: mynick
-channel: #mychannel
+channels: #mychannel,#mychannel2
 command_prefix: .
 reconnect_delay: 60
 debug: False
