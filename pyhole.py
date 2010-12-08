@@ -11,6 +11,7 @@ from pyhole import irc
 
 conf = config.Config("pyhole.cfg", "pyhole")
 
+
 def logger(name):
     """Log handler"""
     debug = conf.get("debug", "bool")
@@ -18,6 +19,7 @@ def logger(name):
         level=logging.DEBUG if debug else logging.INFO,
         format="%(asctime)s [%(name)s:%(levelname)s] %(message)s")
     return logging.getLogger(name)
+
 
 def main():
     """Main Loop"""
