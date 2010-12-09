@@ -3,6 +3,7 @@
 
 import inspect
 import irclib
+import random
 import re
 import time
 
@@ -94,6 +95,11 @@ class IRC(irclib.SimpleIRCClient):
             else:
                 self.connection.join(channel[0])
 
+    def set_nick(self, params):
+        """Set IRC nick"""
+        self.nick = params
+        self.connection.nick(params)
+
     def part_channel(self, params):
         """Part a channel"""
         self.channels.remove(params)
@@ -102,9 +108,11 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_nicknameinuse(self, connection, event):
         """Ensure the use of unique IRC nick"""
+        random_int = random.randint(1, 100)
         self.log.info("IRC nick '%s' is currently in use" % self.nick)
-        connection.nick("_%s_" % self.nick)
-        self.log.info("Setting IRC nick to '_%s_'" % self.nick)
+        self.nick = "%s%d" % (self.nick, random_int)
+        self.log.info("Setting IRC nick to '%s'" % self.nick)
+        connection.nick("%s" % self.nick)
 
     def on_welcome(self, connection, event):
         """Join channel upon successful connection"""

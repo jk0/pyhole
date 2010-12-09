@@ -42,6 +42,13 @@ class Admin(object):
         else:
             self.irc.send_msg(self.info.__doc__)
 
+    def nick(self, params=None):
+        """Change IRC nick (ex: .nick <nick>)"""
+        if params:
+            self.irc.set_nick(params)
+        else:
+            self.irc.send_msg(self.nick.__doc__)
+
     def join(self, params=None):
         """Join a channel (ex: .join #channel [<key>])"""
         if params:
