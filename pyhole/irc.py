@@ -38,6 +38,8 @@ class IRC(irclib.SimpleIRCClient):
         self.modules = []
         self.commands = []
 
+        if reload_mods:
+            reload(modules)
         for name in dir(modules):
             if not name.startswith("__"):
                 module = "global %s\n%s = modules.%s.%s(self)" % (
@@ -69,10 +71,10 @@ class IRC(irclib.SimpleIRCClient):
         c = needle.split(".", 1)
         m = re.match(pattern_p % (self.command_prefix, c[1]), haystack)
         if m:
-            self.log.debug("Evaluating: %s(\"%s\")" % (".".join(c), m.group(1)))
+            self.log.debug("Eval: %s(\"%s\")" % (".".join(c), m.group(1)))
             eval("%s(\"%s\")" % (".".join(c), m.group(1)))
         elif re.match(pattern % (self.command_prefix, c[1]), haystack):
-            self.log.debug("Evaluating: %s()" % ".".join(c))
+            self.log.debug("Eval: %s()" % ".".join(c))
             eval("%s()" % ".".join(c))
 
     def poll_messages(self, message):
@@ -84,6 +86,16 @@ class IRC(irclib.SimpleIRCClient):
         """Send a privmsg"""
         self.connection.privmsg(self.target, msg)
 
+    def op(self, params):
+        """Op a user"""
+        params = params.split(" ", 1)
+        self.connection.mode(params[0], "+o %s" % params[1])
+
+    def set_nick(self, params):
+        """Set IRC nick"""
+        self.nick = params
+        self.connection.nick(params)
+
     def join_channel(self, params):
         """Join a channel"""
         channel = params.split(" ", 1)
@@ -94,11 +106,6 @@ class IRC(irclib.SimpleIRCClient):
                 self.connection.join(channel[0], channel[1])
             else:
                 self.connection.join(channel[0])
-
-    def set_nick(self, params):
-        """Set IRC nick"""
-        self.nick = params
-        self.connection.nick(params)
 
     def part_channel(self, params):
         """Part a channel"""

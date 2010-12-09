@@ -42,6 +42,13 @@ class Admin(object):
         else:
             self.irc.send_msg(self.info.__doc__)
 
+    def op(self, params=None):
+        """Op a user (ex: .op <channel> <nick>)"""
+        if params:
+            self.irc.op(params)
+        else:
+            self.irc.send_msg(self.op.__doc__)
+
     def nick(self, params=None):
         """Change IRC nick (ex: .nick <nick>)"""
         if params:
