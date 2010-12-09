@@ -112,7 +112,7 @@ class IRC(irclib.SimpleIRCClient):
         """Send a privmsg"""
         self.connection.privmsg(self.target, msg)
 
-    def op(self, params):
+    def op_user(self, params):
         """Op a user"""
         params = params.split(" ", 1)
         self.connection.mode(params[0], "+o %s" % params[1])

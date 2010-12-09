@@ -4,6 +4,17 @@
 import sys
 
 
+def admin(func):
+    """Administration Decorator"""
+
+    def f(self, *args):
+        if self.irc.source == self.irc.admin:
+            func(self, *args)
+        else:
+            self.irc.send_msg("Sorry, you are not authorized to do that.")
+    return f
+
+
 class Admin(object):
     """Provide administration functionality"""
 
@@ -30,14 +41,13 @@ class Admin(object):
             self.irc.send_msg(self.help.__doc__)
             self.irc.send_msg(self.irc.active_commands())
 
+    @admin
     def reload(self):
         """Reload all modules"""
-        if self.irc.source == self.irc.admin:
-            self.irc.load_modules(reload_mods=True)
-            self.irc.send_msg(self.irc.active_modules())
-        else:
-            self.irc.send_msg("NO!")
+        self.irc.load_modules(reload_mods=True)
+        self.irc.send_msg(self.irc.active_modules())
 
+    @admin
     def info(self, params=None):
         """Access various statistics (ex: .info <topic>)"""
         if params == "channels":
@@ -45,13 +55,15 @@ class Admin(object):
         else:
             self.irc.send_msg(self.info.__doc__)
 
+    @admin
     def op(self, params=None):
         """Op a user (ex: .op <channel> <nick>)"""
         if params:
-            self.irc.op(params)
+            self.irc.op_user(params)
         else:
             self.irc.send_msg(self.op.__doc__)
 
+    @admin
     def nick(self, params=None):
         """Change IRC nick (ex: .nick <nick>)"""
         if params:
@@ -59,6 +71,7 @@ class Admin(object):
         else:
             self.irc.send_msg(self.nick.__doc__)
 
+    @admin
     def join(self, params=None):
         """Join a channel (ex: .join #channel [<key>])"""
         if params:
@@ -66,6 +79,7 @@ class Admin(object):
         else:
             self.irc.send_msg(self.join.__doc__)
 
+    @admin
     def part(self, params=None):
         """Part a channel (ex: .part <channel>)"""
         if params:
@@ -73,6 +87,7 @@ class Admin(object):
         else:
             self.irc.send_msg(self.part.__doc__)
 
+    @admin
     def quit(self):
         """Quit and shutdown"""
         self.irc.connection.quit()

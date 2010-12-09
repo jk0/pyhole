@@ -3,7 +3,7 @@ admin: yournick!ident@hostname.tld
 server: irc.freenode.net
 port: 6667
 nick: mynick
-channels: #mychannel,#mychannel2
+channels: #mychannel, #mychannel2
 command_prefix: .
 reconnect_delay: 60
 debug: False
