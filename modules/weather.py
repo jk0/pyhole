@@ -10,7 +10,7 @@ class Weather(object):
     def __init__(self, irc):
         self.irc = irc
 
-    def w(self, params=None):
+    def weather(self, params=None):
         """Display current weather report (ex: .w <location>)"""
         if params:
             weather = pywapi.get_weather_from_google(params)
@@ -34,4 +34,8 @@ class Weather(object):
             else:
                 self.irc.send_msg("'%s' not found." % params)
         else:
-            self.irc.send_msg(self.w.__doc__)
+            self.irc.send_msg(self.weather.__doc__)
+
+    def w(self, params=None):
+        """Alias of weather"""
+        self.weather(params)
