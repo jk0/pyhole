@@ -11,7 +11,7 @@ class Admin(object):
         self.irc = irc
 
     def help(self, params=None):
-        """Learn how to use active modules (ex: .help <topic>)"""
+        """Learn how to use active modules (ex: .help <module.command>)"""
         if params:
             # Temporarily load the class for __doc__ access
             module = params.split(".")[0]
@@ -32,8 +32,11 @@ class Admin(object):
 
     def reload(self):
         """Reload all modules"""
-        self.irc.load_modules(reload_mods=True)
-        self.irc.send_msg(self.irc.active_modules())
+        if self.irc.source == self.irc.admin:
+            self.irc.load_modules(reload_mods=True)
+            self.irc.send_msg(self.irc.active_modules())
+        else:
+            self.irc.send_msg("NO!")
 
     def info(self, params=None):
         """Access various statistics (ex: .info <topic>)"""

@@ -19,6 +19,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log = logger
         self.config = config
 
+        self.admin = config.get("admin")
         self.server = config.get("server")
         self.port = config.get("port", "int")
         self.nick = config.get("nick")
@@ -66,8 +67,8 @@ class IRC(irclib.SimpleIRCClient):
         """List active channels"""
         return "Active Channels: %s" % ", ".join(self.channels)
 
-    def match_command(self, pattern_p, pattern, needle, haystack):
-        """Match a command in a message"""
+    def match_direct(self, pattern_p, pattern, needle, haystack):
+        """Match a direct command in a message"""
         c = needle.split(".", 1)
         m = re.match(pattern_p % (self.command_prefix, c[1]), haystack)
         if m:
@@ -77,10 +78,35 @@ class IRC(irclib.SimpleIRCClient):
             self.log.debug("Eval: %s()" % ".".join(c))
             eval("%s()" % ".".join(c))
 
-    def poll_messages(self, message):
+    def match_addressed(self, pattern_p, pattern, needle, haystack):
+        """Match an addressed command in a message"""
+        c = needle.split(".", 1)
+        m = re.match(pattern_p % (self.nick, c[1]), haystack)
+        if m:
+            self.log.debug("Eval: %s(\"%s\")" % (".".join(c), m.group(1)))
+            eval("%s(\"%s\")" % (".".join(c), m.group(1)))
+        elif re.match(pattern % (self.nick, c[1]), haystack):
+            self.log.debug("Eval: %s()" % ".".join(c))
+            eval("%s()" % ".".join(c))
+
+    def match_private(self, pattern_p, pattern, needle, haystack):
+        """Match a command in a private message"""
+        c = needle.split(".", 1)
+        m = re.match(pattern_p % c[1], haystack)
+        if m:
+            self.log.debug("Eval: %s(\"%s\")" % (".".join(c), m.group(1)))
+            eval("%s(\"%s\")" % (".".join(c), m.group(1)))
+        elif re.match(pattern % c[1], haystack):
+            self.log.debug("Eval: %s()" % ".".join(c))
+            eval("%s()" % ".".join(c))
+
+    def poll_messages(self, message, private=False):
         """Watch for known commands"""
         for command in self.commands:
-            self.match_command("^%s%s (.+)$", "^%s%s$", command, message)
+            self.match_direct("^%s%s (.+)$", "^%s%s$", command, message)
+            self.match_addressed("^%s: %s (.+)$", "^%s: %s$", command, message)
+            if private:
+                self.match_private("^%s (.+)$", "^%s$", command, message)
 
     def send_msg(self, msg):
         """Send a privmsg"""
@@ -137,18 +163,20 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_privmsg(self, connection, event):
         """Handle private messages"""
+        self.source = event.source()
         self.target = event.source().split("!")[0]
         msg = event.arguments()[0]
 
         if self.target != self.nick:
             self.log.info("<%s> %s" % (self.target, msg))
             try:
-                self.poll_messages(msg)
+                self.poll_messages(msg, private=True)
             except Exception as e:
                 self.log.error(e)
 
     def on_pubmsg(self, connection, event):
         """Handle public messages"""
+        self.source = event.source()
         self.target = event.target()
         nick = event.source().split("!")[0]
         msg = event.arguments()[0]
