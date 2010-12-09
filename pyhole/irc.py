@@ -52,75 +52,39 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info(self.active_modules())
 
     def active_modules(self):
+        """List active modules"""
         return "Loaded Modules: %s" % ", ".join(self.modules)
 
     def active_commands(self):
+        """List active commands"""
         return ", ".join(self.commands)
 
     def active_channels(self):
+        """List active channels"""
         return "Active Channels: %s" % ", ".join(self.channels)
 
-    def poll_messages(self, message, privmsg=False):
+    def match_command(self, pattern_p, pattern, needle, haystack):
+        """Match a command in a message"""
+        c = needle.split(".", 1)
+        m = re.match(pattern_p % (self.command_prefix, c[1]), haystack)
+        if m:
+            self.log.debug("Evaluating: %s(\"%s\")" % (".".join(c), m.group(1)))
+            eval("%s(\"%s\")" % (".".join(c), m.group(1)))
+        elif re.match(pattern % (self.command_prefix, c[1]), haystack):
+            self.log.debug("Evaluating: %s()" % ".".join(c))
+            eval("%s()" % ".".join(c))
+
+    def poll_messages(self, message):
         """Watch for known commands"""
         for command in self.commands:
-            command = command.split(".", 1)
-            if privmsg:
-                match = re.match("^%s%s (.+)$" % (
-                    self.command_prefix,
-                    command[1]), message)
-                if match:
-                    self.log.debug("Evaluating: %s(\"%s\")" % (
-                        ".".join(command),
-                        match.group(1)))
-                    eval("%s(\"%s\")" % (".".join(command), match.group(1)))
-                elif re.match("^%s%s$" % (
-                    self.command_prefix,
-                    command[1]), message):
-                    self.log.debug("Evaluating: %s()" % ".".join(command))
-                    eval("%s()" % ".".join(command))
-
-                match = re.match("^%s (.+)$" % command[1], message)
-                if match:
-                    self.log.debug("Evaluating: %s(\"%s\")" % (
-                        ".".join(command),
-                        match.group(1)))
-                    eval("%s(\"%s\")" % (".".join(command), match.group(1)))
-                elif re.match("^%s$" % command[1], message):
-                    self.log.debug("Evaluating: %s()" % ".".join(command))
-                    eval("%s()" % ".".join(command))
-            else:
-                match = re.match("^%s%s (.+)$" % (
-                    self.command_prefix,
-                    command[1]), message)
-                if match:
-                    self.log.debug("Evaluating: %s(\"%s\")" % (
-                        ".".join(command),
-                        match.group(1)))
-                    eval("%s(\"%s\")" % (".".join(command), match.group(1)))
-                elif re.match("^%s%s$" % (
-                    self.command_prefix,
-                    command[1]), message):
-                    self.log.debug("Evaluating: %s()" % ".".join(command))
-                    eval("%s()" % ".".join(command))
-
-                match = re.match("^%s: %s (.+)$" % (
-                    self.nick,
-                    command[1]), message)
-                if match:
-                    self.log.debug("Evaluating: %s(\"%s\")" % (
-                        ".".join(command),
-                        match.group(1)))
-                    eval("%s(\"%s\")" % (".".join(command), match.group(1)))
-                elif re.match("^%s: %s$" % (
-                    self.nick,
-                    command[1]), message):
-                    self.log.debug("Evaluating: %s()" % ".".join(command))
-                    eval("%s()" % ".".join(command))
+            self.match_command("^%s%s (.+)$", "^%s%s$", command, message)
 
     def send_msg(self, msg):
+        """Send a privmsg"""
         self.connection.privmsg(self.target, msg)
 
     def join_channel(self, params):
+        """Join a channel"""
         channel = params.split(" ", 1)
         self.send_msg("Joining %s" % channel[0])
         if irclib.is_channel(channel[0]):
@@ -131,6 +95,7 @@ class IRC(irclib.SimpleIRCClient):
                 self.connection.join(channel[0])
 
     def part_channel(self, params):
+        """Part a channel"""
         self.channels.remove(params)
         self.send_msg("Parting %s" % params)
         self.connection.part(params)
@@ -163,7 +128,7 @@ class IRC(irclib.SimpleIRCClient):
         if self.target != self.nick:
             self.log.info("<%s> %s" % (self.target, msg))
             try:
-                self.poll_messages(msg, privmsg=True)
+                self.poll_messages(msg)
             except Exception as e:
                 self.log.error(e)
 
