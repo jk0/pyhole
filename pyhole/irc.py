@@ -2,11 +2,11 @@
 
 
 import inspect
-import irclib
 import random
 import re
 import time
 
+import irclib
 import modules
 
 
@@ -22,6 +22,7 @@ class IRC(irclib.SimpleIRCClient):
         self.admin = config.get("admin")
         self.server = config.get("server")
         self.port = config.get("port", "int")
+        self.ssl = config.get("ssl", "bool")
         self.nick = config.get("nick")
         self.channels = config.get("channels", "list")
         self.command_prefix = config.get("command_prefix")
@@ -32,7 +33,7 @@ class IRC(irclib.SimpleIRCClient):
             self.server,
             self.port,
             self.nick))
-        self.connect(self.server, self.port, self.nick)
+        self.connect(self.server, self.port, self.nick, ssl=self.ssl)
 
     def load_modules(self, reload_mods=False):
         """Load modules and their classes respectively"""
@@ -163,8 +164,8 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_privmsg(self, connection, event):
         """Handle private messages"""
-        self.source = event.source()
-        self.target = event.source().split("!")[0]
+        self.source = event.source().split("@", 1)[0]
+        self.target = event.source().split("!", 1)[0]
         msg = event.arguments()[0]
 
         if self.target != self.nick:
@@ -176,9 +177,9 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_pubmsg(self, connection, event):
         """Handle public messages"""
-        self.source = event.source()
+        self.source = event.source().split("@", 1)[0]
         self.target = event.target()
-        nick = event.source().split("!")[0]
+        nick = event.source().split("!", 1)[0]
         msg = event.arguments()[0]
 
         self.log.info("%s <%s> %s" % (self.target, nick, msg))

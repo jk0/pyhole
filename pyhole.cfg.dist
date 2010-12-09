@@ -1,5 +1,5 @@
 [pyhole]
-admin: yournick!ident@hostname.tld
+admin: nick!ident
 server: irc.freenode.net
 port: 6667
 nick: mynick
