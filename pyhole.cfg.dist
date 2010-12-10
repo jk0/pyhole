@@ -1,10 +1,13 @@
 [pyhole]
 admin: nick!ident
-server: irc.freenode.net
-port: 6667
-nick: mynick
-channels: #mychannel, #mychannel2
 command_prefix: .
 reconnect_delay: 60
-rejoin_delay: 3
+rejoin_delay: 5
 debug: False
+
+[FreeNode]
+server: irc.freenode.net
+port: 6667
+ssl: False
+nick: mynick
+channels: #mychannel, #mychannel2

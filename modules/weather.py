@@ -42,7 +42,7 @@ class Weather(object):
                     self.irc.log.debug("Caching weather data (%s)" % params)
                     mc.set(params, result, 600)
                 else:
-                    self.irc.say("'%s' not found." % params)
+                    self.irc.say("Location not found: '%s'" % params)
         else:
             self.irc.say(self.weather.__doc__)
 

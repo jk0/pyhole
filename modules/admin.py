@@ -12,6 +12,7 @@ def admin(func):
             func(self, *args)
         else:
             self.irc.say("Sorry, you are not authorized to do that.")
+    f.__doc__ = func.__doc__
     return f
 
 

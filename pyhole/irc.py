@@ -13,22 +13,23 @@ import modules
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, logger, version):
+    def __init__(self, config, network, logger, version):
         irclib.SimpleIRCClient.__init__(self)
 
         self.log = logger
-        self.config = config
         self.version = version
 
         self.admin = config.get("admin")
-        self.server = config.get("server")
-        self.port = config.get("port", "int")
-        self.ssl = config.get("ssl", "bool")
-        self.nick = config.get("nick")
-        self.channels = config.get("channels", "list")
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", "int")
         self.rejoin_delay = config.get("rejoin_delay", "int")
+
+        self.server = network.get("server")
+        self.port = network.get("port", "int")
+        self.ssl = network.get("ssl", "bool")
+        self.nick = network.get("nick")
+        self.channels = network.get("channels", "list")
+
         self.load_modules()
 
         self.log.info("Connecting to %s:%d as %s" % (
@@ -182,9 +183,9 @@ class IRC(irclib.SimpleIRCClient):
         ctcp = event.arguments()[0]
 
         if ctcp == "VERSION":
-            version = "pyhole v%s - https://github.com/jk0/pyhole" % self.version
+            v = "pyhole v%s - https://github.com/jk0/pyhole" % self.version
             self.log.info("Received CTCP VERSION from %s" % self.source)
-            connection.ctcp_reply(self.source, "VERSION %s" % version)
+            connection.ctcp_reply(self.source, "VERSION %s" % v)
         elif ctcp == "PING":
             if len(event.arguments()) > 1:
                 self.log.info("Received CTCP PING from %s" % self.source)

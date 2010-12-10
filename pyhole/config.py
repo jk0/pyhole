@@ -1,22 +1,27 @@
 """Intelligent Configuration Library"""
 
 
-import argparse
 import ConfigParser
+import sys
 
 
 class Config(object):
     """A configuration object"""
 
     def __init__(self, file, section):
-        self.parser = argparse.ArgumentParser()
-        self.args = self.parser.parse_args()
-
         self.config = ConfigParser.ConfigParser()
-        with open(file) as f:
-            self.config.readfp(f)
-        f.closed
         self.section = section
+
+        try:
+            with open(file) as f:
+                self.config.readfp(f)
+            f.closed
+        except IOError:
+            sys.exit("No such file: '%s'" % file)
+
+    def sections(self):
+        """Return a list of sections"""
+        return self.config.sections()
 
     def get(self, key, type="string"):
         """Retrieve configuration values"""
