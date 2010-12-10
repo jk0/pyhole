@@ -1,9 +1,6 @@
 """Pyhole Administration"""
 
 
-import sys
-
-
 def admin(func):
     """Administration Decorator"""
 
@@ -26,18 +23,21 @@ class Admin(object):
         """Learn how to use active modules (ex: .help <module.command>)"""
         if params:
             # Temporarily load the class for __doc__ access
-            module = params.split(".")[0]
-            exec("import %s\n%s = %s.%s(self.irc)" % (
-                module,
-                module.capitalize(),
-                module,
-                module.capitalize()))
+            try:
+                module = params.split(".")[0]
+                exec("import %s\n%s = %s.%s(self.irc)" % (
+                    module,
+                    module.capitalize(),
+                    module,
+                    module.capitalize()))
 
-            doc = eval("%s.__doc__" % params.capitalize())
-            self.irc.say(doc)
+                doc = eval("%s.__doc__" % params.capitalize())
+                self.irc.say(doc)
 
-            # Destroy the class
-            exec("%s = None" % module.capitalize())
+                # Destroy the class
+                exec("%s = None" % module.capitalize())
+            except ImportError as e:
+                self.irc.log.error(e)
         else:
             self.irc.say(self.help.__doc__)
             self.irc.say(self.irc.active_commands())
@@ -87,9 +87,3 @@ class Admin(object):
             self.irc.part_channel(params)
         else:
             self.irc.say(self.part.__doc__)
-
-    @admin
-    def quit(self):
-        """Quit and shutdown"""
-        self.irc.connection.quit()
-        sys.exit(0)

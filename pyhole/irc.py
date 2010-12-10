@@ -208,10 +208,7 @@ class IRC(irclib.SimpleIRCClient):
 
         if self.target != self.nick:
             self.log.info("<%s> %s" % (self.target, msg))
-            try:
-                self.poll_messages(msg, private=True)
-            except Exception as e:
-                self.log.error(e)
+            self.poll_messages(msg, private=True)
 
     def on_pubmsg(self, connection, event):
         """Handle public messages"""
@@ -221,7 +218,4 @@ class IRC(irclib.SimpleIRCClient):
         msg = event.arguments()[0]
 
         self.log.info("%s <%s> %s" % (self.target, nick, msg))
-        try:
-            self.poll_messages(msg)
-        except Exception as e:
-            self.log.error(e)
+        self.poll_messages(msg)

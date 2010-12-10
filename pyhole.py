@@ -41,29 +41,22 @@ def main():
     reconnect_delay = bot.get("reconnect_delay", "int")
 
     while True:
-        try:
-            for network in networks:
+        for network in networks:
+            try:
                 connection = irc.IRC(
                     bot,
                     config.Config(__config__, network),
                     logger(network),
                     __version__)
-        except Exception as e:
-            log.error(e)
-            log.error("Retrying in %d seconds" % reconnect_delay)
-            try:
-                time.sleep(reconnect_delay)
-                continue
-            except KeyboardInterrupt:
-                log.info("Shutting down")
-                sys.exit(0)
 
-        try:
-            for network in networks:
-                connection.start()
-        except KeyboardInterrupt:
-            log.info("Shutting down")
-            sys.exit(0)
+                try:
+                    connection.start()
+                except KeyboardInterrupt:
+                    sys.exit(0)
+            except Exception as e:
+                log.error(e)
+                log.error("Retrying in %d seconds" % reconnect_delay)
+                time.sleep(reconnect_delay)
 
 
 if __name__ == "__main__":
