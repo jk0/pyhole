@@ -6,6 +6,8 @@ import re
 import simplejson
 import urllib
 
+from pyhole import utils
+
 
 class Search(object):
     """Provide access to search engines"""
@@ -13,6 +15,7 @@ class Search(object):
     def __init__(self, irc):
         self.irc = irc
 
+    @utils.spawn
     def google(self, params=None):
         """Search Google (ex: .g <query>)"""
         if params:
@@ -36,6 +39,7 @@ class Search(object):
         """Alias of google"""
         self.google(params)
 
+    @utils.spawn
     def imdb(self, params=None):
         """Search IMDb (ex: .imdb <query>)"""
         if params:
@@ -52,6 +56,7 @@ class Search(object):
         else:
             self.irc.say(self.imdb.__doc__)
 
+    @utils.spawn
     def twitter(self, params=None):
         """Search Twitter (ex: .twitter <query>)"""
         if params:
@@ -70,6 +75,7 @@ class Search(object):
         else:
             self.irc.say(self.twitter.__doc__)
 
+    @utils.spawn
     def urban(self, params=None):
         """Search Urban Dictionary (ex: .urban <query>)"""
         if params:
@@ -92,6 +98,7 @@ class Search(object):
         else:
             self.irc.say(self.urban.__doc__)
 
+    @utils.spawn
     def youtube(self, params=None):
         """Search YouTube (ex: .youtube <query>)"""
         if params:

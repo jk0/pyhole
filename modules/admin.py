@@ -1,16 +1,9 @@
 """Pyhole Administration"""
 
 
-def admin(func):
-    """Administration Decorator"""
+import sys
 
-    def f(self, *args):
-        if self.irc.source == self.irc.admin:
-            func(self, *args)
-        else:
-            self.irc.say("Sorry, you are not authorized to do that.")
-    f.__doc__ = func.__doc__
-    return f
+from pyhole import utils
 
 
 class Admin(object):
@@ -42,13 +35,13 @@ class Admin(object):
             self.irc.say(self.help.__doc__)
             self.irc.say(self.irc.active_commands())
 
-    @admin
-    def reload(self):
+    @utils.admin
+    def reload(self, params=None):
         """Reload all modules"""
         self.irc.load_modules(reload_mods=True)
         self.irc.say(self.irc.active_modules())
 
-    @admin
+    @utils.admin
     def info(self, params=None):
         """Access various statistics (ex: .info <topic>)"""
         if params == "channels":
@@ -56,7 +49,7 @@ class Admin(object):
         else:
             self.irc.say(self.info.__doc__)
 
-    @admin
+    @utils.admin
     def op(self, params=None):
         """Op a user (ex: .op <channel> <nick>)"""
         if params:
@@ -64,7 +57,7 @@ class Admin(object):
         else:
             self.irc.say(self.op.__doc__)
 
-    @admin
+    @utils.admin
     def nick(self, params=None):
         """Change IRC nick (ex: .nick <nick>)"""
         if params:
@@ -72,7 +65,7 @@ class Admin(object):
         else:
             self.irc.say(self.nick.__doc__)
 
-    @admin
+    @utils.admin
     def join(self, params=None):
         """Join a channel (ex: .join #channel [<key>])"""
         if params:
@@ -80,10 +73,16 @@ class Admin(object):
         else:
             self.irc.say(self.join.__doc__)
 
-    @admin
+    @utils.admin
     def part(self, params=None):
         """Part a channel (ex: .part <channel>)"""
         if params:
             self.irc.part_channel(params)
         else:
             self.irc.say(self.part.__doc__)
+
+    @utils.admin
+    def quit(self, params=None):
+        """Quit and shut down"""
+        self.irc.say("Later!")
+        sys.exit(0)

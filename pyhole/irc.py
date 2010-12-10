@@ -6,8 +6,6 @@ import random
 import re
 import time
 
-from threading import Thread
-
 import irclib
 import modules
 
@@ -101,15 +99,15 @@ class IRC(irclib.SimpleIRCClient):
             self.dispatch_command(needle)
 
     def dispatch_command(self, command, params=None):
-        if params:
-            self.log.debug("Threading: %s(\"%s\")" % (command, params))
-            exec("t = Thread(target=%s, args=(\"%s\",))" % (
-                command,
-                params))
-        else:
-            self.log.debug("Threading: %s()" % command)
-            exec("t = Thread(target=%s)" % command)
-        eval("t.start()")
+        try:
+            if params:
+                exec("%s(\"%s\")" % (command, params))
+                self.log.debug("Eval: %s(\"%s\")" % (command, params))
+            else:
+                exec("%s()" % command)
+                self.log.debug("Eval: %s()" % command)
+        except Exception as e:
+            self.log.error(e)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""

@@ -4,6 +4,8 @@
 import re
 import urllib
 
+from pyhole import utils
+
 
 class Entertainment(object):
     """Provide access to entertaining sites"""
@@ -11,7 +13,8 @@ class Entertainment(object):
     def __init__(self, irc):
         self.irc = irc
 
-    def grouphug(self):
+    @utils.spawn
+    def grouphug(self, params=None):
         """Display a random Group Hug (ex: .grouphug)"""
         url = "http://grouphug.us/random"
         response = urllib.urlopen(url)
@@ -31,7 +34,8 @@ class Entertainment(object):
         else:
             self.irc.say("Unable to parse GH data")
 
-    def lastnight(self):
+    @utils.spawn
+    def lastnight(self, params=None):
         """Display a random Text From Last Night (ex: .lastnight)"""
         url = "http://www.textsfromlastnight.com/" \
             "Random-Texts-From-Last-Night.html"
