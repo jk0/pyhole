@@ -22,12 +22,12 @@ class Search(object):
             json = simplejson.loads(response.read())
             results = json["responseData"]["results"]
             for result in results:
-                self.irc.send_msg("%s: %s" % (
+                self.irc.say("%s: %s" % (
                     result["titleNoFormatting"].encode("ascii", "ignore"),
                     result["unescapedUrl"]))
                 time.sleep(.10)
         else:
-            self.irc.send_msg(self.google.__doc__)
+            self.irc.say(self.google.__doc__)
 
     def g(self, params=None):
         """Alias of google"""

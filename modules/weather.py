@@ -19,7 +19,7 @@ class Weather(object):
 
             if weather:
                 self.irc.log.debug("Fetching cached weather (%s)" % params)
-                self.irc.send_msg(weather)
+                self.irc.say(weather)
             else:
                 w = pywapi.get_weather_from_google(params)
                 if w["current_conditions"]:
@@ -37,14 +37,14 @@ class Weather(object):
                         humidity,
                         wind,
                         condition)
-                    self.irc.send_msg(result)
+                    self.irc.say(result)
 
                     self.irc.log.debug("Caching weather data (%s)" % params)
                     mc.set(params, result, 600)
                 else:
-                    self.irc.send_msg("'%s' not found." % params)
+                    self.irc.say("'%s' not found." % params)
         else:
-            self.irc.send_msg(self.weather.__doc__)
+            self.irc.say(self.weather.__doc__)
 
     def w(self, params=None):
         """Alias of weather"""

@@ -10,6 +10,8 @@ from pyhole import config
 from pyhole import irc
 
 
+__version__ = "0.0.1"
+
 conf = config.Config("pyhole.cfg", "pyhole")
 
 
@@ -29,7 +31,7 @@ def main():
 
     while True:
         try:
-            connection = irc.IRC(conf, logger("IRC"))
+            connection = irc.IRC(conf, logger("IRC"), __version__)
         except Exception as e:
             log.error(e)
             log.error("Retrying in %d seconds" % reconnect_delay)

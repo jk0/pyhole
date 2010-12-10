@@ -13,11 +13,12 @@ import modules
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, logger):
+    def __init__(self, config, logger, version):
         irclib.SimpleIRCClient.__init__(self)
 
         self.log = logger
         self.config = config
+        self.version = version
 
         self.admin = config.get("admin")
         self.server = config.get("server")
@@ -110,7 +111,7 @@ class IRC(irclib.SimpleIRCClient):
             if private:
                 self.match_private("^%s (.+)$", "^%s$", command, message)
 
-    def send_msg(self, msg):
+    def say(self, msg):
         """Send a privmsg"""
         self.connection.privmsg(self.target, msg)
 
@@ -127,7 +128,7 @@ class IRC(irclib.SimpleIRCClient):
     def join_channel(self, params):
         """Join a channel"""
         channel = params.split(" ", 1)
-        self.send_msg("Joining %s" % channel[0])
+        self.say("Joining %s" % channel[0])
         if irclib.is_channel(channel[0]):
             self.channels.append(channel[0])
             if len(channel) > 1:
@@ -138,7 +139,7 @@ class IRC(irclib.SimpleIRCClient):
     def part_channel(self, params):
         """Part a channel"""
         self.channels.remove(params)
-        self.send_msg("Parting %s" % params)
+        self.say("Parting %s" % params)
         self.connection.part(params)
 
     def on_nicknameinuse(self, connection, event):
@@ -174,6 +175,22 @@ class IRC(irclib.SimpleIRCClient):
                 self.rejoin_delay))
             time.sleep(self.rejoin_delay)
             connection.join(self.target)
+
+    def on_ctcp(self, connection, event):
+        """Respond to CTCP events"""
+        self.source = event.source().split("!", 1)[0]
+        ctcp = event.arguments()[0]
+
+        if ctcp == "VERSION":
+            version = "pyhole v%s - https://github.com/jk0/pyhole" % self.version
+            self.log.info("Received CTCP VERSION from %s" % self.source)
+            connection.ctcp_reply(self.source, "VERSION %s" % version)
+        elif ctcp == "PING":
+            if len(event.arguments()) > 1:
+                self.log.info("Received CTCP PING from %s" % self.source)
+                connection.ctcp_reply(
+                    self.source,
+                    "PING %s" % event.arguments()[1])
 
     def on_privmsg(self, connection, event):
         """Handle private messages"""
