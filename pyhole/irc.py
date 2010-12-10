@@ -6,6 +6,8 @@ import random
 import re
 import time
 
+from threading import Thread
+
 import irclib
 import modules
 
@@ -76,33 +78,38 @@ class IRC(irclib.SimpleIRCClient):
         c = needle.split(".", 1)
         m = re.match(pattern_p % (self.command_prefix, c[1]), haystack)
         if m:
-            self.log.debug("Eval: %s(\"%s\")" % (".".join(c), m.group(1)))
-            eval("%s(\"%s\")" % (".".join(c), m.group(1)))
+            self.dispatch_command(needle, m.group(1))
         elif re.match(pattern % (self.command_prefix, c[1]), haystack):
-            self.log.debug("Eval: %s()" % ".".join(c))
-            eval("%s()" % ".".join(c))
+            self.dispatch_command(needle)
 
     def match_addressed(self, pattern_p, pattern, needle, haystack):
         """Match an addressed command in a message"""
         c = needle.split(".", 1)
         m = re.match(pattern_p % (self.nick, c[1]), haystack)
         if m:
-            self.log.debug("Eval: %s(\"%s\")" % (".".join(c), m.group(1)))
-            eval("%s(\"%s\")" % (".".join(c), m.group(1)))
+            self.dispatch_command(needle, m.group(1))
         elif re.match(pattern % (self.nick, c[1]), haystack):
-            self.log.debug("Eval: %s()" % ".".join(c))
-            eval("%s()" % ".".join(c))
+            self.dispatch_command(needle)
 
     def match_private(self, pattern_p, pattern, needle, haystack):
         """Match a command in a private message"""
         c = needle.split(".", 1)
         m = re.match(pattern_p % c[1], haystack)
         if m:
-            self.log.debug("Eval: %s(\"%s\")" % (".".join(c), m.group(1)))
-            eval("%s(\"%s\")" % (".".join(c), m.group(1)))
+            self.dispatch_command(needle, m.group(1))
         elif re.match(pattern % c[1], haystack):
-            self.log.debug("Eval: %s()" % ".".join(c))
-            eval("%s()" % ".".join(c))
+            self.dispatch_command(needle)
+
+    def dispatch_command(self, command, params=None):
+        if params:
+            self.log.debug("Threading: %s(\"%s\")" % (command, params))
+            exec("t = Thread(target=%s, args=(\"%s\",))" % (
+                command,
+                params))
+        else:
+            self.log.debug("Threading: %s()" % command)
+            exec("t = Thread(target=%s)" % command)
+        eval("t.start()")
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
