@@ -2,6 +2,7 @@
 
 
 import imdb
+import re
 import simplejson
 import urllib
 
@@ -71,7 +72,25 @@ class Search(object):
 
     def urban(self, params=None):
         """Search Urban Dictionary (ex: .urban <query>)"""
-        pass
+        if params:
+            query = urllib.urlencode({"term": params})
+            url = "http://www.urbandictionary.com/define.php?%s" % query
+            response = urllib.urlopen(url)
+            html = response.read()
+            if re.search("<i>%s</i>\nisn't defined" % params, html):
+                self.irc.say("No results found: '%s'" % params)
+            else:
+                r = re.compile("<div class=\"definition\">(.*)</div>" \
+                    "<div class=\"example\">")
+                m = r.search(html)
+                for i, line in enumerate(m.group(1).split("<br/>")):
+                    if i <= 4:
+                        self.irc.say(re.sub("&quot;", "\"", line.strip()))
+                    else:
+                        self.irc.say("[...] %s" % url)
+                        break
+        else:
+            self.irc.say(self.urban.__doc__)
 
     def youtube(self, params=None):
         """Search YouTube (ex: .youtube <query>)"""
