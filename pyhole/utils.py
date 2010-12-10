@@ -15,8 +15,10 @@ def admin(func):
     f.__doc__ = func.__doc__
     return f
 
+
 def spawn(func):
     """Thread Spawning Decorator"""
+
     def f(self, *args, **kwargs):
         if args and args[0]:
             params = " ".join(args)
