@@ -4,6 +4,7 @@
 
 import logging
 import time
+import sys
 
 from pyhole import config
 from pyhole import irc
@@ -35,7 +36,11 @@ def main():
             time.sleep(reconnect_delay)
             continue
 
-        connection.ircobj.process_forever()
+        try:
+            connection.start()
+        except KeyboardInterrupt:
+            log.info("Shutting down")
+            sys.exit(0)
 
 
 if __name__ == "__main__":
