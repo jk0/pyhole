@@ -6,4 +6,5 @@ nick: mynick
 channels: #mychannel, #mychannel2
 command_prefix: .
 reconnect_delay: 60
+rejoin_delay: 3
 debug: False

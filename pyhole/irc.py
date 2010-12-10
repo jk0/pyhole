@@ -27,6 +27,7 @@ class IRC(irclib.SimpleIRCClient):
         self.channels = config.get("channels", "list")
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", "int")
+        self.rejoin_delay = config.get("rejoin_delay", "int")
         self.load_modules()
 
         self.log.info("Connecting to %s:%d as %s" % (
@@ -161,6 +162,18 @@ class IRC(irclib.SimpleIRCClient):
         time.sleep(self.reconnect_delay)
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
         self.connect(self.server, self.port, self.nick)
+
+    def on_kick(self, connection, event):
+        """Automatically rejoin channel if kicked"""
+        self.target = event.target()
+
+        if event.arguments()[1] == self.nick:
+            self.log.info("Kicked from %s" % self.target)
+            self.log.info("Rejoining %s in %d seconds" % (
+                self.target,
+                self.rejoin_delay))
+            time.sleep(self.rejoin_delay)
+            connection.join(self.target)
 
     def on_privmsg(self, connection, event):
         """Handle private messages"""
