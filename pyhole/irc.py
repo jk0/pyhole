@@ -184,7 +184,7 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_ctcp(self, connection, event):
         """Respond to CTCP events"""
-        self.source = event.source().split("!", 1)[0]
+        self.source = irclib.nm_to_n(event.source())
         ctcp = event.arguments()[0]
 
         if ctcp == "VERSION":
@@ -201,7 +201,7 @@ class IRC(irclib.SimpleIRCClient):
     def on_privmsg(self, connection, event):
         """Handle private messages"""
         self.source = event.source().split("@", 1)[0]
-        self.target = event.source().split("!", 1)[0]
+        self.target = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
         if self.target != self.nick:
@@ -212,7 +212,7 @@ class IRC(irclib.SimpleIRCClient):
         """Handle public messages"""
         self.source = event.source().split("@", 1)[0]
         self.target = event.target()
-        nick = event.source().split("!", 1)[0]
+        nick = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
         self.log.info("%s <%s> %s" % (self.target, nick, msg))

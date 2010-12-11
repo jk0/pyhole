@@ -6,6 +6,8 @@ import logging
 import time
 import sys
 
+from multiprocessing import Process
+
 from pyhole import config
 from pyhole import irc
 
@@ -13,12 +15,12 @@ from pyhole import irc
 __version__ = "0.0.1"
 __config__ = "pyhole.cfg"
 
-bot = config.Config(__config__, "pyhole")
+b_config = config.Config(__config__, "pyhole")
 
 
 def logger(name):
     """Log handler"""
-    debug = bot.get("debug", "bool")
+    debug = b_config.get("debug", "bool")
     logging.basicConfig(
         level=logging.DEBUG if debug else logging.INFO,
         format="%(asctime)s [%(name)s:%(levelname)s] %(message)s")
@@ -34,36 +36,32 @@ def network_list(sections):
     return networks
 
 
-def main():
-    """Main Loop"""
-    log = logger("MAIN")
-    networks = network_list(bot.sections())
-    reconnect_delay = bot.get("reconnect_delay", "int")
+def irc_process(b_log, b_config, network):
+    """IRC network connection process"""
+    n_config = config.Config(__config__, network)
+    n_log = logger(network)
+    reconnect_delay = b_config.get("reconnect_delay", "int")
 
     while True:
         try:
-            for network in networks:
-                connection = irc.IRC(
-                    bot,
-                    config.Config(__config__, network),
-                    logger(network),
-                    __version__)
+            connection = irc.IRC(b_config, n_config, n_log, __version__)
         except Exception as e:
-            log.error(e)
-            log.error("Retrying in %d seconds" % reconnect_delay)
-            try:
-                time.sleep(reconnect_delay)
-                continue
-            except KeyboardInterrupt:
-                log.info("Shutting down")
-                sys.exit(0)
+            b_log.error(e)
+            b_log.error("Retrying in %d seconds" % reconnect_delay)
+            time.sleep(reconnect_delay)
 
-        try:
-            for network in networks:
-                connection.start()
-        except KeyboardInterrupt:
-            log.info("Shutting down")
-            sys.exit(0)
+        connection.start()
+
+
+def main():
+    """Main Loop"""
+    b_log = logger("MAIN")
+    networks = network_list(b_config.sections())
+
+    for network in networks:
+        p = Process(target=irc_process, args=(b_log, b_config, network))
+        p.start()
+        time.sleep(1)
 
 
 if __name__ == "__main__":

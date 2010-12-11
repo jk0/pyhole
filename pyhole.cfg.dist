@@ -11,3 +11,10 @@ port: 6667
 ssl: False
 nick: mynick
 channels: #mychannel, #mychannel2
+
+[EFnet]
+server: irc.efnet.net
+port: 6667
+ssl: False
+nick: mynick
+channels: #mychannel, #mychannel2
