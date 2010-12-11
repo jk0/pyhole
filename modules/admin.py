@@ -29,8 +29,8 @@ class Admin(object):
 
                 # Destroy the class
                 exec("%s = None" % module.capitalize())
-            except ImportError as e:
-                self.irc.log.error(e)
+            except ImportError:
+                self.irc.say("No moduled named '%s'" % params)
         else:
             self.irc.say(self.help.__doc__)
             self.irc.say(self.irc.active_commands())
