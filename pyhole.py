@@ -4,7 +4,6 @@
 
 import logging
 import time
-import sys
 
 from multiprocessing import Process
 
