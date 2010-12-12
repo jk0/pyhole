@@ -78,7 +78,6 @@ def main():
             args=(b_log, b_config, network))
         t.daemon = True
         t.start()
-        time.sleep(1)
 
     try:
         while True:

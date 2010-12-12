@@ -180,8 +180,8 @@ class IRC(irclib.SimpleIRCClient):
     def on_disconnect(self, connection, event):
         """Attempt to reconnect after disconnection"""
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
-        time.sleep(self.reconnect_delay)
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
+        time.sleep(self.reconnect_delay)
         self.connect(self.server, self.port, self.nick)
 
     def on_kick(self, connection, event):
