@@ -36,14 +36,7 @@ class Entertainment(object):
         r = re.compile("<div class=\"content\">\n\s+<p>(.*)</p>\n\s+</div>")
         m = r.search(html)
         if m:
-            line = m.group(1)
-            line = re.sub("<[^>]*?>", "", line)
-            line = re.sub("&nbsp;", " ", line)
-            line = re.sub("&#8212;", "-", line)
-            line = re.sub("&#8217;", "'", line)
-            line = re.sub("&#8220;", "\"", line)
-            line = re.sub("&#8221;", "\"", line)
-            line = re.sub("&#8230;", "...", line)
+            line = utils.decode_entities(m.group(1))
             self.irc.say(line)
         else:
             self.irc.say("Unable to parse GH data")

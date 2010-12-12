@@ -15,6 +15,7 @@
 """Pyhole Utility Library"""
 
 
+import re
 import threading
 
 
@@ -46,3 +47,17 @@ def spawn(func):
         t.start()
     f.__doc__ = func.__doc__
     return f
+
+
+def decode_entities(html):
+    """Strip HTML entities from a string"""
+    html = re.sub("<[^>]*?>", "", html)
+    html = re.sub("&nbsp;", " ", html)
+    html = re.sub("&quot;", "\"", html)
+    html = re.sub("&#8212;", "-", html)
+    html = re.sub("&#8217;", "'", html)
+    html = re.sub("&#8220;", "\"", html)
+    html = re.sub("&#8221;", "\"", html)
+    html = re.sub("&#8230;", "...", html)
+
+    return html.strip()
