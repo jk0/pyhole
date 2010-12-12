@@ -115,11 +115,11 @@ class IRC(irclib.SimpleIRCClient):
     def dispatch_command(self, command, params=None):
         try:
             if params:
-                exec("%s(\"%s\")" % (command, params))
                 self.log.debug("Eval: %s(\"%s\")" % (command, params))
+                exec("%s(\"%s\")" % (command, params))
             else:
-                exec("%s()" % command)
                 self.log.debug("Eval: %s()" % command)
+                exec("%s()" % command)
         except Exception as e:
             self.log.error(e)
 
