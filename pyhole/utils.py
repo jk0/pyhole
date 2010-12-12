@@ -1,7 +1,7 @@
 """Pyhole Utility Library"""
 
 
-from threading import Thread
+import threading
 
 
 def admin(func):
@@ -22,9 +22,12 @@ def spawn(func):
     def f(self, *args, **kwargs):
         if args and args[0]:
             params = " ".join(args)
-            t = Thread(target=func, args=(self, params), kwargs=kwargs)
+            t = threading.Thread(
+                target=func,
+                args=(self, params),
+                kwargs=kwargs)
         else:
-            t = Thread(target=func, args=(self,), kwargs=kwargs)
+            t = threading.Thread(target=func, args=(self,), kwargs=kwargs)
         self.irc.log.debug("Spawning: %s" % t.name)
         t.start()
     f.__doc__ = func.__doc__
