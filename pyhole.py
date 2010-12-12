@@ -3,9 +3,9 @@
 
 
 import logging
+import threading
 import time
-
-from multiprocessing import Process
+import sys
 
 from pyhole import config
 from pyhole import irc
@@ -35,8 +35,8 @@ def network_list(sections):
     return networks
 
 
-def irc_process(b_log, b_config, network):
-    """IRC network connection process"""
+def irc_thread(b_log, b_config, network):
+    """IRC network connection thread"""
     n_config = config.Config(__config__, network)
     n_log = logger(network)
     reconnect_delay = b_config.get("reconnect_delay", "int")
@@ -58,10 +58,18 @@ def main():
     networks = network_list(b_config.sections())
 
     for network in networks:
-        p = Process(target=irc_process, args=(b_log, b_config, network))
-        p.start()
+        t = threading.Thread(
+            target=irc_thread,
+            args=(b_log, b_config, network))
+        t.daemon = True
+        t.start()
         time.sleep(1)
 
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
