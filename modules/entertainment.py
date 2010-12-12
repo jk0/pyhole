@@ -33,17 +33,17 @@ class Entertainment(object):
         url = "http://grouphug.us/random"
         response = urllib.urlopen(url)
         html = response.read()
-        r = re.compile("<div class=\"content\">\n    <p>(.*)</p>\n  </div>")
+        r = re.compile("<div class=\"content\">\n\s+<p>(.*)</p>\n\s+</div>")
         m = r.search(html)
         if m:
             line = m.group(1)
-            line = re.sub("<.*>", "", line)
-            line = re.sub("&#8217;", "'", line)
+            line = re.sub("<[^>]*?>", "", line)
             line = re.sub("&nbsp;", " ", line)
-            line = re.sub("&#8230;", "...", line)
+            line = re.sub("&#8212;", "-", line)
+            line = re.sub("&#8217;", "'", line)
             line = re.sub("&#8220;", "\"", line)
             line = re.sub("&#8221;", "\"", line)
-            line = re.sub("&#8212;", "-", line)
+            line = re.sub("&#8230;", "...", line)
             self.irc.say(line)
         else:
             self.irc.say("Unable to parse GH data")

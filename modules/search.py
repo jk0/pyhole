@@ -105,6 +105,7 @@ class Search(object):
                 m = r.search(html)
                 for i, line in enumerate(m.group(1).split("<br/>")):
                     if i <= 4:
+                        line = re.sub("<[^>]*?>", "", line)
                         self.irc.say(re.sub("&quot;", "\"", line.strip()))
                     else:
                         self.irc.say("[...] %s" % url)
