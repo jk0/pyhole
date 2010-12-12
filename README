@@ -1,0 +1,23 @@
+pyhole - A modular IRC bot for Python developers.
+
+
+Core Requirements
+
+    - Python 2.6
+
+
+Module Requirements
+
+    - IMDbPY
+    - pywapi
+    - simplejson
+
+
+Installation
+
+    git clone git://github.com/jk0/pyhole.git
+    cd pyhole
+    cp pyhole.cfg.dist pyhole.cfg
+    vi pyhole.cfg
+
+    ./pyhole.py

@@ -50,10 +50,10 @@ def network_list(sections):
     return networks
 
 
-def irc_thread(b_log, b_config, network):
+def irc_thread(b_log, b_config, b_network):
     """IRC network connection thread"""
-    n_config = config.Config(__config__, network)
-    n_log = logger(network)
+    n_config = config.Config(__config__, b_network)
+    n_log = logger(b_network)
     reconnect_delay = b_config.get("reconnect_delay", "int")
 
     while True:
