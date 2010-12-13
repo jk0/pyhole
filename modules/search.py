@@ -34,8 +34,8 @@ class Search(object):
         """Search Google (ex: .g <query>)"""
         if params:
             query = urllib.urlencode({"q": params})
-            url = "http://ajax.googleapis.com/ajax/" \
-                "services/search/web?v=1.0&%s" % query
+            url = ("http://ajax.googleapis.com/ajax/"
+                "services/search/web?v=1.0&%s" % query)
             response = urllib.urlopen(url)
             json = simplejson.loads(response.read())
             results = json["responseData"]["results"]
@@ -100,8 +100,8 @@ class Search(object):
             if re.search("<i>%s</i>\nisn't defined" % params, html):
                 self.irc.say("No results found: '%s'" % params)
             else:
-                r = re.compile("<div class=\"definition\">(.*)</div>" \
-                    "<div class=\"example\">")
+                r = (re.compile("<div class=\"definition\">(.*)</div>"
+                    "<div class=\"example\">"))
                 m = r.search(html)
                 for i, line in enumerate(m.group(1).split("<br/>")):
                     if i <= 4:

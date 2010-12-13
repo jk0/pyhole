@@ -44,8 +44,8 @@ class Entertainment(object):
     @utils.spawn
     def lastnight(self, params=None):
         """Display a random Text From Last Night (ex: .lastnight)"""
-        url = "http://www.textsfromlastnight.com/" \
-            "Random-Texts-From-Last-Night.html"
+        url = ("http://www.textsfromlastnight.com/"
+            "Random-Texts-From-Last-Night.html")
         response = urllib.urlopen(url)
         html = response.read()
         r = re.compile("<p><a href=\"/Text-Replies-.+.html\">(.*)</a></p>")
