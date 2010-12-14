@@ -16,10 +16,20 @@
 
 
 import eventlet
+import logging
 import re
 
 
 eventlet.monkey_patch()
+
+
+def logger(name, debug=False):
+    """Log handler"""
+    logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO,
+        format="%(asctime)s [%(name)s] %(message)s",
+        datefmt="%H:%M:%S")
+    return logging.getLogger(name)
 
 
 def admin(func):

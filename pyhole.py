@@ -17,7 +17,6 @@
 """pyhole - A modular IRC bot for Python developers."""
 
 
-import logging
 import sys
 import time
 
@@ -30,15 +29,7 @@ __version__ = "0.0.1"
 __config__ = "pyhole.cfg"
 
 b_config = config.Config(__config__, "pyhole")
-
-
-def logger(name):
-    """Log handler"""
-    debug = b_config.get("debug", "bool")
-    logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO,
-        format="%(asctime)s [%(name)s:%(levelname)s] %(message)s")
-    return logging.getLogger(name)
+b_debug = b_config.get("debug", "bool")
 
 
 def network_list(sections):
@@ -54,7 +45,7 @@ def network_list(sections):
 def irc_connection(b_config, b_network):
     """IRC network connection"""
     n_config = config.Config(__config__, b_network)
-    n_log = logger(b_network)
+    n_log = utils.logger(b_network, b_debug)
     reconnect_delay = b_config.get("reconnect_delay", "int")
 
     while True:
@@ -70,7 +61,7 @@ def irc_connection(b_config, b_network):
 
 
 if __name__ == "__main__":
-    b_log = logger("MAIN")
+    b_log = utils.logger("MAIN", b_debug)
     networks = network_list(b_config.sections())
 
     b_log.info("Connecting to IRC Networks: %s" % ", ".join(networks))
