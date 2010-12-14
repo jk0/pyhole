@@ -17,7 +17,6 @@
 
 import eventlet
 import re
-import threading
 
 
 eventlet.monkey_patch()
