@@ -18,12 +18,12 @@
 
 
 import logging
-import threading
-import time
 import sys
+import time
 
 from pyhole import config
 from pyhole import irc
+from pyhole import utils
 
 
 __version__ = "0.0.1"
@@ -50,7 +50,8 @@ def network_list(sections):
     return networks
 
 
-def irc_thread(b_log, b_config, b_network):
+@utils.spawn
+def irc_thread(b_config, b_network):
     """IRC network connection thread"""
     n_config = config.Config(__config__, b_network)
     n_log = logger(b_network)
@@ -60,9 +61,10 @@ def irc_thread(b_log, b_config, b_network):
         try:
             connection = irc.IRC(b_config, n_config, n_log, __version__)
         except Exception as e:
-            b_log.error(e)
-            b_log.error("Retrying in %d seconds" % reconnect_delay)
+            n_log.error(e)
+            n_log.error("Retrying in %d seconds" % reconnect_delay)
             time.sleep(reconnect_delay)
+            continue
 
         connection.start()
 
@@ -72,17 +74,15 @@ def main():
     b_log = logger("MAIN")
     networks = network_list(b_config.sections())
 
+    b_log.info("Connecting to IRC Networks: %s" % ", ".join(networks))
     for network in networks:
-        t = threading.Thread(
-            target=irc_thread,
-            args=(b_log, b_config, network))
-        t.daemon = True
-        t.start()
+        irc_thread(b_config, network)
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
+        b_log.info("Caught KeyboardInterrupt, shutting down")
         sys.exit(1)
 
 

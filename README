@@ -4,6 +4,7 @@ pyhole - A modular IRC bot for Python developers.
 Core Requirements
 
     - Python 2.6
+    - Eventlet
 
 
 Module Requirements

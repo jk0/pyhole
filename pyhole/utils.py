@@ -15,8 +15,12 @@
 """Pyhole Utility Library"""
 
 
+import eventlet
 import re
 import threading
+
+
+eventlet.monkey_patch()
 
 
 def admin(func):
@@ -32,19 +36,10 @@ def admin(func):
 
 
 def spawn(func):
-    """Thread Spawning Decorator"""
+    """Greenthread Spawning Decorator"""
 
     def f(self, *args, **kwargs):
-        if args and args[0]:
-            params = " ".join(args)
-            t = threading.Thread(
-                target=func,
-                args=(self, params),
-                kwargs=kwargs)
-        else:
-            t = threading.Thread(target=func, args=(self,), kwargs=kwargs)
-        self.irc.log.debug("Spawning: %s" % t.name)
-        t.start()
+        eventlet.spawn_n(func, self, *args, **kwargs)
     f.__doc__ = func.__doc__
     return f
 
