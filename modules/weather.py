@@ -30,7 +30,12 @@ class Weather(object):
     def weather(self, params=None):
         """Display current weather report (ex: .w <location>)"""
         if params:
-            w = pywapi.get_weather_from_google(params)
+            try:
+                w = pywapi.get_weather_from_google(params)
+            except Exception:
+                self.irc.say("Unable to fetch weather data")
+                return
+
             if w["current_conditions"]:
                 city = w["forecast_information"]["city"]
                 temp_f = w["current_conditions"]["temp_f"]

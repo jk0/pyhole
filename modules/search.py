@@ -36,7 +36,13 @@ class Search(object):
             query = urllib.urlencode({"q": params})
             url = ("http://ajax.googleapis.com/ajax/"
                 "services/search/web?v=1.0&%s" % query)
-            response = urllib.urlopen(url)
+
+            try:
+                response = urllib.urlopen(url)
+            except Exception:
+                self.irc.say("Unable to fetch Google data")
+                return
+
             json = simplejson.loads(response.read())
             results = json["responseData"]["results"]
             if results:
@@ -58,7 +64,13 @@ class Search(object):
         """Search IMDb (ex: .imdb <query>)"""
         if params:
             i = imdb.IMDb()
-            results = i.search_movie(params, results=4)
+
+            try:
+                results = i.search_movie(params, results=4)
+            except Exception:
+                self.irc.say("Unable to fetch IMDb data")
+                return
+
             if results:
                 for r in results:
                     self.irc.say("%s (%s): http://www.imdb.com/title/tt%s/" % (
@@ -76,7 +88,13 @@ class Search(object):
         if params:
             query = urllib.urlencode({"q": params, "rpp": 4})
             url = "http://search.twitter.com/search.json?%s" % query
-            response = urllib.urlopen(url)
+
+            try:
+                response = urllib.urlopen(url)
+            except Exception:
+                self.irc.say("Unable to fetch Twitter data")
+                return
+
             json = simplejson.loads(response.read())
             results = json["results"]
             if results:
@@ -95,7 +113,13 @@ class Search(object):
         if params:
             query = urllib.urlencode({"term": params})
             url = "http://www.urbandictionary.com/define.php?%s" % query
-            response = urllib.urlopen(url)
+
+            try:
+                response = urllib.urlopen(url)
+            except Exception:
+                self.irc.say("Unable to fetch Urban Dictionary data")
+                return
+
             html = response.read()
             if re.search("<i>%s</i>\nisn't defined" % params, html):
                 self.irc.say("No results found: '%s'" % params)
@@ -123,7 +147,13 @@ class Search(object):
                 "max-results": 4,
                 "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
-            response = urllib.urlopen(url)
+
+            try:
+                response = urllib.urlopen(url)
+            except Exception:
+                self.irc.say("Unable to fetch YouTube data")
+                return
+
             json = simplejson.loads(response.read())
             results = json["data"]
             if len(results) > 4:
