@@ -182,7 +182,11 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
-        self.connect(self.server, self.port, self.nick)
+        self.log.info("Connecting to %s:%d as %s" % (
+            self.server,
+            self.port,
+            self.nick))
+        self.connect(self.server, self.port, self.nick, ssl=self.ssl)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked"""

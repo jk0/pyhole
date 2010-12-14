@@ -15,6 +15,8 @@
 """Pyhole Administration"""
 
 
+import sys
+
 from pyhole import utils
 
 
@@ -92,3 +94,10 @@ class Admin(object):
             self.irc.part_channel(params)
         else:
             self.irc.say(self.part.__doc__)
+
+    @utils.admin
+    def quit(self, params=None):
+        """Quit and shutdown"""
+        self.irc.say("Later!")
+        self.irc.log.info("Shutting down")
+        sys.exit(1)
