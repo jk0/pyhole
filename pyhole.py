@@ -51,8 +51,8 @@ def network_list(sections):
 
 
 @utils.spawn
-def irc_thread(b_config, b_network):
-    """IRC network connection thread"""
+def irc_connection(b_config, b_network):
+    """IRC network connection"""
     n_config = config.Config(__config__, b_network)
     n_log = logger(b_network)
     reconnect_delay = b_config.get("reconnect_delay", "int")
@@ -69,14 +69,13 @@ def irc_thread(b_config, b_network):
         connection.start()
 
 
-def main():
-    """Main Loop"""
+if __name__ == "__main__":
     b_log = logger("MAIN")
     networks = network_list(b_config.sections())
 
     b_log.info("Connecting to IRC Networks: %s" % ", ".join(networks))
     for network in networks:
-        irc_thread(b_config, network)
+        irc_connection(b_config, network)
 
     try:
         while True:
@@ -84,7 +83,3 @@ def main():
     except KeyboardInterrupt:
         b_log.info("Caught KeyboardInterrupt, shutting down")
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
