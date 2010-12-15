@@ -7,6 +7,7 @@ debug: False
 
 [FreeNode]
 server: irc.freenode.net
+password:
 port: 6667
 ssl: False
 nick: mynick
@@ -14,6 +15,7 @@ channels: #mychannel, #mychannel2
 
 [EFnet]
 server: irc.efnet.net
+password:
 port: 6667
 ssl: False
 nick: mynick

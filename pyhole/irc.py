@@ -39,6 +39,7 @@ class IRC(irclib.SimpleIRCClient):
         self.rejoin_delay = config.get("rejoin_delay", "int")
 
         self.server = network.get("server")
+        self.password = network.get("password")
         self.port = network.get("port", "int")
         self.ssl = network.get("ssl", "bool")
         self.nick = network.get("nick")
@@ -50,7 +51,12 @@ class IRC(irclib.SimpleIRCClient):
             self.server,
             self.port,
             self.nick))
-        self.connect(self.server, self.port, self.nick, ssl=self.ssl)
+        self.connect(
+            self.server,
+            self.port,
+            self.nick,
+            self.password,
+            ssl=self.ssl)
 
     def load_modules(self, reload_mods=False):
         """Load modules and their classes respectively"""
@@ -186,7 +192,12 @@ class IRC(irclib.SimpleIRCClient):
             self.server,
             self.port,
             self.nick))
-        self.connect(self.server, self.port, self.nick, ssl=self.ssl)
+        self.connect(
+            self.server,
+            self.port,
+            self.nick,
+            self.password,
+            ssl=self.ssl)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked"""
