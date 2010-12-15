@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Entertainment Module"""
+"""Pyhole Entertainment Plugin"""
 
 
 import re
@@ -34,7 +34,7 @@ class Entertainment(object):
 
         try:
             response = urllib.urlopen(url)
-        except Exception:
+        except IOError:
             self.irc.say("Unable to fetch Group Hug data")
             return
 
@@ -55,7 +55,7 @@ class Entertainment(object):
 
         try:
             response = urllib.urlopen(url)
-        except Exception:
+        except IOError:
             self.irc.say("Unable to fetch Texts From Last Night data")
             return
 

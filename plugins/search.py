@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Search Module"""
+"""Pyhole Search Plugin"""
 
 
 import imdb
@@ -39,7 +39,7 @@ class Search(object):
 
             try:
                 response = urllib.urlopen(url)
-            except Exception:
+            except IOError:
                 self.irc.say("Unable to fetch Google data")
                 return
 
@@ -67,7 +67,7 @@ class Search(object):
 
             try:
                 results = i.search_movie(params, results=4)
-            except Exception:
+            except IOError:
                 self.irc.say("Unable to fetch IMDb data")
                 return
 
@@ -91,7 +91,7 @@ class Search(object):
 
             try:
                 response = urllib.urlopen(url)
-            except Exception:
+            except IOError:
                 self.irc.say("Unable to fetch Twitter data")
                 return
 
@@ -117,7 +117,7 @@ class Search(object):
 
             try:
                 response = urllib.urlopen(url)
-            except Exception:
+            except IOError:
                 self.irc.say("Unable to fetch Urban Dictionary data")
                 return
 
@@ -151,7 +151,7 @@ class Search(object):
 
             try:
                 response = urllib.urlopen(url)
-            except Exception:
+            except IOError:
                 self.irc.say("Unable to fetch YouTube data")
                 return
 

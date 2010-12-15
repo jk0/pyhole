@@ -173,7 +173,7 @@ class IRC(irclib.SimpleIRCClient):
         connection.nick("%s" % self.nick)
 
     def on_welcome(self, connection, event):
-        """Join channel upon successful connection"""
+        """Join channels upon successful connection"""
         for channel in self.channels:
             if irclib.is_channel(channel):
                 self.log.info("Joining %s" % channel)

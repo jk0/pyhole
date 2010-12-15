@@ -65,13 +65,13 @@ def irc_connection(b_config, b_network):
 
 if __name__ == "__main__":
     b_log = utils.logger("MAIN", b_debug)
-    networks = network_list(b_config.sections())
+    b_networks = network_list(b_config.sections())
 
-    b_log.info("Connecting to IRC Networks: %s" % ", ".join(networks))
-    for network in networks:
+    b_log.info("Connecting to IRC Networks: %s" % ", ".join(b_networks))
+    for b_network in b_networks:
         p = multiprocessing.Process(
             target=irc_connection,
-            args=(b_config, network))
+            args=(b_config, b_network))
         p.start()
 
     try:
