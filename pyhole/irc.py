@@ -87,10 +87,6 @@ class IRC(irclib.SimpleIRCClient):
         """List active commands"""
         return ", ".join(self.commands)
 
-    def active_channels(self):
-        """List active channels"""
-        return "Active Channels: %s" % ", ".join(self.channels)
-
     def match_direct(self, pattern_p, pattern, needle, haystack):
         """Match a direct command in a message"""
         c = needle.split(".", 1)

@@ -17,6 +17,7 @@
 """pyhole - A modular IRC bot for Python developers."""
 
 
+import multiprocessing
 import sys
 import time
 
@@ -41,7 +42,6 @@ def network_list(sections):
     return networks
 
 
-@utils.spawn
 def irc_connection(b_config, b_network):
     """IRC network connection"""
     n_config = config.Config(__config__, b_network)
@@ -57,7 +57,10 @@ def irc_connection(b_config, b_network):
             time.sleep(reconnect_delay)
             continue
 
-        connection.start()
+        try:
+            connection.start()
+        except KeyboardInterrupt:
+            sys.exit(1)
 
 
 if __name__ == "__main__":
@@ -66,11 +69,13 @@ if __name__ == "__main__":
 
     b_log.info("Connecting to IRC Networks: %s" % ", ".join(networks))
     for network in networks:
-        irc_connection(b_config, network)
+        p = multiprocessing.Process(
+            target=irc_connection,
+            args=(b_config, network))
+        p.start()
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         b_log.info("Caught KeyboardInterrupt, shutting down")
-        sys.exit(1)

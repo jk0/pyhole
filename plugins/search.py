@@ -101,7 +101,8 @@ class Search(object):
                 for r in results:
                     self.irc.say("@%s: %s" % (
                         r["from_user"],
-                        r["text"].encode("ascii", "ignore")))
+                        utils.decode_entities(
+                            r["text"].encode("ascii", "ignore"))))
             else:
                 self.irc.say("No results found: '%s'" % params)
         else:

@@ -56,14 +56,6 @@ class Admin(object):
         self.irc.say(self.irc.active_plugins())
 
     @utils.admin
-    def info(self, params=None):
-        """Access various statistics (ex: .info <topic>)"""
-        if params == "channels":
-            self.irc.say(self.irc.active_channels())
-        else:
-            self.irc.say(self.info.__doc__)
-
-    @utils.admin
     def op(self, params=None):
         """Op a user (ex: .op <channel> <nick>)"""
         if params:
@@ -94,10 +86,3 @@ class Admin(object):
             self.irc.part_channel(params)
         else:
             self.irc.say(self.part.__doc__)
-
-    @utils.admin
-    def quit(self, params=None):
-        """Quit and shutdown"""
-        self.irc.say("Later!")
-        self.irc.log.info("Shutting down")
-        sys.exit(1)
