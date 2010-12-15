@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from modules import admin
-from modules import entertainment
-from modules import search
-from modules import weather
+from plugins import admin
+from plugins import entertainment
+from plugins import search
+from plugins import weather

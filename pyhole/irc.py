@@ -21,7 +21,7 @@ import re
 import time
 
 import irclib
-import modules
+import plugins
 
 
 class IRC(irclib.SimpleIRCClient):
@@ -45,7 +45,7 @@ class IRC(irclib.SimpleIRCClient):
         self.nick = network.get("nick")
         self.channels = network.get("channels", "list")
 
-        self.load_modules()
+        self.load_plugins()
 
         self.log.info("Connecting to %s:%d as %s" % (
             self.server,
@@ -58,30 +58,30 @@ class IRC(irclib.SimpleIRCClient):
             self.password,
             ssl=self.ssl)
 
-    def load_modules(self, reload_mods=False):
-        """Load modules and their classes respectively"""
-        self.modules = []
+    def load_plugins(self, reload_plugins=False):
+        """Load plugins and their commands respectively"""
+        self.plugins = []
         self.commands = []
 
-        if reload_mods:
-            reload(modules)
-        for name in dir(modules):
+        if reload_plugins:
+            reload(plugins)
+        for name in dir(plugins):
             if not name.startswith("__"):
-                module = "global %s\n%s = modules.%s.%s(self)" % (
+                plugin = "global %s\n%s = plugins.%s.%s(self)" % (
                     name, name, name, name.capitalize())
-                if reload_mods:
-                    exec("reload(modules.%s)\n%s" % (name, module))
+                if reload_plugins:
+                    exec("reload(plugins.%s)\n%s" % (name, plugin))
                 else:
-                    exec(module)
-                self.modules.append(name)
+                    exec(plugin)
+                self.plugins.append(name)
                 for k, v in inspect.getmembers(eval(name), inspect.ismethod):
                     if not k.startswith("__"):
                         self.commands.append("%s.%s" % (name, k))
-        self.log.info(self.active_modules())
+        self.log.info(self.active_plugins())
 
-    def active_modules(self):
-        """List active modules"""
-        return "Loaded Modules: %s" % ", ".join(self.modules)
+    def active_plugins(self):
+        """List active plugins"""
+        return "Loaded Plugins: %s" % ", ".join(self.plugins)
 
     def active_commands(self):
         """List active commands"""
@@ -131,11 +131,11 @@ class IRC(irclib.SimpleIRCClient):
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
-        for command in self.commands:
-            self.match_direct("^\%s%s (.+)$", "^\%s%s$", command, message)
-            self.match_addressed("^%s: %s (.+)$", "^%s: %s$", command, message)
+        for c in self.commands:
+            self.match_direct("^\%s%s (.+)$", "^\%s%s$", c, message)
+            self.match_addressed("^%s: %s (.+)$", "^%s: %s$", c, message)
             if private:
-                self.match_private("^%s (.+)$", "^%s$", command, message)
+                self.match_private("^%s (.+)$", "^%s$", c, message)
 
     def say(self, msg):
         """Send a privmsg"""

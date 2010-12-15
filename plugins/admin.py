@@ -27,33 +27,33 @@ class Admin(object):
         self.irc = irc
 
     def help(self, params=None):
-        """Learn how to use active modules (ex: .help <module.command>)"""
+        """Learn how to use active plugins (ex: .help <plugin.command>)"""
         if params:
             # Temporarily load the class for __doc__ access
             try:
-                module = params.split(".")[0]
+                plugin = params.split(".")[0]
                 exec("import %s\n%s = %s.%s(self.irc)" % (
-                    module,
-                    module.capitalize(),
-                    module,
-                    module.capitalize()))
+                    plugin,
+                    plugin.capitalize(),
+                    plugin,
+                    plugin.capitalize()))
 
                 doc = eval("%s.__doc__" % params.capitalize())
                 self.irc.say(doc)
 
                 # Destroy the class
-                exec("%s = None" % module.capitalize())
+                exec("%s = None" % plugin.capitalize())
             except ImportError:
-                self.irc.say("No moduled named '%s'" % params)
+                self.irc.say("No plugin named '%s'" % params)
         else:
             self.irc.say(self.help.__doc__)
             self.irc.say(self.irc.active_commands())
 
     @utils.admin
     def reload(self, params=None):
-        """Reload all modules"""
-        self.irc.load_modules(reload_mods=True)
-        self.irc.say(self.irc.active_modules())
+        """Reload all plugins"""
+        self.irc.load_plugins(reload_plugins=True)
+        self.irc.say(self.irc.active_plugins())
 
     @utils.admin
     def info(self, params=None):
