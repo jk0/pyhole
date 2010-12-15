@@ -132,7 +132,7 @@ class IRC(irclib.SimpleIRCClient):
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
         for command in self.commands:
-            self.match_direct("^%s%s (.+)$", "^%s%s$", command, message)
+            self.match_direct("^\%s%s (.+)$", "^\%s%s$", command, message)
             self.match_addressed("^%s: %s (.+)$", "^%s: %s$", command, message)
             if private:
                 self.match_private("^%s (.+)$", "^%s$", command, message)
