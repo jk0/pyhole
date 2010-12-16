@@ -49,6 +49,11 @@ class Admin(object):
             self.irc.say(self.help.__doc__)
             self.irc.say(self.irc.active_commands())
 
+    def version(self, params=None):
+        """Display the current version"""
+        self.irc.say("pyhole v%s - https://github.com/jk0/pyhole" % 
+            self.irc.version)
+
     @utils.admin
     def reload(self, params=None):
         """Reload all plugins"""
