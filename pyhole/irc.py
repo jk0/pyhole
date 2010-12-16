@@ -207,6 +207,14 @@ class IRC(irclib.SimpleIRCClient):
             time.sleep(self.rejoin_delay)
             connection.join(self.target)
 
+    def on_invite(self, connection, event):
+        """Join a channel upon invitation"""
+        self.source = event.source().split("@", 1)[0]
+        self.target = irclib.nm_to_n(event.source())
+
+        if self.source == self.admin:
+            self.join_channel(event.arguments()[0])
+
     def on_ctcp(self, connection, event):
         """Respond to CTCP events"""
         self.source = irclib.nm_to_n(event.source())
