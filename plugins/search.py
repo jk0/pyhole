@@ -20,6 +20,8 @@ import re
 import simplejson
 import urllib
 
+from xml.dom import minidom
+
 from pyhole import utils
 
 
@@ -137,6 +139,32 @@ class Search(object):
                         break
         else:
             self.irc.say(self.urban.__doc__)
+
+    @utils.spawn
+    def wikipedia(self, params=None):
+        """Search Wikipedia (ex: .wikipedia <query>)"""
+        if params:
+            query = urllib.urlencode({
+                "action": "query",
+                "generator": "allpages",
+                "gaplimit": 4,
+                "gapfrom": params,
+                "format": "xml"})
+            url = "http://en.wikipedia.org/w/api.php?%s" % query
+
+            try:
+                response = urllib.urlopen(url)
+            except IOError:
+                self.irc.say("Unable to fetch Wikipedia data")
+                return
+
+            xml = minidom.parseString(response.read())
+            for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
+                title = i._attrs["title"].firstChild.data
+                title = re.sub(" ", "_", title)
+                self.irc.say("http://en.wikipedia.org/wiki/%s" % title)
+        else:
+            self.irc.say(self.wikipedia.__doc__)
 
     @utils.spawn
     def youtube(self, params=None):

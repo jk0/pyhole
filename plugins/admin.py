@@ -51,8 +51,7 @@ class Admin(object):
 
     def version(self, params=None):
         """Display the current version"""
-        self.irc.say("pyhole v%s - https://github.com/jk0/pyhole" % 
-            self.irc.version)
+        self.irc.say(self.irc.version)
 
     @utils.admin
     def reload(self, params=None):
@@ -67,6 +66,14 @@ class Admin(object):
             self.irc.op_user(params)
         else:
             self.irc.say(self.op.__doc__)
+
+    @utils.admin
+    def deop(self, params=None):
+        """De-op a user (ex: .deop <channel> <nick>)"""
+        if params:
+            self.irc.deop_user(params)
+        else:
+            self.irc.say(self.deop.__doc__)
 
     @utils.admin
     def nick(self, params=None):

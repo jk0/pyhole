@@ -66,7 +66,7 @@ class IRC(irclib.SimpleIRCClient):
         if reload_plugins:
             reload(plugins)
         for name in dir(plugins):
-            if not name.startswith("__"):
+            if not name.startswith("_"):
                 plugin = "global %s\n%s = plugins.%s.%s(self)" % (
                     name, name, name, name.capitalize())
                 if reload_plugins:
@@ -75,7 +75,7 @@ class IRC(irclib.SimpleIRCClient):
                     exec(plugin)
                 self.plugins.append(name)
                 for k, v in inspect.getmembers(eval(name), inspect.ismethod):
-                    if not k.startswith("__"):
+                    if not k.startswith("_"):
                         self.commands.append("%s.%s" % (name, k))
         self.log.info(self.active_plugins())
 
@@ -141,6 +141,11 @@ class IRC(irclib.SimpleIRCClient):
         """Op a user"""
         params = params.split(" ", 1)
         self.connection.mode(params[0], "+o %s" % params[1])
+
+    def deop_user(self, params):
+        """De-op a user"""
+        params = params.split(" ", 1)
+        self.connection.mode(params[0], "-o %s" % params[1])
 
     def set_nick(self, params):
         """Set IRC nick"""
@@ -221,15 +226,23 @@ class IRC(irclib.SimpleIRCClient):
         ctcp = event.arguments()[0]
 
         if ctcp == "VERSION":
-            v = "pyhole v%s - https://github.com/jk0/pyhole" % self.version
             self.log.info("Received CTCP VERSION from %s" % self.source)
-            connection.ctcp_reply(self.source, "VERSION %s" % v)
+            connection.ctcp_reply(self.source, "VERSION %s" % self.version)
         elif ctcp == "PING":
             if len(event.arguments()) > 1:
                 self.log.info("Received CTCP PING from %s" % self.source)
                 connection.ctcp_reply(
                     self.source,
                     "PING %s" % event.arguments()[1])
+
+    def on_action(self, connection, event):
+        """Handle IRC actions"""
+        self.source = event.source().split("@", 1)[0]
+        self.target = event.target()
+        nick = irclib.nm_to_n(event.source())
+        msg = event.arguments()[0]
+
+        self.log.info("%s * %s %s" % (self.target, nick, msg))
 
     def on_privmsg(self, connection, event):
         """Handle private messages"""

@@ -26,7 +26,7 @@ from pyhole import irc
 from pyhole import utils
 
 
-__version__ = "0.0.1"
+__version__ = "pyhole v0.0.5 - https://github.com/jk0/pyhole"
 __config__ = "pyhole.cfg"
 
 b_config = config.Config(__config__, "pyhole")

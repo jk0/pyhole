@@ -1256,12 +1256,12 @@ def _ctcp_dequote(message):
 
         messages = []
         i = 0
-        while i < len(chunks)-1:
+        while i < len(chunks) - 1:
             # Add message if it's non-empty.
             if len(chunks[i]) > 0:
                 messages.append(chunks[i])
 
-            if i < len(chunks)-2:
+            if i < len(chunks) - 2:
                 # Aye!  CTCP tagged data ahead!
                 messages.append(tuple(chunks[i + 1].split(" ", 1)))
 
@@ -1532,7 +1532,7 @@ numeric_events = {
     "423": "noadmininfo",
     "424": "fileerror",
     "431": "nonicknamegiven",
-    "432": "erroneusnickname", # Thiss iz how its speld in thee RFC.
+    "432": "erroneusnickname",  # Thiss iz how its speld in thee RFC.
     "433": "nicknameinuse",
     "436": "nickcollision",
     "437": "unavailresource",  # "Nick temporally unavailable"
@@ -1547,7 +1547,7 @@ numeric_events = {
     "462": "alreadyregistered",
     "463": "nopermforhost",
     "464": "passwdmismatch",
-    "465": "yourebannedcreep", # I love this one...
+    "465": "yourebannedcreep",  # I love this one...
     "466": "youwillbebanned",
     "467": "keyset",
     "471": "channelisfull",
