@@ -62,6 +62,7 @@ class IRC(irclib.SimpleIRCClient):
         """Load plugins and their commands respectively"""
         self.plugins = []
         self.commands = []
+        self.keywords = []
 
         if reload_plugins:
             reload(plugins)
@@ -75,7 +76,9 @@ class IRC(irclib.SimpleIRCClient):
                     exec(plugin)
                 self.plugins.append(name)
                 for k, v in inspect.getmembers(eval(name), inspect.ismethod):
-                    if not k.startswith("_"):
+                    if k.startswith("keyword_"):
+                        self.keywords.append("%s.%s" % (name, k))
+                    elif not k.startswith("_"):
                         self.commands.append("%s.%s" % (name, k))
         self.log.info(self.active_plugins())
 
@@ -114,6 +117,13 @@ class IRC(irclib.SimpleIRCClient):
         elif re.match(pattern % c[1], haystack):
             self.dispatch_command(needle)
 
+    def match_keyword(self, pattern, needle, haystack):
+        """Match a keyword in a message"""
+        k = needle.split("_", 1)
+        m = re.search(pattern % k[1], haystack, re.I)
+        if m:
+            self.dispatch_command(needle, m.group(1))
+
     def dispatch_command(self, command, params=None):
         try:
             if params:
@@ -132,6 +142,9 @@ class IRC(irclib.SimpleIRCClient):
             self.match_addressed("^%s: %s (.+)$", "^%s: %s$", c, message)
             if private:
                 self.match_private("^%s (.+)$", "^%s$", c, message)
+
+        for k in self.keywords:
+            self.match_keyword("%s(.+)", k, message)
 
     def say(self, msg):
         """Send a privmsg"""

@@ -14,6 +14,7 @@
 
 from plugins import admin
 from plugins import entertainment
+from plugins import keywords
 from plugins import news
 from plugins import search
 from plugins import weather
