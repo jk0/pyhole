@@ -120,9 +120,12 @@ class IRC(irclib.SimpleIRCClient):
     def match_keyword(self, pattern, needle, haystack):
         """Match a keyword in a message"""
         k = needle.split("_", 1)
-        m = re.search(pattern % k[1], haystack, re.I)
-        if m:
-            self.dispatch_command(needle, m.group(1))
+        words = haystack.split(" ")
+
+        for word in words:
+            m = re.search(pattern % k[1], word, re.I)
+            if m:
+                self.dispatch_command(needle, m.group(1))
 
     def dispatch_command(self, command, params=None):
         try:
