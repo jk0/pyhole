@@ -26,7 +26,7 @@ from pyhole import irc
 from pyhole import utils
 
 
-__version__ = "pyhole v0.0.5 - https://github.com/jk0/pyhole"
+__version__ = "pyhole v0.0.6 - https://github.com/jk0/pyhole"
 __config__ = "pyhole.cfg"
 
 b_config = config.Config(__config__, "pyhole")
@@ -61,6 +61,11 @@ def irc_connection(b_config, b_network):
             connection.start()
         except KeyboardInterrupt:
             sys.exit(1)
+        except Exception as e:
+            n_log.error(e)
+            n_log.error("Retrying in %d seconds" % reconnect_delay)
+            time.sleep(reconnect_delay)
+            continue
 
 
 if __name__ == "__main__":

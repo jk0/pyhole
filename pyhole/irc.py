@@ -197,9 +197,13 @@ class IRC(irclib.SimpleIRCClient):
     def on_welcome(self, connection, event):
         """Join channels upon successful connection"""
         for channel in self.channels:
-            if irclib.is_channel(channel):
-                self.log.info("Joining %s" % channel)
-                connection.join(channel)
+            c = channel.split(" ", 1)
+            if irclib.is_channel(c[0]):
+                self.log.info("Joining %s" % c[0])
+                if len(c) > 1:
+                    connection.join(c[0], c[1])
+                else:
+                    connection.join(c[0])
 
     def on_disconnect(self, connection, event):
         """Attempt to reconnect after disconnection"""

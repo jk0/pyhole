@@ -16,7 +16,6 @@
 
 
 import re
-import string
 import urllib
 
 from pyhole import utils
@@ -50,7 +49,7 @@ class Keywords(object):
             if t:
                 status = re.search("class=\"value status.+\">(.+)</a>", html)
                 owner = re.search("class=\"sprite person\">(.+)</a>", html)
-                title = filter(lambda x: x in string.printable, t.group(1))
+                title = utils.decode_entities(t.group(1))
 
                 self.irc.say("Launchpad %s [%s | %s]" % (
                     title,

@@ -18,6 +18,7 @@
 import eventlet
 import logging
 import re
+import string
 
 
 eventlet.monkey_patch()
@@ -63,5 +64,6 @@ def decode_entities(html):
     html = re.sub("&#8220;", "\"", html)
     html = re.sub("&#8221;", "\"", html)
     html = re.sub("&#8230;", "...", html)
+    html = filter(lambda x: x in string.printable, html)
 
     return html.strip()
