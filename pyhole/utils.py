@@ -58,6 +58,7 @@ def decode_entities(html):
     """Strip HTML entities from a string"""
     html = re.sub("<[^>]*?>", "", html)
     html = re.sub("&nbsp;", " ", html)
+    html = re.sub("&amp;", "&", html)
     html = re.sub("&quot;", "\"", html)
     html = re.sub("&#8212;", "-", html)
     html = re.sub("&#8217;", "'", html)
