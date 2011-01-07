@@ -92,40 +92,41 @@ class IRC(irclib.SimpleIRCClient):
 
     def match_direct(self, pattern_p, pattern, needle, haystack):
         """Match a direct command in a message"""
-        c = needle.split(".", 1)
-        m = re.match(pattern_p % (self.command_prefix, c[1]), haystack)
+        c = needle.split(".", 1)[1]
+        m = re.match(pattern_p % (self.command_prefix, c), haystack)
         if m:
             self.dispatch_command(needle, m.group(1))
-        elif re.match(pattern % (self.command_prefix, c[1]), haystack):
+        elif re.match(pattern % (self.command_prefix, c), haystack):
             self.dispatch_command(needle)
 
     def match_addressed(self, pattern_p, pattern, needle, haystack):
         """Match an addressed command in a message"""
-        c = needle.split(".", 1)
-        m = re.match(pattern_p % (self.nick, c[1]), haystack)
+        c = needle.split(".", 1)[1]
+        m = re.match(pattern_p % (self.nick, c), haystack)
         if m:
             self.dispatch_command(needle, m.group(1))
-        elif re.match(pattern % (self.nick, c[1]), haystack):
+        elif re.match(pattern % (self.nick, c), haystack):
             self.dispatch_command(needle)
 
     def match_private(self, pattern_p, pattern, needle, haystack):
         """Match a command in a private message"""
-        c = needle.split(".", 1)
-        m = re.match(pattern_p % c[1], haystack)
+        c = needle.split(".", 1)[1]
+        m = re.match(pattern_p % c, haystack)
         if m:
             self.dispatch_command(needle, m.group(1))
-        elif re.match(pattern % c[1], haystack):
+        elif re.match(pattern % c, haystack):
             self.dispatch_command(needle)
 
     def match_keyword(self, pattern, needle, haystack):
         """Match a keyword in a message"""
-        k = needle.split("_", 1)
+        k = needle.split("_", 1)[1]
         words = haystack.split(" ")
 
         for word in words:
-            m = re.search(pattern % k[1], word, re.I)
+            m = re.search(pattern % k, word, re.I)
             if m:
-                self.dispatch_command(needle, m.group(1))
+                params = re.sub("\W+", "", m.group(1))
+                self.dispatch_command(needle, params)
 
     def dispatch_command(self, command, params=None):
         try:
