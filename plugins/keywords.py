@@ -32,14 +32,12 @@ class Keywords(object):
     def keyword_lp(self, params=None):
         """Retrieve Launchpad bug information"""
         if params:
-            bug = params.split(" ")[0]
-
             try:
-                int(bug)
+                int(params)
             except ValueError:
                 return
 
-            url = "https://bugs.launchpad.net/nova/+bug/%s" % bug
+            url = "https://bugs.launchpad.net/nova/+bug/%s" % params
 
             try:
                 response = urllib.urlopen(url)
