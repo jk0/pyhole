@@ -1,0 +1,60 @@
+#   Copyright 2010-2011 Josh Kearney
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+"""Pyhole Keyword Plugin"""
+
+
+import re
+import string
+import urllib
+
+from pyhole import utils
+
+
+class Keywords(object):
+    """Watch for keywords in IRC messages"""
+
+    def __init__(self, irc):
+        self.irc = irc
+
+    @utils.spawn
+    def keyword_lp(self, params=None):
+        """Retrieve Launchpad bug information"""
+        if params:
+            bug = params.split(" ")[0]
+
+            try:
+                int(bug)
+            except ValueError:
+                return
+
+            url = "https://bugs.launchpad.net/nova/+bug/%s" % bug
+
+            try:
+                response = urllib.urlopen(url)
+            except IOError:
+                self.irc.say("Unable to fetch Launchpad data")
+                return
+
+            html = response.read()
+            t = re.search("<title>(.+)</title>", html)
+            if t:
+                status = re.search("class=\"value status.+\">(.+)</a>", html)
+                owner = re.search("class=\"sprite person\">(.+)</a>", html)
+                title = filter(lambda x: x in string.printable, t.group(1))
+
+                self.irc.say("Launchpad %s [%s | %s]" % (
+                    title,
+                    status.group(1),
+                    owner.group(1)))
