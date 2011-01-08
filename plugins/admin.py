@@ -48,6 +48,7 @@ class Admin(object):
         else:
             self.irc.say(self.help.__doc__)
             self.irc.say(self.irc.active_commands())
+            self.irc.say("Active Keywords: %s" % self.irc.active_keywords())
 
     def version(self, params=None):
         """Display the current version"""

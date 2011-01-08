@@ -90,13 +90,19 @@ class IRC(irclib.SimpleIRCClient):
         """List active commands"""
         return ", ".join(self.commands)
 
+    def active_keywords(self):
+        """List active keywords"""
+        return ", ".join(self.keywords)
+
     def match_direct(self, pattern_p, pattern, needle, haystack):
         """Match a direct command in a message"""
         c = needle.split(".", 1)[1]
         m = re.match(pattern_p % (self.command_prefix, c), haystack)
         if m:
+            self.addressed = False
             self.dispatch_command(needle, m.group(1))
         elif re.match(pattern % (self.command_prefix, c), haystack):
+            self.addressed = False
             self.dispatch_command(needle)
 
     def match_addressed(self, pattern_p, pattern, needle, haystack):
@@ -104,8 +110,10 @@ class IRC(irclib.SimpleIRCClient):
         c = needle.split(".", 1)[1]
         m = re.match(pattern_p % (self.nick, c), haystack)
         if m:
+            self.addressed = True
             self.dispatch_command(needle, m.group(1))
         elif re.match(pattern % (self.nick, c), haystack):
+            self.addressed = True
             self.dispatch_command(needle)
 
     def match_private(self, pattern_p, pattern, needle, haystack):
@@ -113,8 +121,10 @@ class IRC(irclib.SimpleIRCClient):
         c = needle.split(".", 1)[1]
         m = re.match(pattern_p % c, haystack)
         if m:
+            self.addressed = False
             self.dispatch_command(needle, m.group(1))
         elif re.match(pattern % c, haystack):
+            self.addressed = False
             self.dispatch_command(needle)
 
     def match_keyword(self, pattern, needle, haystack):
@@ -152,7 +162,11 @@ class IRC(irclib.SimpleIRCClient):
 
     def say(self, msg):
         """Send a privmsg"""
-        self.connection.privmsg(self.target, msg)
+        if self.addressed:
+            nick = self.source.split("!")[0]
+            self.connection.privmsg(self.target, "%s: %s" % (nick, msg))
+        else:
+            self.connection.privmsg(self.target, msg)
 
     def op_user(self, params):
         """Op a user"""

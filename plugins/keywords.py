@@ -29,7 +29,7 @@ class Keywords(object):
 
     @utils.spawn
     def keyword_lp(self, params=None):
-        """Retrieve Launchpad bug information"""
+        """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
             try:
                 int(params)
