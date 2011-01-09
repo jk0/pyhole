@@ -57,9 +57,9 @@ class Keywords(object):
                 return
 
             class Issue(ActiveResource):
-                _site = 'https://redmine.domain'
-                _user = 'username'
-                _password = 'password'
+                _site = "https://redmine.domain"
+                _user = "username"
+                _password = "password"
 
             try:
                 issue = Issue.find(params)
