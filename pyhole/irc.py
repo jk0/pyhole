@@ -45,6 +45,8 @@ class IRC(irclib.SimpleIRCClient):
         self.nick = network.get("nick")
         self.channels = network.get("channels", "list")
 
+        self.addressed = False
+
         self.load_plugins()
 
         self.log.info("Connecting to %s:%d as %s" % (
