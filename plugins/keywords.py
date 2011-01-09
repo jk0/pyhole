@@ -18,6 +18,9 @@
 import re
 import urllib
 
+from launchpadlib.launchpad import Launchpad
+from pyactiveresource.activeresource import ActiveResource
+
 from pyhole import utils
 
 
@@ -26,6 +29,7 @@ class Keywords(object):
 
     def __init__(self, irc):
         self.irc = irc
+        self.launchpad = Launchpad.login_anonymously("pyhole")
 
     @utils.spawn
     def keyword_lp(self, params=None):
@@ -36,22 +40,35 @@ class Keywords(object):
             except ValueError:
                 return
 
-            url = "https://bugs.launchpad.net/nova/+bug/%s" % params
-
             try:
-                response = urllib.urlopen(url)
-            except IOError:
-                self.irc.say("Unable to fetch Launchpad data")
+                bug = self.launchpad.bugs[params]
+
+                self.irc.say("Launchpad bug #%s %s [%s]" % (
+                    bug.id,
+                    bug.title,
+                    bug.bug_tasks[len(bug.bug_tasks) - 1].status))
+            except Exception:
                 return
 
-            html = response.read()
-            t = re.search("<title>(.+)</title>", html)
-            if t:
-                status = re.search("class=\"value status.+\">(.+)</a>", html)
-                owner = re.search("class=\"sprite person\">(.+)</a>", html)
-                title = utils.decode_entities(t.group(1))
+    @utils.spawn
+    def keyword_rm(self, params=None):
+        """Retrieve Redmine bug information (ex: RM12345)"""
+        if params:
+            try:
+                int(params)
+            except ValueError:
+                return
 
-                self.irc.say("Launchpad %s [%s | %s]" % (
-                    title,
-                    status.group(1),
-                    owner.group(1)))
+            class Issue(ActiveResource):
+                _site = 'https://redmine.domain'
+                _user = 'username'
+                _password = 'password'
+
+            try:
+                issue = Issue.find(params)
+
+                self.irc.say("Redmine bug #%s: %s" % (
+                    issue.id,
+                    issue.subject))
+            except Exception:
+                return

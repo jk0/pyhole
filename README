@@ -10,6 +10,8 @@ Core Requirements
 Module Requirements
 
     - IMDbPY
+    - launchpadlib
+    - pyactiveresource
     - pywapi
     - simplejson
 
