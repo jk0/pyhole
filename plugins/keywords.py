@@ -15,9 +15,6 @@
 """Pyhole Keyword Plugin"""
 
 
-import re
-import urllib
-
 from launchpadlib.launchpad import Launchpad
 from pyactiveresource.activeresource import ActiveResource
 
