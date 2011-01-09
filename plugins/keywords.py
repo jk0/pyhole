@@ -40,7 +40,7 @@ class Keywords(object):
             try:
                 bug = self.launchpad.bugs[params]
 
-                self.irc.say("Launchpad bug #%s %s [%s]" % (
+                self.irc.say("Launchpad bug #%s: %s [%s]" % (
                     bug.id,
                     bug.title,
                     bug.bug_tasks[len(bug.bug_tasks) - 1].status))
