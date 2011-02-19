@@ -76,7 +76,7 @@ class Keywords(object):
                 return
 
             xml = minidom.parseString(response.read())
-            for i, item in enumerate(xml.childNodes):
+            for item in xml.childNodes:
                 issue = dict(
                     id=item.childNodes[0].firstChild.data,
                     status=item.childNodes[3].\
