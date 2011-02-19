@@ -14,7 +14,6 @@
 
 """Pyhole Utility Library"""
 
-
 import eventlet
 import logging
 import re

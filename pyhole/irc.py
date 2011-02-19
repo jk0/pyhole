@@ -14,7 +14,6 @@
 
 """Event-based IRC Class"""
 
-
 import inspect
 import random
 import re

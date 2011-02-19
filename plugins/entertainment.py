@@ -14,7 +14,6 @@
 
 """Pyhole Entertainment Plugin"""
 
-
 import re
 import urllib
 

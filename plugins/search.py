@@ -14,7 +14,6 @@
 
 """Pyhole Search Plugin"""
 
-
 import imdb
 import re
 import simplejson

@@ -14,7 +14,6 @@
 
 """Pyhole Administration Plugin"""
 
-
 import sys
 
 from pyhole import utils

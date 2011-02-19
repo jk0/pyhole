@@ -14,7 +14,6 @@
 
 """Pyhole Weather Plugin"""
 
-
 import pywapi
 
 from pyhole import utils

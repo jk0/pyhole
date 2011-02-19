@@ -14,7 +14,6 @@
 
 """Pyhole Keyword Plugin"""
 
-
 from launchpadlib.launchpad import Launchpad
 from pyactiveresource.activeresource import ActiveResource
 
@@ -26,9 +25,9 @@ class Keywords(object):
 
     def __init__(self, irc):
         self.irc = irc
-        cachedir = ".cachedir"
-        self.launchpad = Launchpad.login_anonymously('pyhole', 'production', cachedir) 
-        #self.launchpad = Launchpad.login_anonymously("pyhole")
+        cachedir = "/tmp/pyhole/cache"
+        self.launchpad = Launchpad.login_anonymously(
+            "pyhole", "production", cachedir)
 
     @utils.spawn
     def keyword_lp(self, params=None):

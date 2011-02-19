@@ -14,7 +14,6 @@
 
 """Intelligent Configuration Library"""
 
-
 import ConfigParser
 import sys
 

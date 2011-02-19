@@ -16,7 +16,6 @@
 
 """pyhole - A modular IRC bot for Python developers."""
 
-
 import multiprocessing
 import sys
 import time
