@@ -147,7 +147,7 @@ class IRC(irclib.SimpleIRCClient):
             else:
                 self.log.debug("Eval: %s()" % command)
                 exec("%s()" % command)
-        except Exception as e:
+        except Exception, e:
             self.log.error(e)
 
     def poll_messages(self, message, private=False):

@@ -26,8 +26,8 @@ class Config(object):
         self.section = section
 
         try:
-            with open(file) as f:
-                self.config.readfp(f)
+            f = open(file)
+            self.config.readfp(f)
             f.closed
         except IOError:
             sys.exit("No such file: '%s'" % file)
