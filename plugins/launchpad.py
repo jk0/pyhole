@@ -24,19 +24,18 @@ class Launchpad(object):
 
     def __init__(self, irc):
         self.irc = irc
+        self.launchpad = LP.login_anonymously(
+            "pyhole",
+            "production",
+            self.irc.cache)
 
     @utils.spawn
     def bugs(self, params=None):
         """Display current bugs for a team (ex: .bugs <project> <team>)"""
         if params:
-            launchpad = LP.login_anonymously(
-                "pyhole",
-                "production",
-                self.irc.cache)
-
             project, team = params.split(" ")
-            members = launchpad.people[team]
-            proj = launchpad.projects[project]
+            members = self.launchpad.people[team]
+            proj = self.launchpad.projects[project]
 
             for person in members.members:
                 self.irc.log.debug("LP: Looking up %s" % person.display_name)
