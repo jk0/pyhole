@@ -24,7 +24,9 @@ import eventlet
 import urllib
 from eventlet.green import urllib2
 
+
 class Launchpad(object):
+
     """Provide access to Canonical's Launchpad http://launchpad.net"""
 
     def __init__(self, irc):
@@ -33,17 +35,17 @@ class Launchpad(object):
     @utils.spawn
     def bugs(self, params=None):
         """Display current bugs for team (ex: .bugs <project> <team>)"""
-        
+
         doc = urllib.urlopen("https://blueprints.launchpad.net/nova")
         cachedir = ".cachedir"
         launchpad = LP.login_anonymously('pyhole', 'production', cachedir)
-        pool=eventlet.GreenPool()
+        pool = eventlet.GreenPool()
         project, team = params.split(" ")
         ozone = launchpad.people[team]
         proj = launchpad.projects[project]
         for person in ozone.members:
-			print "Checking " + person.display_name
-			self.find_bugs(person, proj)
+            print "Checking " + person.display_name
+            self.find_bugs(person, proj)
 
     def find_bugs(self, person, proj):
         if str(person) == "None":
@@ -51,4 +53,4 @@ class Launchpad(object):
         bugs = proj.searchTasks(assignee=person)
         for b in bugs:
             self.irc.say(person.display_name + " " + b.web_link)
-            self.irc.say(b.title)
+            self.irc.say(b.titleg)
