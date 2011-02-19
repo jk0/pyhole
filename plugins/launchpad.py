@@ -14,8 +14,6 @@
 
 """Pyhole Launchpad Plugin"""
 
-import urllib
-
 from launchpadlib.launchpad import Launchpad as LP
 
 from pyhole import utils
