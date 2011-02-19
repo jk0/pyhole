@@ -16,7 +16,7 @@
 
 import urllib
 
-from launchpadlib.launchpad import Launchpad
+from launchpadlib.launchpad import Launchpad as LP
 from xml.dom import minidom
 
 from pyhole import utils
@@ -27,9 +27,10 @@ class Keywords(object):
 
     def __init__(self, irc):
         self.irc = irc
-        cachedir = "/tmp/pyhole/cache"
-        self.launchpad = Launchpad.login_anonymously(
-            "pyhole", "production", cachedir)
+        self.launchpad = LP.login_anonymously(
+            "pyhole",
+            "production",
+            self.irc.cache)
 
     @utils.spawn
     def keyword_lp(self, params=None):

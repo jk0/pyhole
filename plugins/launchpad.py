@@ -29,8 +29,10 @@ class Launchpad(object):
     def bugs(self, params=None):
         """Display current bugs for a team (ex: .bugs <project> <team>)"""
         if params:
-            cachedir = "/tmp/pyhole/cache"
-            launchpad = LP.login_anonymously("pyhole", "production", cachedir)
+            launchpad = LP.login_anonymously(
+                "pyhole",
+                "production",
+                self.irc.cache)
 
             project, team = params.split(" ")
             members = launchpad.people[team]

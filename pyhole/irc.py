@@ -36,6 +36,7 @@ class IRC(irclib.SimpleIRCClient):
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", "int")
         self.rejoin_delay = config.get("rejoin_delay", "int")
+        self.cache = config.get("cache")
 
         self.server = network.get("server")
         self.password = network.get("password")
