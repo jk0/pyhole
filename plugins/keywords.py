@@ -14,8 +14,10 @@
 
 """Pyhole Keyword Plugin"""
 
+import urllib
+
 from launchpadlib.launchpad import Launchpad
-from pyactiveresource.activeresource import ActiveResource
+from xml.dom import minidom
 
 from pyhole import utils
 
@@ -38,13 +40,16 @@ class Keywords(object):
             except ValueError:
                 return
 
+            lp = "https://bugs.launchpad.net/launchpad/+bug/"
+
             try:
                 bug = self.launchpad.bugs[params]
 
-                self.irc.say("Launchpad bug #%s: %s [%s]" % (
+                self.irc.say("Launchpad bug #%s: %s [Status: %s]" % (
                     bug.id,
                     bug.title,
                     bug.bug_tasks[len(bug.bug_tasks) - 1].status))
+                self.irc.say("%s%s" % (lp, bug.id))
             except Exception:
                 return
 
@@ -57,16 +62,34 @@ class Keywords(object):
             except ValueError:
                 return
 
-            class Issue(ActiveResource):
-                _site = "https://redmine.domain"
-                _user = "username"
-                _password = "password"
+            key = "abcd1234"
+            domain = "redmine.example.com"
+            url = "https://%s:password@%s/issues/%s.xml" % (
+                key,
+                domain,
+                params)
 
             try:
-                issue = Issue.find(params)
-
-                self.irc.say("Redmine bug #%s: %s" % (
-                    issue.id,
-                    issue.subject))
-            except Exception:
+                response = urllib.urlopen(url)
+            except IOError:
+                self.irc.say("Unable to fetch Redmine data")
                 return
+
+            xml = minidom.parseString(response.read())
+            for i, item in enumerate(xml.childNodes):
+                issue = dict(
+                    id=item.childNodes[0].firstChild.data,
+                    status=item.childNodes[3].\
+                        _attrsNS.values()[1].firstChild.data,
+                    assigned_to=item.childNodes[6].\
+                        _attrsNS.values()[1].firstChild.data,
+                    subject=item.childNodes[9].firstChild.data)
+
+            self.irc.say("Redmine bug #%s: %s [Status: %s, Assigned: %s]" % (
+                issue["id"],
+                issue["subject"],
+                issue["status"],
+                issue["assigned_to"]))
+            self.irc.say("https://%s/issues/show/%s" % (
+                domain,
+                issue["id"]))
