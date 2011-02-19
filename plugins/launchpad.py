@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2011 Paul Voccio
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,43 +14,39 @@
 
 """Pyhole Launchpad Plugin"""
 
+import urllib
 
-import pywapi
+from launchpadlib.launchpad import Launchpad as LP
 
 from pyhole import utils
 
-from launchpadlib.launchpad import Launchpad as LP
-import eventlet
-import urllib
-from eventlet.green import urllib2
-
 
 class Launchpad(object):
-
-    """Provide access to Canonical's Launchpad http://launchpad.net"""
+    """Provide access to Canonical's Launchpad"""
 
     def __init__(self, irc):
         self.irc = irc
 
     @utils.spawn
     def bugs(self, params=None):
-        """Display current bugs for team (ex: .bugs <project> <team>)"""
+        """Display current bugs for a team (ex: .bugs <project> <team>)"""
+        if params:
+            cachedir = "/tmp/pyhole/cache"
+            launchpad = LP.login_anonymously("pyhole", "production", cachedir)
 
-        doc = urllib.urlopen("https://blueprints.launchpad.net/nova")
-        cachedir = ".cachedir"
-        launchpad = LP.login_anonymously('pyhole', 'production', cachedir)
-        pool = eventlet.GreenPool()
-        project, team = params.split(" ")
-        ozone = launchpad.people[team]
-        proj = launchpad.projects[project]
-        for person in ozone.members:
-            print "Checking " + person.display_name
-            self.find_bugs(person, proj)
+            project, team = params.split(" ")
+            members = launchpad.people[team]
+            proj = launchpad.projects[project]
 
-    def find_bugs(self, person, proj):
-        if str(person) == "None":
-            next
+            for person in members.members:
+                self.irc.log.debug("LP: Looking up %s" % person.display_name)
+                self._find_bugs(person, proj)
+        else:
+            self.irc.say(self.bugs.__doc__)
+
+    def _find_bugs(self, person, proj):
+        """Lookup Launchpad bugs"""
         bugs = proj.searchTasks(assignee=person)
         for b in bugs:
-            self.irc.say(person.display_name + " " + b.web_link)
-            self.irc.say(b.titleg)
+            self.irc.say("%s %s" % (person.display_name, b.web_link))
+            self.irc.say(b.title)
