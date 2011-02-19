@@ -27,7 +27,7 @@ class Keywords(object):
     def __init__(self, irc):
         self.irc = irc
         cachedir = ".cachedir"
-        self.launchpad = Launchpad.login_anonymously('just testing', 'production', cachedir) 
+        self.launchpad = Launchpad.login_anonymously('pyhole', 'production', cachedir) 
         #self.launchpad = Launchpad.login_anonymously("pyhole")
 
     @utils.spawn
