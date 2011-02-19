@@ -32,14 +32,15 @@ class Launchpad(object):
 
     @utils.spawn
     def bugs(self, params=None):
-        """Display current bugs for team (ex: .bugs <team>)"""
+        """Display current bugs for team (ex: .bugs <project> <team>)"""
         
         doc = urllib.urlopen("https://blueprints.launchpad.net/nova")
         cachedir = ".cachedir"
         launchpad = LP.login_anonymously('pyhole', 'production', cachedir)
         pool=eventlet.GreenPool()
-        ozone = launchpad.people['rackspace-ozone']
-        proj = launchpad.projects['nova']
+        project, team = params.split(" ")
+        ozone = launchpad.people[team]
+        proj = launchpad.projects[project]
         for person in ozone.members:
 			print "Checking " + person.display_name
 			self.find_bugs(person, proj)
@@ -49,8 +50,5 @@ class Launchpad(object):
             next
         bugs = proj.searchTasks(assignee=person)
         for b in bugs:
-            self.irc.say(person.display_name + " " + str(b))
-     
-
-
-
+            self.irc.say(person.display_name + " " + b.web_link)
+            self.irc.say(b.title)
