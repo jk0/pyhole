@@ -18,3 +18,4 @@ from plugins import keywords
 from plugins import news
 from plugins import search
 from plugins import weather
+from plugins import launchpad
