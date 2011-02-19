@@ -28,7 +28,7 @@ class Config(object):
         try:
             f = open(file)
             self.config.readfp(f)
-            f.closed
+            f.close()
         except IOError:
             sys.exit("No such file: '%s'" % file)
 
