@@ -14,7 +14,6 @@
 
 """Event-based IRC Class"""
 
-
 import inspect
 import random
 import re
@@ -141,6 +140,7 @@ class IRC(irclib.SimpleIRCClient):
                 self.dispatch_command(needle, params)
 
     def dispatch_command(self, command, params=None):
+        """Execute a bot command"""
         try:
             if params:
                 self.log.debug("Eval: %s(\"%s\")" % (command, params))
@@ -148,7 +148,7 @@ class IRC(irclib.SimpleIRCClient):
             else:
                 self.log.debug("Eval: %s()" % command)
                 exec("%s()" % command)
-        except Exception as e:
+        except Exception, e:
             self.log.error(e)
 
     def poll_messages(self, message, private=False):

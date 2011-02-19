@@ -14,7 +14,6 @@
 
 """Pyhole News Plugin"""
 
-
 import urllib
 
 from xml.dom import minidom

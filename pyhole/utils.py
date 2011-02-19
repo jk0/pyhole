@@ -14,7 +14,6 @@
 
 """Pyhole Utility Library"""
 
-
 import eventlet
 import logging
 import re
@@ -35,7 +34,6 @@ def logger(name, debug=False):
 
 def admin(func):
     """Administration Decorator"""
-
     def f(self, *args, **kwargs):
         if self.irc.source == self.irc.admin:
             func(self, *args, **kwargs)
@@ -47,7 +45,6 @@ def admin(func):
 
 def spawn(func):
     """Greenthread Spawning Decorator"""
-
     def f(self, *args, **kwargs):
         eventlet.spawn_n(func, self, *args, **kwargs)
     f.__doc__ = func.__doc__

@@ -16,7 +16,6 @@
 
 """pyhole - A modular IRC bot for Python developers."""
 
-
 import multiprocessing
 import sys
 import time
@@ -51,7 +50,7 @@ def irc_connection(b_config, b_network):
     while True:
         try:
             connection = irc.IRC(b_config, n_config, n_log, __version__)
-        except Exception as e:
+        except Exception, e:
             n_log.error(e)
             n_log.error("Retrying in %d seconds" % reconnect_delay)
             time.sleep(reconnect_delay)
@@ -61,7 +60,7 @@ def irc_connection(b_config, b_network):
             connection.start()
         except KeyboardInterrupt:
             sys.exit(1)
-        except Exception as e:
+        except Exception, e:
             n_log.error(e)
             n_log.error("Retrying in %d seconds" % reconnect_delay)
             time.sleep(reconnect_delay)
