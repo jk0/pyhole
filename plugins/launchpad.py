@@ -31,7 +31,7 @@ class Launchpad(object):
 
     @utils.spawn
     def teambugs(self, params=None):
-        """Display current bugs for a team (ex: .bugs <project> <team>|<user>)"""
+        """Current bugs for a team (ex: .bugs <project> <team>|<user>)"""
         if params:
             project, team = params.split(" ")
             try:
@@ -41,7 +41,7 @@ class Launchpad(object):
                 self._find_bugs(members, proj)
                 #find everyone on the team
                 for person in members.members:
-                    self.irc.log.debug("LP: Looking up %s" % person.display_name)
+                    self.irc.log.debug("LP: %s" % person.display_name)
                     self._find_bugs(person, proj)
             except KeyError:
                 self.irc.say("Sads. Can't find %s user in Launchpad" % (team))
@@ -56,6 +56,4 @@ class Launchpad(object):
                 self.irc.say("%s %s" % (person.display_name, b.web_link))
                 self.irc.say(b.title)
         else:
-	        self.irc.say("Yay, no bugs found for %s" % (person.display_name))
-
-			
+            self.irc.say("Yay, no bugs found for %s" % (person.display_name))
