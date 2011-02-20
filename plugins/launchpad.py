@@ -30,7 +30,7 @@ class Launchpad(object):
             self.irc.cache)
 
     @utils.spawn
-    def teambugs(self, params=None):
+    def bugs(self, params=None):
         """Current bugs for a team (ex: .bugs <project> <team>|<user>)"""
         if params:
             project, team = params.split(" ")
