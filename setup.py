@@ -13,7 +13,7 @@ setup(
     name = "pyhole",
     version = "0.5.1",
     description = "Modular IRC Bot for Python",
-    long_description = read('README.rst'),
+    long_description = read('README'),
     url = 'https://github.com/jk0/pyhole',
     license = 'Apache',
     author = 'Josh Kearney',
@@ -29,8 +29,4 @@ setup(
         'Programming Language :: Python',
     ],
     install_requires = requirements,
-    
-    entry_points = {
-        'console_scripts': ['pyhole = pyhole.py']
-    }
 )
