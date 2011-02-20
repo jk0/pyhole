@@ -30,13 +30,15 @@ class Launchpad(object):
             self.irc.cache)
 
     @utils.spawn
-    def bugs(self, params=None):
-        """Display current bugs for a team (ex: .bugs <project> <team>)"""
+    def teambugs(self, params=None):
+        """Display current bugs for a team (ex: .bugs <project> <team>|<user>)"""
         if params:
             project, team = params.split(" ")
             members = self.launchpad.people[team]
             proj = self.launchpad.projects[project]
-
+            #find a single member
+            self._find_bugs(members, proj)
+            #find everyone on the team
             for person in members.members:
                 self.irc.log.debug("LP: Looking up %s" % person.display_name)
                 self._find_bugs(person, proj)
