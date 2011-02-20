@@ -7,7 +7,7 @@ Core Requirements
     - Eventlet
 
 
-Module Requirements
+Plugin Requirements
 
     - IMDbPY
     - launchpadlib
