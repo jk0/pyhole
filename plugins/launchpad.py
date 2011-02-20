@@ -34,20 +34,28 @@ class Launchpad(object):
         """Display current bugs for a team (ex: .bugs <project> <team>|<user>)"""
         if params:
             project, team = params.split(" ")
-            members = self.launchpad.people[team]
-            proj = self.launchpad.projects[project]
-            #find a single member
-            self._find_bugs(members, proj)
-            #find everyone on the team
-            for person in members.members:
-                self.irc.log.debug("LP: Looking up %s" % person.display_name)
-                self._find_bugs(person, proj)
+            try:
+                members = self.launchpad.people[team]
+                proj = self.launchpad.projects[project]
+                #find a single member
+                self._find_bugs(members, proj)
+                #find everyone on the team
+                for person in members.members:
+                    self.irc.log.debug("LP: Looking up %s" % person.display_name)
+                    self._find_bugs(person, proj)
+            except KeyError:
+                self.irc.say("Sads. Can't find %s user in Launchpad" % (team))
         else:
             self.irc.say(self.bugs.__doc__)
 
     def _find_bugs(self, person, proj):
         """Lookup Launchpad bugs"""
         bugs = proj.searchTasks(assignee=person)
-        for b in bugs:
-            self.irc.say("%s %s" % (person.display_name, b.web_link))
-            self.irc.say(b.title)
+        if len(bugs):
+            for b in bugs:
+                self.irc.say("%s %s" % (person.display_name, b.web_link))
+                self.irc.say(b.title)
+        else:
+	        self.irc.say("Yay, no bugs found for %s" % (person.display_name))
+
+			
