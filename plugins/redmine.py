@@ -12,47 +12,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Keyword Plugin"""
+"""Pyhole Redmine Plugin"""
 
 import urllib
 
-from launchpadlib.launchpad import Launchpad as LP
 from xml.dom import minidom
 
 from pyhole import utils
 
 
-class Keywords(object):
-    """Watch for keywords in IRC messages"""
+class Redmine(object):
+    """Provide access to the Redmine API"""
 
     def __init__(self, irc):
         self.irc = irc
-        self.launchpad = LP.login_anonymously(
-            "pyhole",
-            "production",
-            self.irc.cache)
-
-    @utils.spawn
-    def keyword_lp(self, params=None):
-        """Retrieve Launchpad bug information (ex: LP12345)"""
-        if params:
-            try:
-                int(params)
-            except ValueError:
-                return
-
-            lp = "https://bugs.launchpad.net/launchpad/+bug/"
-
-            try:
-                bug = self.launchpad.bugs[params]
-
-                self.irc.say("Launchpad bug #%s: %s [Status: %s]" % (
-                    bug.id,
-                    bug.title,
-                    bug.bug_tasks[len(bug.bug_tasks) - 1].status))
-                self.irc.say("%s%s" % (lp, bug.id))
-            except Exception:
-                return
 
     @utils.spawn
     def keyword_rm(self, params=None):

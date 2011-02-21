@@ -20,7 +20,7 @@ from pyhole import utils
 
 
 class Launchpad(object):
-    """Provide access to Canonical's Launchpad"""
+    """Provide access to the Launchpad API"""
 
     def __init__(self, irc):
         self.irc = irc
@@ -49,6 +49,28 @@ class Launchpad(object):
                 self.irc.say("Unable to find user '%s' in Launchpad" % team)
         else:
             self.irc.say(self.bugs.__doc__)
+
+    @utils.spawn
+    def keyword_lp(self, params=None):
+        """Retrieve Launchpad bug information (ex: LP12345)"""
+        if params:
+            try:
+                int(params)
+            except ValueError:
+                return
+
+            lp = "https://bugs.launchpad.net/launchpad/+bug/"
+
+            try:
+                bug = self.launchpad.bugs[params]
+
+                self.irc.say("Launchpad bug #%s: %s [Status: %s]" % (
+                    bug.id,
+                    bug.title,
+                    bug.bug_tasks[len(bug.bug_tasks) - 1].status))
+                self.irc.say("%s%s" % (lp, bug.id))
+            except Exception:
+                return
 
     def _find_bugs(self, person, project, single=False):
         """Lookup Launchpad bugs"""
