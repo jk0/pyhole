@@ -17,8 +17,6 @@
 import urllib
 import simplejson
 
-from xml.dom import minidom
-
 from pyhole import utils
 
 
@@ -33,49 +31,15 @@ class Redmine(object):
 
     @utils.spawn
     def rbugs(self, params=None):
-        """Redmine bugs for a user (ex: .rbugs <user>)"""
+        """Redmine bugs for a user (ex: .rbugs <login>)"""
         if params:
-            user = params.split(" ", 1)[0]
-            user_id = None
-            users_url = "%s/users.json?limit=1000" % self.redmine_url
+            login = params.split(" ", 1)[0]
+            user_id = self._find_user(login)
 
-            try:
-                users_response = urllib.urlopen(users_url)
-            except IOError:
-                self.irc.say("Unable to fetch Redmine data")
-                return
-
-            users = simplejson.loads(users_response.read())["users"]
-            for redmine_user in users:
-                if user == redmine_user["login"]:
-                    user_id = int(redmine_user["id"])
-
-            if not user_id:
-                self.irc.say("Redmine user '%s' not found" % user)
-                return
-
-            issues_url = "%s/issues.json?assigned_to_id=%d" % (
-                self.redmine_url,
-                user_id)
-
-            try:
-                issues_response = urllib.urlopen(issues_url)
-            except IOError:
-                self.irc.say("Unable to fetch Redmine data")
-                return
-
-            issues = simplejson.loads(issues_response.read())["issues"]
+            issues = self._find_issues(user_id)
             for i, issue in enumerate(issues):
                 if i <= 4:
-                    self.irc.say("Redmine bug #%d: %s"
-                        "[Status: %s, Assignee: %s]" % (
-                            issue["id"],
-                            issue["subject"],
-                            issue["status"]["name"],
-                            issue["assigned_to"]["name"]))
-                    self.irc.say("https://%s/issues/show/%s" % (
-                        self.irc.redmine_domain,
-                        issue["id"]))
+                    self._find_issue(issue["id"])
                 else:
                     self.irc.say("[...] truncated last %d bugs" % (
                         len(issues) - i))
@@ -87,34 +51,64 @@ class Redmine(object):
     def keyword_rm(self, params=None):
         """Retrieve Redmine bug information (ex: RM12345)"""
         if params:
-            try:
-                int(params)
-            except ValueError:
-                return
+            utils.ensure_int(params)
+            self._find_issue(params)
 
-            url = "%s/issues/%s.xml" % (self.redmine_url, params)
+    def _find_issues(self, user_id):
+        """Find all issues for a Redmine user"""
+        url = "%s/issues.json?assigned_to_id=%s" % (
+            self.redmine_url,
+            user_id)
 
-            try:
-                response = urllib.urlopen(url)
-            except IOError:
-                self.irc.say("Unable to fetch Redmine data")
-                return
+        try:
+            response = urllib.urlopen(url)
+        except IOError:
+            self.irc.say("Unable to fetch Redmine data")
+            return
 
-            xml = minidom.parseString(response.read())
-            for item in xml.childNodes:
-                issue = dict(
-                    id=item.childNodes[0].firstChild.data,
-                    status=item.childNodes[3].\
-                        _attrsNS.values()[1].firstChild.data,
-                    assigned_to=item.childNodes[6].\
-                        _attrsNS.values()[1].firstChild.data,
-                    subject=item.childNodes[9].firstChild.data)
+        return simplejson.loads(response.read())["issues"]
 
-            self.irc.say("Redmine bug #%s: %s [Status: %s, Assignee: %s]" % (
-                issue["id"],
-                issue["subject"],
-                issue["status"],
-                issue["assigned_to"]))
-            self.irc.say("https://%s/issues/show/%s" % (
-                self.irc.redmine_domain,
-                issue["id"]))
+    def _find_user(self, login):
+        """Find a specific Redmine user"""
+        for user in self._find_users():
+            if login == user["login"]:
+                return user["id"]
+        else:
+            self.irc.say("Redmine user '%s' not found" % login)
+            return
+
+    def _find_users(self):
+        """Find all Redmine users"""
+        url = "%s/users.json?limit=1000" % self.redmine_url
+
+        try:
+            response = urllib.urlopen(url)
+        except IOError:
+            self.irc.say("Unable to fetch Redmine data")
+            return
+
+        return simplejson.loads(response.read())["users"]
+
+    def _find_issue(self, issue_id):
+        """Find and display a Redmine issue"""
+        url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
+
+        try:
+            response = urllib.urlopen(url)
+        except IOError:
+            self.irc.say("Unable to fetch Redmine data")
+            return
+
+        try:
+            issue = simplejson.loads(response.read())["issue"]
+        except:
+            return
+
+        self.irc.say("Redmine bug #%s: %s [Status: %s, Assignee: %s]" % (
+            issue["id"],
+            issue["subject"],
+            issue["status"]["name"],
+            issue["assigned_to"]["name"]))
+        self.irc.say("https://%s/issues/show/%s" % (
+            self.irc.redmine_domain,
+            issue["id"]))

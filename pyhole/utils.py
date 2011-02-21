@@ -65,3 +65,11 @@ def decode_entities(html):
     html = filter(lambda x: x in string.printable, html)
 
     return html.strip()
+
+
+def ensure_int(param):
+    """Ensure the given param is an int"""
+    try:
+        int(param)
+    except ValueError:
+        return

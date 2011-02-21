@@ -54,11 +54,7 @@ class Launchpad(object):
     def keyword_lp(self, params=None):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
-            try:
-                int(params)
-            except ValueError:
-                return
-
+            utils.ensure_int(params)
             lp = "https://bugs.launchpad.net/launchpad/+bug/"
 
             try:
