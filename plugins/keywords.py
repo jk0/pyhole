@@ -63,11 +63,9 @@ class Keywords(object):
             except ValueError:
                 return
 
-            key = "abcd1234"
-            domain = "redmine.example.com"
             url = "https://%s:password@%s/issues/%s.xml" % (
-                key,
-                domain,
+                self.irc.redmine_key,
+                self.irc.redmine_domain,
                 params)
 
             try:
@@ -92,5 +90,5 @@ class Keywords(object):
                 issue["status"],
                 issue["assigned_to"]))
             self.irc.say("https://%s/issues/show/%s" % (
-                domain,
+                self.irc.redmine_domain,
                 issue["id"]))

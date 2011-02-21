@@ -29,6 +29,7 @@ __version__ = "pyhole v0.0.6 - http://pyhole.org"
 __config__ = "pyhole.cfg"
 
 b_config = config.Config(__config__, "pyhole")
+r_config = config.Config(__config__, "Redmine")
 b_debug = b_config.get("debug", "bool")
 
 
@@ -36,7 +37,7 @@ def network_list(sections):
     """Prepare the list of IRC networks"""
     networks = []
     for network in sections:
-        if network != "pyhole":
+        if network != "pyhole" and network != "Redmine":
             networks.append(network)
     return networks
 
@@ -49,7 +50,12 @@ def irc_connection(b_config, b_network):
 
     while True:
         try:
-            connection = irc.IRC(b_config, n_config, n_log, __version__)
+            connection = irc.IRC(
+                b_config,
+                r_config,
+                n_config,
+                n_log,
+                __version__)
         except Exception, e:
             n_log.error(e)
             n_log.error("Retrying in %d seconds" % reconnect_delay)

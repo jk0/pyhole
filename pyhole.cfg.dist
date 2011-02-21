@@ -1,3 +1,5 @@
+# Global Configuration
+
 [pyhole]
 admin: nick!ident
 command_prefix: .
@@ -5,6 +7,12 @@ reconnect_delay: 60
 rejoin_delay: 5
 cache: /tmp/pyhole/cache
 debug: False
+
+[Redmine]
+domain: redmine.example.com
+key: abcd1234
+
+# IRC Network Configuration
 
 [FreeNode]
 server: irc.freenode.net
