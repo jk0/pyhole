@@ -30,10 +30,10 @@ class Launchpad(object):
             self.irc.cache)
 
     @utils.spawn
-    def bugs(self, params=None):
-        """Current bugs for a team (ex: .bugs <project> <team>|<user>)"""
+    def lbugs(self, params=None):
+        """Launchpad bugs for a team (ex: .lbugs <project> <team>|<user>)"""
         if params:
-            project, team = params.split(" ")
+            project, team = params.split(" ", 2)
             try:
                 members = self.launchpad.people[team]
                 proj = self.launchpad.projects[project]
@@ -48,7 +48,7 @@ class Launchpad(object):
             except KeyError:
                 self.irc.say("Unable to find user '%s' in Launchpad" % team)
         else:
-            self.irc.say(self.bugs.__doc__)
+            self.irc.say(self.lbugs.__doc__)
 
     @utils.spawn
     def keyword_lp(self, params=None):

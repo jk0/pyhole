@@ -15,6 +15,7 @@
 """Pyhole Redmine Plugin"""
 
 import urllib
+import simplejson
 
 from xml.dom import minidom
 
@@ -26,6 +27,61 @@ class Redmine(object):
 
     def __init__(self, irc):
         self.irc = irc
+        self.redmine_url = "https://%s:password@%s" % (
+            self.irc.redmine_key,
+            self.irc.redmine_domain)
+
+    @utils.spawn
+    def rbugs(self, params=None):
+        """Redmine bugs for a user (ex: .rbugs <user>)"""
+        if params:
+            user = params.split(" ", 1)[0]
+            user_id = None
+            users_url = "%s/users.json?limit=1000" % self.redmine_url
+
+            try:
+                users_response = urllib.urlopen(users_url)
+            except IOError:
+                self.irc.say("Unable to fetch Redmine data")
+                return
+
+            users = simplejson.loads(users_response.read())["users"]
+            for redmine_user in users:
+                if user == redmine_user["login"]:
+                    user_id = int(redmine_user["id"])
+
+            if not user_id:
+                self.irc.say("Redmine user '%s' not found" % user)
+                return
+
+            issues_url = "%s/issues.json?assigned_to_id=%d" % (
+                self.redmine_url,
+                user_id)
+
+            try:
+                issues_response = urllib.urlopen(issues_url)
+            except IOError:
+                self.irc.say("Unable to fetch Redmine data")
+                return
+
+            issues = simplejson.loads(issues_response.read())["issues"]
+            for i, issue in enumerate(issues):
+                if i <= 4:
+                    self.irc.say("Redmine bug #%d: %s"
+                        "[Status: %s, Assignee: %s]" % (
+                            issue["id"],
+                            issue["subject"],
+                            issue["status"]["name"],
+                            issue["assigned_to"]["name"]))
+                    self.irc.say("https://%s/issues/show/%s" % (
+                        self.irc.redmine_domain,
+                        issue["id"]))
+                else:
+                    self.irc.say("[...] truncated last %d bugs" % (
+                        len(issues) - i))
+                    return
+        else:
+            self.irc.say(self.rbugs.__doc__)
 
     @utils.spawn
     def keyword_rm(self, params=None):
@@ -36,10 +92,7 @@ class Redmine(object):
             except ValueError:
                 return
 
-            url = "https://%s:password@%s/issues/%s.xml" % (
-                self.irc.redmine_key,
-                self.irc.redmine_domain,
-                params)
+            url = "%s/issues/%s.xml" % (self.redmine_url, params)
 
             try:
                 response = urllib.urlopen(url)
@@ -57,7 +110,7 @@ class Redmine(object):
                         _attrsNS.values()[1].firstChild.data,
                     subject=item.childNodes[9].firstChild.data)
 
-            self.irc.say("Redmine bug #%s: %s [Status: %s, Assigned: %s]" % (
+            self.irc.say("Redmine bug #%s: %s [Status: %s, Assignee: %s]" % (
                 issue["id"],
                 issue["subject"],
                 issue["status"],
