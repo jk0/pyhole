@@ -101,7 +101,7 @@ class Redmine(object):
         except:
             return
 
-        self.irc.say("RM bug #%s: %s [Status: %s, Assignee: %s]" % (
+        self.irc.say("RM Bug #%s: %s [Status: %s, Assignee: %s]" % (
             issue["id"],
             issue["subject"],
             issue["status"]["name"],
