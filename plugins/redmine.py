@@ -44,6 +44,8 @@ class Redmine(object):
                     self.irc.say("[...] truncated last %d bugs" % (
                         len(issues) - i))
                     return
+            else:
+                self.irc.say("No Redmine bugs found for '%s'" % login)
         else:
             self.irc.say(self.rbugs.__doc__)
 
@@ -73,13 +75,19 @@ class Redmine(object):
         for user in self._find_users():
             if login == user["login"]:
                 return user["id"]
-        else:
-            self.irc.say("Redmine user '%s' not found" % login)
-            return
 
-    def _find_users(self):
+        for user in self._find_users(100):
+            if login == user["login"]:
+                return user["id"]
+
+    def _find_users(self, offset=None):
         """Find all Redmine users"""
-        url = "%s/users.json?limit=1000" % self.redmine_url
+        if offset:
+            url = "%s/users.json?limit=100&offset=%d" % (
+                self.redmine_url,
+                offset)
+        else:
+            url = "%s/users.json?limit=100" % self.redmine_url
 
         try:
             response = urllib.urlopen(url)
