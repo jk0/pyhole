@@ -14,8 +14,8 @@
 
 """Pyhole Redmine Plugin"""
 
-import urllib
 import simplejson
+import urllib
 
 from pyhole import utils
 
