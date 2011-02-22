@@ -15,7 +15,6 @@
 """Pyhole Entertainment Plugin"""
 
 import re
-import urllib
 
 from pyhole import utils
 
@@ -25,17 +24,13 @@ class Entertainment(object):
 
     def __init__(self, irc):
         self.irc = irc
+        self.name = self.__class__.__name__
 
     @utils.spawn
     def grouphug(self, params=None):
         """Display a random Group Hug (ex: .grouphug)"""
         url = "http://grouphug.us/random"
-
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Group Hug data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         html = response.read()
         r = re.compile("<div class=\"content\">\n\s+<p>(.*)</p>\n\s+</div>")
@@ -52,11 +47,7 @@ class Entertainment(object):
         url = ("http://www.textsfromlastnight.com/"
             "Random-Texts-From-Last-Night.html")
 
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Texts From Last Night data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         html = response.read()
         r = re.compile("<p><a href=\"/Text-Replies-.+.html\">(.*)</a></p>")

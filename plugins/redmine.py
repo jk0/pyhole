@@ -15,7 +15,6 @@
 """Pyhole Redmine Plugin"""
 
 import simplejson
-import urllib
 
 from pyhole import utils
 
@@ -25,6 +24,7 @@ class Redmine(object):
 
     def __init__(self, irc):
         self.irc = irc
+        self.name = self.__class__.__name__
         self.redmine_url = "https://%s:password@%s" % (
             self.irc.redmine_key,
             self.irc.redmine_domain)
@@ -64,11 +64,7 @@ class Redmine(object):
             self.redmine_url,
             user_id)
 
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Redmine data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         return simplejson.loads(response.read())["issues"]
 
@@ -91,23 +87,14 @@ class Redmine(object):
         else:
             url = "%s/users.json?limit=100" % self.redmine_url
 
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Redmine data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         return simplejson.loads(response.read())["users"]
 
     def _find_issue(self, issue_id):
         """Find and display a Redmine issue"""
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
-
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Redmine data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         try:
             issue = simplejson.loads(response.read())["issue"]

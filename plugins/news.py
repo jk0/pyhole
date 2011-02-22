@@ -14,8 +14,6 @@
 
 """Pyhole News Plugin"""
 
-import urllib
-
 from xml.dom import minidom
 
 from pyhole import utils
@@ -26,17 +24,13 @@ class News(object):
 
     def __init__(self, irc):
         self.irc = irc
+        self.name = self.__class__.__name__
 
     @utils.spawn
     def cnn(self, params=None):
         """Display current CNN news (ex: .cnn)"""
         url = "http://rss.cnn.com/rss/cnn_topstories.rss"
-
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch CNN data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[2].childNodes[0].childNodes):
@@ -50,12 +44,7 @@ class News(object):
     def digg(self, params=None):
         """Display current Digg news (ex: .digg)"""
         url = "http://services.digg.com/2.0/story.getTopNews?type=rss"
-
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Digg data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[0].childNodes[1].childNodes):
@@ -69,12 +58,7 @@ class News(object):
     def hackernews(self, params=None):
         """Display current Hacker News links (ex: .hackernews)"""
         url = "http://news.ycombinator.com/rss"
-
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Hacker News data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.firstChild.childNodes[0].childNodes):
@@ -88,12 +72,7 @@ class News(object):
     def reddit(self, params=None):
         """Display current reddit news (ex: .reddit)"""
         url = "http://www.reddit.com/.rss"
-
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch reddit data")
-            return
+        response = self.irc.fetch_url(url, self.name)
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[0].childNodes[0].childNodes):
@@ -102,22 +81,3 @@ class News(object):
                 self.irc.say("%s: %s" % (
                     ref[0].firstChild.data.encode("ascii", "ignore"),
                     ref[1].firstChild.data.encode("ascii", "ignore")))
-
-    @utils.spawn
-    def slashdot(self, params=None):
-        """Display current Slashdot news (ex: .slashdot)"""
-        url = "http://rss.slashdot.org/Slashdot/slashdot"
-
-        try:
-            response = urllib.urlopen(url)
-        except IOError:
-            self.irc.say("Unable to fetch Slashdot data")
-            return
-
-        xml = minidom.parseString(response.read())
-        for i, item in enumerate(xml.childNodes[1].childNodes[0].childNodes):
-            if i >= 21 and i <= 24:
-                ref = item.childNodes
-                self.irc.say("%s: %s" % (
-                    ref[0].firstChild.data,
-                    ref[1].firstChild.data))

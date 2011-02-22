@@ -29,6 +29,7 @@ class Search(object):
 
     def __init__(self, irc):
         self.irc = irc
+        self.name = self.__class__.__name__
 
     @utils.spawn
     def google(self, params=None):
@@ -38,11 +39,7 @@ class Search(object):
             url = ("http://ajax.googleapis.com/ajax/"
                 "services/search/web?v=1.0&%s" % query)
 
-            try:
-                response = urllib.urlopen(url)
-            except IOError:
-                self.irc.say("Unable to fetch Google data")
-                return
+            response = self.irc.fetch_url(url, self.name)
 
             json = simplejson.loads(response.read())
             results = json["responseData"]["results"]
@@ -89,12 +86,7 @@ class Search(object):
         if params:
             query = urllib.urlencode({"q": params, "rpp": 4})
             url = "http://search.twitter.com/search.json?%s" % query
-
-            try:
-                response = urllib.urlopen(url)
-            except IOError:
-                self.irc.say("Unable to fetch Twitter data")
-                return
+            response = self.irc.fetch_url(url, self.name)
 
             json = simplejson.loads(response.read())
             results = json["results"]
@@ -115,12 +107,7 @@ class Search(object):
         if params:
             query = urllib.urlencode({"term": params})
             url = "http://www.urbandictionary.com/define.php?%s" % query
-
-            try:
-                response = urllib.urlopen(url)
-            except IOError:
-                self.irc.say("Unable to fetch Urban Dictionary data")
-                return
+            response = self.irc.fetch_url(url, self.name)
 
             html = response.read()
             if re.search("<i>%s</i>\nisn't defined" % params, html):
@@ -150,12 +137,7 @@ class Search(object):
                 "gapfrom": params,
                 "format": "xml"})
             url = "http://en.wikipedia.org/w/api.php?%s" % query
-
-            try:
-                response = urllib.urlopen(url)
-            except IOError:
-                self.irc.say("Unable to fetch Wikipedia data")
-                return
+            response = self.irc.fetch_url(url, self.name)
 
             xml = minidom.parseString(response.read())
             for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
@@ -175,12 +157,7 @@ class Search(object):
                 "max-results": 4,
                 "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
-
-            try:
-                response = urllib.urlopen(url)
-            except IOError:
-                self.irc.say("Unable to fetch YouTube data")
-                return
+            response = self.irc.fetch_url(url, self.name)
 
             json = simplejson.loads(response.read())
             results = json["data"]

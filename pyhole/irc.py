@@ -18,6 +18,7 @@ import inspect
 import random
 import re
 import time
+import urllib
 
 import irclib
 import plugins
@@ -205,6 +206,14 @@ class IRC(irclib.SimpleIRCClient):
         self.channels.remove(params)
         self.say("Parting %s" % params)
         self.connection.part(params)
+
+    def fetch_url(self, url, name):
+        """Fetch a URL"""
+        try:
+            return urllib.urlopen(url)
+        except IOError:
+            self.say("Unable to fetch %s data" % name)
+            return
 
     def on_nicknameinuse(self, connection, event):
         """Ensure the use of unique IRC nick"""
