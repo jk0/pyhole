@@ -37,15 +37,17 @@ class Redmine(object):
             user_id = self._find_user(login)
 
             issues = self._find_issues(user_id)
+            i = 0
             for i, issue in enumerate(issues):
                 if i <= 4:
                     self._find_issue(issue["id"])
                 else:
                     self.irc.say("[...] truncated last %d bugs" % (
                         len(issues) - i))
-                    return
+                    break
             else:
-                self.irc.say("No Redmine bugs found for '%s'" % login)
+                if i <= 0:
+                    self.irc.say("No Redmine bugs found for '%s'" % login)
         else:
             self.irc.say(self.rbugs.__doc__)
 
