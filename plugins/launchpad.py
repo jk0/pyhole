@@ -55,25 +55,32 @@ class Launchpad(object):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
             utils.ensure_int(params)
-            lp = "https://bugs.launchpad.net/launchpad/+bug/"
 
             try:
                 bug = self.launchpad.bugs[params]
+                task = bug.bug_tasks[len(bug.bug_tasks) - 1]
 
-                self.irc.say("Launchpad bug #%s: %s [Status: %s]" % (
+                self.irc.say("LP Bug #%s: %s [Status: %s, Assignee: %s]" % (
                     bug.id,
                     bug.title,
-                    bug.bug_tasks[len(bug.bug_tasks) - 1].status))
-                self.irc.say("%s%s" % (lp, bug.id))
+                    task.status,
+                    self._find_display_name(task.assignee_link)))
+                self.irc.say(bug.web_link)
             except Exception:
                 return
+
+    def _find_display_name(self, user):
+        """Lookup a Launchpad user's display name"""
+        return self.launchpad.people[user].display_name
 
     def _find_bugs(self, person, project, single=False):
         """Lookup Launchpad bugs"""
         bugs = project.searchTasks(assignee=person)
         if len(bugs):
             for bug in bugs:
-                self.irc.say("%s by %s" % (bug.title, person.display_name))
+                self.irc.say("LP %s [Assignee: %s]" % (
+                    bug.title,
+                    person.display_name))
                 self.irc.say(bug.web_link)
         else:
             if single:
