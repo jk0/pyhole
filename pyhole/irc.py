@@ -33,7 +33,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log = logger
         self.version = version
 
-        self.admin = config.get("admin")
+        self.admins = config.get("admins", "list")
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", "int")
         self.rejoin_delay = config.get("rejoin_delay", "int")
@@ -267,7 +267,7 @@ class IRC(irclib.SimpleIRCClient):
         self.source = event.source().split("@", 1)[0]
         self.target = irclib.nm_to_n(event.source())
 
-        if self.source == self.admin:
+        if self.source in self.admins:
             self.join_channel(event.arguments()[0])
 
     def on_ctcp(self, connection, event):

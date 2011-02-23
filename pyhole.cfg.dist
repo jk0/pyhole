@@ -1,7 +1,7 @@
 # Global Configuration
 
 [pyhole]
-admin: nick!ident
+admins: nick!ident, nick2!ident
 command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5

@@ -35,7 +35,7 @@ def logger(name, debug=False):
 def admin(func):
     """Administration Decorator"""
     def f(self, *args, **kwargs):
-        if self.irc.source == self.irc.admin:
+        if self.irc.source in self.irc.admins:
             func(self, *args, **kwargs)
         else:
             self.irc.say("Sorry, you are not authorized to do that.")
