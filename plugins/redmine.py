@@ -105,7 +105,7 @@ class Redmine(object):
             issue["id"],
             issue["subject"],
             issue["status"]["name"],
-            issue["assigned_to"]["name"]))
+            issue.get("assigned_to", {}).get("name", "N/A")))
         self.irc.say("https://%s/issues/show/%s" % (
             self.irc.redmine_domain,
             issue["id"]))
