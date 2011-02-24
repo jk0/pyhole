@@ -55,7 +55,6 @@ class Redmine(object):
     def keyword_rm(self, params=None):
         """Retrieve Redmine bug information (ex: RM12345)"""
         if params:
-            utils.ensure_int(params)
             self._find_issue(params)
 
     def _find_issues(self, user_id):
@@ -93,6 +92,8 @@ class Redmine(object):
 
     def _find_issue(self, issue_id):
         """Find and display a Redmine issue"""
+        utils.ensure_int(issue_id)
+
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
         response = self.irc.fetch_url(url, self.name)
 
