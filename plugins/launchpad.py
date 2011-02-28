@@ -17,9 +17,10 @@
 from launchpadlib.launchpad import Launchpad as LP
 
 from pyhole import utils
+from pyhole import plugin
 
 
-class Launchpad(object):
+class Launchpad(plugin.Plugin):
     """Provide access to the Launchpad API"""
 
     def __init__(self, irc):
@@ -29,6 +30,7 @@ class Launchpad(object):
             "production",
             self.irc.cache)
 
+    @plugin.hook_add_command('lbugs')
     @utils.spawn
     def lbugs(self, params=None):
         """Launchpad bugs for a team (ex: .lbugs <project> <team>|<user>)"""
@@ -50,6 +52,7 @@ class Launchpad(object):
         else:
             self.irc.say(self.lbugs.__doc__)
 
+    @plugin.hook_add_keyword('lp')
     @utils.spawn
     def keyword_lp(self, params=None):
         """Retrieve Launchpad bug information (ex: LP12345)"""

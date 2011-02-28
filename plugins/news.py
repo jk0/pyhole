@@ -17,15 +17,17 @@
 from xml.dom import minidom
 
 from pyhole import utils
+from pyhole import plugin
 
 
-class News(object):
+class News(plugin.Plugin):
     """Provide access to news feeds"""
 
     def __init__(self, irc):
         self.irc = irc
         self.name = self.__class__.__name__
 
+    @plugin.hook_add_command('cnn')
     @utils.spawn
     def cnn(self, params=None):
         """Display current CNN news (ex: .cnn)"""
@@ -40,6 +42,7 @@ class News(object):
                     ref[1].firstChild.data,
                     ref[5].firstChild.data))
 
+    @plugin.hook_add_command('digg')
     @utils.spawn
     def digg(self, params=None):
         """Display current Digg news (ex: .digg)"""
@@ -54,6 +57,7 @@ class News(object):
                     ref[1].firstChild.data.strip(),
                     ref[3].firstChild.data.strip()))
 
+    @plugin.hook_add_command('hackernews')
     @utils.spawn
     def hackernews(self, params=None):
         """Display current Hacker News links (ex: .hackernews)"""
@@ -68,6 +72,7 @@ class News(object):
                     ref[0].firstChild.data.strip(),
                     ref[1].firstChild.data))
 
+    @plugin.hook_add_command('reddit')
     @utils.spawn
     def reddit(self, params=None):
         """Display current reddit news (ex: .reddit)"""

@@ -22,15 +22,17 @@ import urllib
 from xml.dom import minidom
 
 from pyhole import utils
+from pyhole import plugin
 
 
-class Search(object):
+class Search(plugin.Plugin):
     """Provide access to search engines"""
 
     def __init__(self, irc):
         self.irc = irc
         self.name = self.__class__.__name__
 
+    @plugin.hook_add_command('google')
     @utils.spawn
     def google(self, params=None):
         """Search Google (ex: .g <query>)"""
@@ -53,10 +55,12 @@ class Search(object):
         else:
             self.irc.say(self.google.__doc__)
 
+    @plugin.hook_add_command('g')
     def g(self, params=None):
         """Alias of google"""
         self.google(params)
 
+    @plugin.hook_add_command('imdb')
     @utils.spawn
     def imdb(self, params=None):
         """Search IMDb (ex: .imdb <query>)"""
@@ -80,6 +84,7 @@ class Search(object):
         else:
             self.irc.say(self.imdb.__doc__)
 
+    @plugin.hook_add_command('twitter')
     @utils.spawn
     def twitter(self, params=None):
         """Search Twitter (ex: .twitter <query>)"""
@@ -126,6 +131,7 @@ class Search(object):
         else:
             self.irc.say(self.urban.__doc__)
 
+    @plugin.hook_add_command('wikipedia')
     @utils.spawn
     def wikipedia(self, params=None):
         """Search Wikipedia (ex: .wikipedia <query>)"""
@@ -147,6 +153,7 @@ class Search(object):
         else:
             self.irc.say(self.wikipedia.__doc__)
 
+    @plugin.hook_add_command('youtube')
     @utils.spawn
     def youtube(self, params=None):
         """Search YouTube (ex: .youtube <query>)"""
