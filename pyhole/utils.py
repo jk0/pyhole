@@ -40,6 +40,8 @@ def admin(func):
         else:
             self.irc.reply("Sorry, you are not authorized to do that.")
     f.__doc__ = func.__doc__
+    f.__name__ = func.__name__
+    f.__module__ = func.__module__
     return f
 
 
@@ -48,6 +50,8 @@ def spawn(func):
     def f(self, *args, **kwargs):
         eventlet.spawn_n(func, self, *args, **kwargs)
     f.__doc__ = func.__doc__
+    f.__name__ = func.__name__
+    f.__module__ = func.__module__
     return f
 
 
