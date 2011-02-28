@@ -32,7 +32,7 @@ class Search(plugin.Plugin):
         self.irc = irc
         self.name = self.__class__.__name__
 
-    @plugin.hook_add_command('google', **kwargs)
+    @plugin.hook_add_command('google')
     @utils.spawn
     def google(self, params=None):
         """Search Google (ex: .g <query>)"""
