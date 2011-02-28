@@ -29,10 +29,13 @@ class Plugin(object):
     __metaclass__ = PluginMetaClass
 
     _plugins = []
-    _plugin_instances = []
-    _keyword_hooks = []
-    _command_hooks = []
-    _message_hooks = []
+
+    @classmethod
+    def _init_cls_vars(self):
+        self._plugin_instances = []
+        self._keyword_hooks = []
+        self._message_hooks = []
+        self._command_hooks = []
 
     def __init__(self, *args, **kwargs):
         if 'irc' in kwargs:
@@ -50,15 +53,16 @@ class Plugin(object):
         for instance in self._plugin_instances:
             for attr_name in dir(instance):
                 attr = getattr(instance, attr_name)
-                if getattr(attr, '_is_keyword_hook', 0):
+                if getattr(attr, '_is_keyword_hook', False):
                     self._keyword_hooks.append(attr)
-                elif getattr(attr, '_is_command_hook', 0):
+                elif getattr(attr, '_is_command_hook', False):
                     self._command_hooks.append(attr)
-                elif getattr(attr, '_is_message_hook', 0):
+                elif getattr(attr, '_is_message_hook', False):
                     self._message_hooks.append(attr)
 
     @classmethod
     def load_plugins(self, plugindir, *args, **kwargs):
+        self._init_cls_vars()
         self._plugins_module = __import__(plugindir)
         for p in dir(self._plugins_module):
             if not p.startswith('_'):
@@ -67,9 +71,8 @@ class Plugin(object):
 
     @classmethod
     def reload_plugins(self, *args, **kwargs):
-        self._plugin_instances = []
+        self._init_cls_vars()
         self._plugin_classes = []
-        self._keyword_hooks = []
         reload(self._plugins_module)
         for x in self._plugins:
             reload(getattr(self._plugins_module, x))
@@ -88,19 +91,18 @@ class Plugin(object):
     @classmethod
     def keyword_hook(*args, **kwargs):
         def wrap(f):
-            f._is_keyword_hook = 1
+            f._is_keyword_hook = True
             f._regexp_matches = []
             f._keywords = args[1:]
             for arg in args[1:]:
                 f._regexp_matches.append("(^|\s+)%s(\S+)" % arg)
-            print f._regexp_matches
             return f
         return wrap
 
     @classmethod
     def message_hook(*args, **kwargs):
         def wrap(f):
-            f._is_message_hook = 1
+            f._is_message_hook = True
             f._regexp_matches = args[1:]
             return f
         return wrap
@@ -126,21 +128,60 @@ class Plugin(object):
         return keywords
 
     @classmethod
+    def active_commands(self):
+        commands = []
+        for cmd_hook in self._command_hooks:
+            commands.extend(cmd_hook._commands)
+        return commands
+
+    @classmethod
     def do_message_hook(self, message, private=False):
-#        for c in self.commands:
-#            self.match_direct("^\%s%s (.+)$", "^\%s%s$", c, message)
-#            self.match_addressed("^%s: %s (.+)$", "^%s: %s$", c, message)
-#        if private:
-#            self.match_private("^%s (.+)$", "^%s$", c, message)
 
         for kw_hook in self._keyword_hooks:
             for kw_regexp in kw_hook._regexp_matches:
                 m = re.search(kw_regexp, message, re.I)
                 if m:
-                    kw_hook(m.group(2), message)
+                    kw_hook(m.group(2), private=private,
+                            full_message=message)
 
         for msg_hook in self._message_hooks:
             for msg_regexp in msg_hook._regexp_matches:
                 m = re.search(msg_regexp, message, re.I)
                 if m:
-                    msg_hook(m, message)
+                    msg_hook(m, private=private, full_message=message)
+
+    @classmethod
+    def do_command_hook(self, command_prefix, nick, message, private=False):
+
+        for cmd_hook in self._command_hooks:
+            addressed=False
+
+            if private:
+                for cmd in cmd_hook._commands:
+                    m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd),
+                            message, re.I)
+                    if m:
+                        cmd_hook(m.group(1), command=cmd, 
+                            private=private, addressed=addressed,
+                            full_message=message)
+
+            if message.startswith(command_prefix):
+                # Strip off command prefix
+                msg_rest = message[len(command_prefix):]
+            else:
+                # Check for command starting with nick being addressed
+                msg_start_upper = message[:len(nick)+1].upper()
+                if msg_start_upper == nick.upper() + ':':
+                    # Get rest of string after "nick:" and white spaces
+                    msg_rest = re.sub("^\s+", "", message[len(nick)+1:])
+                else:
+                    continue
+                addressed=True
+
+            for cmd in cmd_hook._commands:
+                m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd),
+                            msg_rest, re.I)
+                if m:
+                    cmd_hook(m.group(1), command=cmd, 
+                            private=private, addressed=addressed,
+                            full_message=message)
