@@ -196,17 +196,3 @@ def active_plugin_classes():
 
     return Plugin._plugin_classes
 
-
-def get_command_doc(command):
-    """
-    Get the doc string for a particular command.
-    """
-
-
-# This command should probably be moved somewhat into irc.py, if we
-# can provide the correct interfaces
-
-    for _, cmd_hook, cmd in _plugin_hooks['command']:
-        if cmd.upper() == command.upper():
-            return cmd_hook.__doc__
-    return "No command named '%s' found" % command

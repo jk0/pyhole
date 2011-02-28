@@ -21,19 +21,30 @@ from pyhole import plugin
 class Admin(plugin.Plugin):
     """Provide administration functionality"""
 
+    def _find_doc_string(self, params):
+        """Find the doc string for a command or keyword hook"""
+
+        for _, cmd_hook, cmd in plugin.hook_get_commands():
+            if cmd.upper() == params.upper():
+                return cmd_hook.__doc__
+
+        for _, kw_hook, kw in plugin.hook_get_keywords():
+            if kw.upper() == params.upper():
+                return kw_hook.__doc__
+
+        return None
+
+
     @plugin.hook_add_command('help')
     def help(self, params=None, **kwargs):
-        """Learn how to use active plugins (ex: .help <plugin.command>)"""
+        """Learn how to use active commands (ex: .help <command>)"""
+
         if params:
-            # Temporarily load the class for __doc__ access
-            try:
-                doc = plugin.get_command_doc(params)
-                if doc:
-                    self.irc.reply(doc)
-                else:
-                    self.irc.reply("No help available for %s" % params)
-            except ImportError:
-                self.irc.reply("No plugin named '%s'" % params)
+            doc = self._find_doc_string(params)
+            if doc:
+                self.irc.reply(doc)
+            else:
+                self.irc.reply("No help available for %s" % params)
         else:
             self.irc.reply(self.help.__doc__)
             self.irc.reply("Active commands: %s" % self.irc.active_commands())
