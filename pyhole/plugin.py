@@ -191,3 +191,11 @@ class Plugin(object):
                             private=private, addressed=addressed,
                             full_message=message)
 
+
+    @classmethod
+    def get_command_doc(self, command):
+        for cmd_hook in self._command_hooks:
+            for cmd in cmd_hook._commands:
+                if cmd.upper() == command.upper():
+                    return cmd_hook.__doc__
+        return "No command named '%s' found" % command
