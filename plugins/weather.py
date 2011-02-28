@@ -34,7 +34,7 @@ class Weather(plugin.Plugin):
             try:
                 w = pywapi.get_weather_from_google(params)
             except Exception:
-                self.irc.say("Unable to fetch weather data")
+                self.irc.reply("Unable to fetch weather data")
                 return
 
             if w["current_conditions"]:
@@ -52,11 +52,11 @@ class Weather(plugin.Plugin):
                     humidity,
                     wind,
                     condition)
-                self.irc.say(result)
+                self.irc.reply(result)
             else:
-                self.irc.say("Location not found: '%s'" % params)
+                self.irc.reply("Location not found: '%s'" % params)
         else:
-            self.irc.say(self.weather.__doc__)
+            self.irc.reply(self.weather.__doc__)
 
     @plugin.hook_add_command('w')
     def w(self, params=None, **kwargs):

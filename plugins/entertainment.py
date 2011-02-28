@@ -39,9 +39,9 @@ class Entertainment(plugin.Plugin):
         m = r.search(html)
         if m:
             line = utils.decode_entities(m.group(1))
-            self.irc.say(line)
+            self.irc.reply(line)
         else:
-            self.irc.say("Unable to parse Group Hug data")
+            self.irc.reply("Unable to parse Group Hug data")
 
     @plugin.hook_add_command('lastnight')
     @utils.spawn
@@ -56,6 +56,6 @@ class Entertainment(plugin.Plugin):
         r = re.compile("<p><a href=\"/Text-Replies-.+.html\">(.*)</a></p>")
         m = r.search(html)
         if m:
-            self.irc.say(m.group(1))
+            self.irc.reply(m.group(1))
         else:
-            self.irc.say("Unable to parse Texts From Last Night data")
+            self.irc.reply("Unable to parse Texts From Last Night data")

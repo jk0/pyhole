@@ -44,14 +44,14 @@ class Redmine(plugin.Plugin):
                 if i <= 4:
                     self._find_issue(issue["id"])
                 else:
-                    self.irc.say("[...] truncated last %d bugs" % (
+                    self.irc.reply("[...] truncated last %d bugs" % (
                         len(issues) - i))
                     break
             else:
                 if i <= 0:
-                    self.irc.say("No Redmine bugs found for '%s'" % login)
+                    self.irc.reply("No Redmine bugs found for '%s'" % login)
         else:
-            self.irc.say(self.rbugs.__doc__)
+            self.irc.reply(self.rbugs.__doc__)
 
     @plugin.hook_add_keyword('rm')
     @utils.spawn
@@ -105,11 +105,11 @@ class Redmine(plugin.Plugin):
         except:
             return
 
-        self.irc.say("RM Bug #%s: %s [Status: %s, Assignee: %s]" % (
+        self.irc.reply("RM Bug #%s: %s [Status: %s, Assignee: %s]" % (
             issue["id"],
             issue["subject"],
             issue["status"]["name"],
             issue.get("assigned_to", {}).get("name", "N/A")))
-        self.irc.say("https://%s/issues/show/%s" % (
+        self.irc.reply("https://%s/issues/show/%s" % (
             self.irc.redmine_domain,
             issue["id"]))

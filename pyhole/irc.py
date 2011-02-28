@@ -119,14 +119,15 @@ class IRC(irclib.SimpleIRCClient):
                             private=private, full_message=message)
 
     def run_command_hooks(self, message, private):
-        addressed = False
 
         for mod_name, f, cmd in plugin.hook_get_commands():
+            self.addressed = False
+
             if private:
                 m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message, re.I)
                 if m:
                     self.run_hook_command(mod_name, f, m.group(1),
-                            private=private, addressed=addressed,
+                            private=private, addressed=self.addressed,
                             full_message=message)
 
             if message.startswith(self.command_prefix):
@@ -141,28 +142,35 @@ class IRC(irclib.SimpleIRCClient):
                             message[len(self.nick)+1:])
                 else:
                     continue
-                addressed=True
+                self.addressed=True
 
             m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
             if m:
                 self.run_hook_command(mod_name, f, m.group(1),
-                        private=private, addressed=addressed,
+                        private=private, addressed=self.addressed,
                         full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
 
+        self.addressed = False
+
         self.run_command_hooks(message, private)
         self.run_keyword_hooks(message, private)
         self.run_msg_regexp_hooks(message, private)
 
-    def say(self, msg):
+    def reply(self, msg):
         """Send a privmsg"""
         if self.addressed:
             nick = self.source.split("!")[0]
             self.connection.privmsg(self.target, "%s: %s" % (nick, msg))
         else:
             self.connection.privmsg(self.target, msg)
+
+    def privmsg(self, target, msg)
+        """Send a privmsg"""
+
+        self.connection.privmsg(target, msg)
 
     def op_user(self, params):
         """Op a user"""
@@ -182,7 +190,7 @@ class IRC(irclib.SimpleIRCClient):
     def join_channel(self, params):
         """Join a channel"""
         channel = params.split(" ", 1)
-        self.say("Joining %s" % channel[0])
+        self.reply("Joining %s" % channel[0])
         if irclib.is_channel(channel[0]):
             self.channels.append(channel[0])
             if len(channel) > 1:
@@ -193,7 +201,7 @@ class IRC(irclib.SimpleIRCClient):
     def part_channel(self, params):
         """Part a channel"""
         self.channels.remove(params)
-        self.say("Parting %s" % params)
+        self.reply("Parting %s" % params)
         self.connection.part(params)
 
     def fetch_url(self, url, name):
@@ -201,7 +209,7 @@ class IRC(irclib.SimpleIRCClient):
         try:
             return urllib.urlopen(url)
         except IOError:
-            self.say("Unable to fetch %s data" % name)
+            self.reply("Unable to fetch %s data" % name)
             return
 
     def on_nicknameinuse(self, connection, event):

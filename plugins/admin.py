@@ -22,76 +22,77 @@ class Admin(plugin.Plugin):
     """Provide administration functionality"""
 
     @plugin.hook_add_command('help')
-    def help(self, params=None, **kwarg):
+    def help(self, params=None, **kwargs):
         """Learn how to use active plugins (ex: .help <plugin.command>)"""
         if params:
             # Temporarily load the class for __doc__ access
             try:
                 doc = plugin.get_command_doc(params)
                 if doc:
-                    self.irc.say(doc)
+                    self.irc.reply(doc)
                 else:
-                    self.irc.say("No help available for %s" % params)
+                    self.irc.reply("No help available for %s" % params)
             except ImportError:
-                self.irc.say("No plugin named '%s'" % params)
+                self.irc.reply("No plugin named '%s'" % params)
         else:
-            self.irc.say(self.help.__doc__)
-            self.irc.say("Active commands: %s" % self.irc.active_commands())
-            self.irc.say("Active Keywords: %s" % self.irc.active_keywords())
+            self.irc.reply(self.help.__doc__)
+            self.irc.reply("Active commands: %s" % self.irc.active_commands())
+            self.irc.reply("Active Keywords: %s" % self.irc.active_keywords())
 
     @plugin.hook_add_command('version')
-    def version(self, params=None, **kwarg):
+    def version(self, params=None, **kwargs):
         """Display the current version"""
-        self.irc.say(self.irc.version)
+        self.irc.reply(self.irc.version)
 
     @plugin.hook_add_command('reload')
     @utils.admin
-    def reload(self, params=None, **kwarg):
+    def reload(self, params=None, **kwargs):
         """Reload all plugins"""
         self.irc.load_plugins(reload_plugins=True)
-        self.irc.say(self.irc.active_plugins())
+        self.irc.reply(self.irc.active_plugins())
 
     @plugin.hook_add_command('op')
     @utils.admin
-    def op(self, params=None, **kwarg):
+    def op(self, params=None, **kwargs):
         """Op a user (ex: .op <channel> <nick>)"""
         if params:
             self.irc.op_user(params)
         else:
-            self.irc.say(self.op.__doc__)
+            self.irc.reply(self.op.__doc__)
 
     @plugin.hook_add_command('deop')
     @utils.admin
-    def deop(self, params=None, **kwarg):
+    def deop(self, params=None, **kwargs):
         """De-op a user (ex: .deop <channel> <nick>)"""
         if params:
             self.irc.deop_user(params)
         else:
-            self.irc.say(self.deop.__doc__)
+            self.irc.reply(self.deop.__doc__)
 
     @plugin.hook_add_command('nick')
     @utils.admin
-    def nick(self, params=None, **kwarg):
+    def nick(self, params=None, **kwargs):
         """Change IRC nick (ex: .nick <nick>)"""
         if params:
             self.irc.set_nick(params)
         else:
-            self.irc.say(self.nick.__doc__)
+            self.irc.reply(self.nick.__doc__)
 
     @plugin.hook_add_command('join')
     @utils.admin
-    def join(self, params=None, **kwarg):
+    def join(self, params=None, **kwargs):
         """Join a channel (ex: .join #channel [<key>])"""
+        print params
         if params:
             self.irc.join_channel(params)
         else:
-            self.irc.say(self.join.__doc__)
+            self.irc.reply(self.join.__doc__)
 
     @plugin.hook_add_command('part')
     @utils.admin
-    def part(self, params=None, **kwarg):
+    def part(self, params=None, **kwargs):
         """Part a channel (ex: .part <channel>)"""
         if params:
             self.irc.part_channel(params)
         else:
-            self.irc.say(self.part.__doc__)
+            self.irc.reply(self.part.__doc__)

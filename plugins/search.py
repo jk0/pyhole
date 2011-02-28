@@ -47,13 +47,13 @@ class Search(plugin.Plugin):
             results = json["responseData"]["results"]
             if results:
                 for r in results:
-                    self.irc.say("%s: %s" % (
+                    self.irc.reply("%s: %s" % (
                         r["titleNoFormatting"].encode("ascii", "ignore"),
                         r["unescapedUrl"]))
             else:
-                self.irc.say("No results found: '%s'" % params)
+                self.irc.reply("No results found: '%s'" % params)
         else:
-            self.irc.say(self.google.__doc__)
+            self.irc.reply(self.google.__doc__)
 
     @plugin.hook_add_command('g')
     def g(self, params=None, **kwargs):
@@ -70,19 +70,19 @@ class Search(plugin.Plugin):
             try:
                 results = i.search_movie(params, results=4)
             except IOError:
-                self.irc.say("Unable to fetch IMDb data")
+                self.irc.reply("Unable to fetch IMDb data")
                 return
 
             if results:
                 for r in results:
-                    self.irc.say("%s (%s): http://www.imdb.com/title/tt%s/" % (
+                    self.irc.reply("%s (%s): http://www.imdb.com/title/tt%s/" % (
                         r["title"],
                         r["year"],
                         r.movieID))
             else:
-                self.irc.say("No results found: '%s'" % params)
+                self.irc.reply("No results found: '%s'" % params)
         else:
-            self.irc.say(self.imdb.__doc__)
+            self.irc.reply(self.imdb.__doc__)
 
     @plugin.hook_add_command('twitter')
     @utils.spawn
@@ -97,14 +97,14 @@ class Search(plugin.Plugin):
             results = json["results"]
             if results:
                 for r in results:
-                    self.irc.say("@%s: %s" % (
+                    self.irc.reply("@%s: %s" % (
                         r["from_user"],
                         utils.decode_entities(
                             r["text"].encode("ascii", "ignore"))))
             else:
-                self.irc.say("No results found: '%s'" % params)
+                self.irc.reply("No results found: '%s'" % params)
         else:
-            self.irc.say(self.twitter.__doc__)
+            self.irc.reply(self.twitter.__doc__)
 
     @plugin.hook_add_command('urban')
     @utils.spawn
@@ -117,7 +117,7 @@ class Search(plugin.Plugin):
 
             html = response.read()
             if re.search("<i>%s</i>\nisn't defined" % params, html):
-                self.irc.say("No results found: '%s'" % params)
+                self.irc.reply("No results found: '%s'" % params)
             else:
                 r = (re.compile("<div class=\"definition\">(.*)</div>"
                     "<div class=\"example\">"))
@@ -125,12 +125,12 @@ class Search(plugin.Plugin):
                 for i, line in enumerate(m.group(1).split("<br/>")):
                     if i <= 4:
                         line = utils.decode_entities(line)
-                        self.irc.say(line)
+                        self.irc.reply(line)
                     else:
-                        self.irc.say("[...] %s" % url)
+                        self.irc.reply("[...] %s" % url)
                         break
         else:
-            self.irc.say(self.urban.__doc__)
+            self.irc.reply(self.urban.__doc__)
 
     @plugin.hook_add_command('wikipedia')
     @utils.spawn
@@ -150,9 +150,9 @@ class Search(plugin.Plugin):
             for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
                 title = i._attrs["title"].firstChild.data
                 title = re.sub(" ", "_", title)
-                self.irc.say("http://en.wikipedia.org/wiki/%s" % title)
+                self.irc.reply("http://en.wikipedia.org/wiki/%s" % title)
         else:
-            self.irc.say(self.wikipedia.__doc__)
+            self.irc.reply(self.wikipedia.__doc__)
 
     @plugin.hook_add_command('youtube')
     @utils.spawn
@@ -172,8 +172,8 @@ class Search(plugin.Plugin):
             if len(results) > 4:
                 for r in results["items"]:
                     v = r["player"]["default"].split("&", 1)[0]
-                    self.irc.say("%s: %s" % (r["title"], v))
+                    self.irc.reply("%s: %s" % (r["title"], v))
             else:
-                self.irc.say("No results found: '%s'" % params)
+                self.irc.reply("No results found: '%s'" % params)
         else:
-            self.irc.say(self.youtube.__doc__)
+            self.irc.reply(self.youtube.__doc__)

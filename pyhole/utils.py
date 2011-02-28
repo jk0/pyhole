@@ -38,7 +38,7 @@ def admin(func):
         if self.irc.source in self.irc.admins:
             func(self, *args, **kwargs)
         else:
-            self.irc.say("Sorry, you are not authorized to do that.")
+            self.irc.reply("Sorry, you are not authorized to do that.")
     f.__doc__ = func.__doc__
     return f
 

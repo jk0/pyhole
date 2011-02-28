@@ -38,7 +38,7 @@ class News(plugin.Plugin):
         for i, item in enumerate(xml.childNodes[2].childNodes[0].childNodes):
             if i >= 21 and i <= 28 and item.childNodes:
                 ref = item.childNodes
-                self.irc.say("%s: %s" % (
+                self.irc.reply("%s: %s" % (
                     ref[1].firstChild.data,
                     ref[5].firstChild.data))
 
@@ -53,7 +53,7 @@ class News(plugin.Plugin):
         for i, item in enumerate(xml.childNodes[0].childNodes[1].childNodes):
             if i >= 15 and i <= 21 and item.childNodes:
                 ref = item.childNodes
-                self.irc.say("%s: %s" % (
+                self.irc.reply("%s: %s" % (
                     ref[1].firstChild.data.strip(),
                     ref[3].firstChild.data.strip()))
 
@@ -68,7 +68,7 @@ class News(plugin.Plugin):
         for i, item in enumerate(xml.firstChild.childNodes[0].childNodes):
             if i >= 3 and i <= 6:
                 ref = item.childNodes
-                self.irc.say("%s: %s" % (
+                self.irc.reply("%s: %s" % (
                     ref[0].firstChild.data.strip(),
                     ref[1].firstChild.data))
 
@@ -83,6 +83,6 @@ class News(plugin.Plugin):
         for i, item in enumerate(xml.childNodes[0].childNodes[0].childNodes):
             if i >= 4 and i <= 7:
                 ref = item.childNodes
-                self.irc.say("%s: %s" % (
+                self.irc.reply("%s: %s" % (
                     ref[0].firstChild.data.encode("ascii", "ignore"),
                     ref[1].firstChild.data.encode("ascii", "ignore")))

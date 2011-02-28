@@ -48,9 +48,9 @@ class Launchpad(plugin.Plugin):
                     self.irc.log.debug("LP: %s" % person.display_name)
                     self._find_bugs(person, proj)
             except KeyError:
-                self.irc.say("Unable to find user '%s' in Launchpad" % team)
+                self.irc.reply("Unable to find user '%s' in Launchpad" % team)
         else:
-            self.irc.say(self.lbugs.__doc__)
+            self.irc.reply(self.lbugs.__doc__)
 
     @plugin.hook_add_keyword('lp')
     @utils.spawn
@@ -63,12 +63,12 @@ class Launchpad(plugin.Plugin):
                 bug = self.launchpad.bugs[params]
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
 
-                self.irc.say("LP Bug #%s: %s [Status: %s, Assignee: %s]" % (
+                self.irc.reply("LP Bug #%s: %s [Status: %s, Assignee: %s]" % (
                     bug.id,
                     bug.title,
                     task.status,
                     self._find_display_name(task.assignee_link)))
-                self.irc.say(bug.web_link)
+                self.irc.reply(bug.web_link)
             except Exception:
                 return
 
@@ -81,10 +81,10 @@ class Launchpad(plugin.Plugin):
         bugs = project.searchTasks(assignee=person)
         if len(bugs):
             for bug in bugs:
-                self.irc.say("LP %s [Assignee: %s]" % (
+                self.irc.reply("LP %s [Assignee: %s]" % (
                     bug.title,
                     person.display_name))
-                self.irc.say(bug.web_link)
+                self.irc.reply(bug.web_link)
         else:
             if single:
-                self.irc.say("No bugs found for %s" % (person.display_name))
+                self.irc.reply("No bugs found for %s" % (person.display_name))
