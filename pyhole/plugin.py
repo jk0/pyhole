@@ -16,6 +16,8 @@
 
 """Pyhole Plugin Library"""
 
+import re
+
 class PluginMetaClass(type):
     def __init__(cls, name, bases, attrs):
         if not hasattr(cls, '_plugin_classes'):
@@ -29,6 +31,8 @@ class Plugin(object):
     _plugins = []
     _plugin_instances = []
     _keyword_hooks = []
+    _command_hooks = []
+    _message_hooks = []
 
     def __init__(self, *args, **kwargs):
         if 'irc' in kwargs:
@@ -48,6 +52,10 @@ class Plugin(object):
                 attr = getattr(instance, attr_name)
                 if getattr(attr, '_is_keyword_hook', 0):
                     self._keyword_hooks.append(attr)
+                elif getattr(attr, '_is_command_hook', 0):
+                    self._command_hooks.append(attr)
+                elif getattr(attr, '_is_message_hook', 0):
+                    self._message_hooks.append(attr)
 
     @classmethod
     def load_plugins(self, plugindir, *args, **kwargs):
@@ -81,7 +89,27 @@ class Plugin(object):
     def keyword_hook(*args, **kwargs):
         def wrap(f):
             f._is_keyword_hook = 1
+            f._regexp_matches = []
             f._keywords = args[1:]
+            for arg in args[1:]:
+                f._regexp_matches.append("(^|\s+)%s(\S+)" % arg)
+            print f._regexp_matches
+            return f
+        return wrap
+
+    @classmethod
+    def message_hook(*args, **kwargs):
+        def wrap(f):
+            f._is_message_hook = 1
+            f._regexp_matches = args[1:]
+            return f
+        return wrap
+
+    @classmethod
+    def command_hook(*args, **kwargs):
+        def wrap(f):
+            f._is_command_hook = 1
+            f._commands = args[1:]
             return f
         return wrap
 
@@ -90,3 +118,29 @@ class Plugin(object):
         for kw_hook in self._keyword_hooks:
             yield kw_hook
 
+    @classmethod
+    def active_keywords(self):
+        keywords = []
+        for kw_hook in self._keyword_hooks:
+            keywords.extend(kw_hook._keywords)
+        return keywords
+
+    @classmethod
+    def do_message_hook(self, message, private=False):
+#        for c in self.commands:
+#            self.match_direct("^\%s%s (.+)$", "^\%s%s$", c, message)
+#            self.match_addressed("^%s: %s (.+)$", "^%s: %s$", c, message)
+#        if private:
+#            self.match_private("^%s (.+)$", "^%s$", c, message)
+
+        for kw_hook in self._keyword_hooks:
+            for kw_regexp in kw_hook._regexp_matches:
+                m = re.search(kw_regexp, message, re.I)
+                if m:
+                    kw_hook(m.group(2), message)
+
+        for msg_hook in self._message_hooks:
+            for msg_regexp in msg_hook._regexp_matches:
+                m = re.search(msg_regexp, message, re.I)
+                if m:
+                    msg_hook(m, message)
