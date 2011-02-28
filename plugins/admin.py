@@ -93,7 +93,6 @@ class Admin(plugin.Plugin):
     @utils.admin
     def join(self, params=None, **kwargs):
         """Join a channel (ex: .join #channel [<key>])"""
-        print params
         if params:
             self.irc.join_channel(params)
         else:
