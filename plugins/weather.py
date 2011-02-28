@@ -28,7 +28,7 @@ class Weather(plugin.Plugin):
 
     @plugin.hook_add_command('weather')
     @utils.spawn
-    def weather(self, params=None):
+    def weather(self, params=None, **kwargs):
         """Display current weather report (ex: .w <location>)"""
         if params:
             try:
@@ -59,6 +59,6 @@ class Weather(plugin.Plugin):
             self.irc.say(self.weather.__doc__)
 
     @plugin.hook_add_command('w')
-    def w(self, params=None):
+    def w(self, params=None, **kwargs):
         """Alias of weather"""
-        self.weather(params)
+        self.weather(params, **kwargs)

@@ -32,7 +32,7 @@ class Redmine(plugin.Plugin):
 
     @plugin.hook_add_command('rbugs')
     @utils.spawn
-    def rbugs(self, params=None):
+    def rbugs(self, params=None, **kwargs):
         """Redmine bugs for a user (ex: .rbugs <login>)"""
         if params:
             login = params.split(" ", 1)[0]
@@ -53,7 +53,7 @@ class Redmine(plugin.Plugin):
         else:
             self.irc.say(self.rbugs.__doc__)
 
-    @plugin.hook_add_keyword('rm')
+    @plugin.hook_add_keyword('rm', **kwargs)
     @utils.spawn
     def keyword_rm(self, params=None):
         """Retrieve Redmine bug information (ex: RM12345)"""

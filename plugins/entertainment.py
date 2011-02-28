@@ -29,7 +29,7 @@ class Entertainment(plugin.Plugin):
 
     @plugin.hook_add_command('grouphug')
     @utils.spawn
-    def grouphug(self, params=None):
+    def grouphug(self, params=None, **kwargs):
         """Display a random Group Hug (ex: .grouphug)"""
         url = "http://grouphug.us/random"
         response = self.irc.fetch_url(url, self.name)
@@ -45,7 +45,7 @@ class Entertainment(plugin.Plugin):
 
     @plugin.hook_add_command('lastnight')
     @utils.spawn
-    def lastnight(self, params=None):
+    def lastnight(self, params=None, **kwargs):
         """Display a random Text From Last Night (ex: .lastnight)"""
         url = ("http://www.textsfromlastnight.com/"
             "Random-Texts-From-Last-Night.html")

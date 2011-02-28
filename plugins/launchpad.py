@@ -32,7 +32,7 @@ class Launchpad(plugin.Plugin):
 
     @plugin.hook_add_command('lbugs')
     @utils.spawn
-    def lbugs(self, params=None):
+    def lbugs(self, params=None, **kwargs):
         """Launchpad bugs for a team (ex: .lbugs <project> <team>|<user>)"""
         if params:
             project, team = params.split(" ", 2)
@@ -54,7 +54,7 @@ class Launchpad(plugin.Plugin):
 
     @plugin.hook_add_keyword('lp')
     @utils.spawn
-    def keyword_lp(self, params=None):
+    def keyword_lp(self, params=None, **kwargs):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
             utils.ensure_int(params)

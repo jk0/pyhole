@@ -29,7 +29,7 @@ class News(plugin.Plugin):
 
     @plugin.hook_add_command('cnn')
     @utils.spawn
-    def cnn(self, params=None):
+    def cnn(self, params=None, **kwargs):
         """Display current CNN news (ex: .cnn)"""
         url = "http://rss.cnn.com/rss/cnn_topstories.rss"
         response = self.irc.fetch_url(url, self.name)
@@ -44,7 +44,7 @@ class News(plugin.Plugin):
 
     @plugin.hook_add_command('digg')
     @utils.spawn
-    def digg(self, params=None):
+    def digg(self, params=None, **kwargs):
         """Display current Digg news (ex: .digg)"""
         url = "http://services.digg.com/2.0/story.getTopNews?type=rss"
         response = self.irc.fetch_url(url, self.name)
@@ -59,7 +59,7 @@ class News(plugin.Plugin):
 
     @plugin.hook_add_command('hackernews')
     @utils.spawn
-    def hackernews(self, params=None):
+    def hackernews(self, params=None, **kwargs):
         """Display current Hacker News links (ex: .hackernews)"""
         url = "http://news.ycombinator.com/rss"
         response = self.irc.fetch_url(url, self.name)
@@ -74,7 +74,7 @@ class News(plugin.Plugin):
 
     @plugin.hook_add_command('reddit')
     @utils.spawn
-    def reddit(self, params=None):
+    def reddit(self, params=None, **kwargs):
         """Display current reddit news (ex: .reddit)"""
         url = "http://www.reddit.com/.rss"
         response = self.irc.fetch_url(url, self.name)

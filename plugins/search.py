@@ -32,7 +32,7 @@ class Search(plugin.Plugin):
         self.irc = irc
         self.name = self.__class__.__name__
 
-    @plugin.hook_add_command('google')
+    @plugin.hook_add_command('google', **kwargs)
     @utils.spawn
     def google(self, params=None):
         """Search Google (ex: .g <query>)"""
@@ -56,13 +56,13 @@ class Search(plugin.Plugin):
             self.irc.say(self.google.__doc__)
 
     @plugin.hook_add_command('g')
-    def g(self, params=None):
+    def g(self, params=None, **kwargs):
         """Alias of google"""
-        self.google(params)
+        self.google(params, **kwargs)
 
     @plugin.hook_add_command('imdb')
     @utils.spawn
-    def imdb(self, params=None):
+    def imdb(self, params=None, **kwargs):
         """Search IMDb (ex: .imdb <query>)"""
         if params:
             i = imdb.IMDb()
@@ -86,7 +86,7 @@ class Search(plugin.Plugin):
 
     @plugin.hook_add_command('twitter')
     @utils.spawn
-    def twitter(self, params=None):
+    def twitter(self, params=None, **kwargs):
         """Search Twitter (ex: .twitter <query>)"""
         if params:
             query = urllib.urlencode({"q": params, "rpp": 4})
@@ -106,8 +106,9 @@ class Search(plugin.Plugin):
         else:
             self.irc.say(self.twitter.__doc__)
 
+    @plugin.hook_add_command('urban')
     @utils.spawn
-    def urban(self, params=None):
+    def urban(self, params=None, **kwargs):
         """Search Urban Dictionary (ex: .urban <query>)"""
         if params:
             query = urllib.urlencode({"term": params})
@@ -133,7 +134,7 @@ class Search(plugin.Plugin):
 
     @plugin.hook_add_command('wikipedia')
     @utils.spawn
-    def wikipedia(self, params=None):
+    def wikipedia(self, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)"""
         if params:
             query = urllib.urlencode({
@@ -155,7 +156,7 @@ class Search(plugin.Plugin):
 
     @plugin.hook_add_command('youtube')
     @utils.spawn
-    def youtube(self, params=None):
+    def youtube(self, params=None, **kwargs):
         """Search YouTube (ex: .youtube <query>)"""
         if params:
             query = urllib.urlencode({
