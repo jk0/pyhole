@@ -55,7 +55,7 @@ class Redmine(plugin.Plugin):
 
     @plugin.hook_add_keyword('rm')
     @utils.spawn
-    def keyword_rm(self, params=None):
+    def keyword_rm(self, params=None, **kwargs):
         """Retrieve Redmine bug information (ex: RM12345)"""
         if params:
             self._find_issue(params)

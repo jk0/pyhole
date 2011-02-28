@@ -34,7 +34,7 @@ class Search(plugin.Plugin):
 
     @plugin.hook_add_command('google')
     @utils.spawn
-    def google(self, params=None):
+    def google(self, params=None, **kwargs):
         """Search Google (ex: .g <query>)"""
         if params:
             query = urllib.urlencode({"q": params})
