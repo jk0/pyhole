@@ -16,7 +16,44 @@
 
 """Pyhole Plugin Library"""
 
+import functools
 import re
+import sys
+
+def _reset_variables():
+    global _plugin_instances
+    global _plugin_hooks
+    _plugin_instances = []
+    _plugin_hooks = {}
+    for x in _hook_names:
+        _plugin_hooks[x] = []
+
+# Decorator for adding a hook
+def hook_add(hookname, arg):
+    def wrap(f):
+        setattr(f, '_is_%s_hook' % hookname, True)
+        f._hook_arg = arg
+        return f
+    return wrap
+
+def hook_get(hookname):
+    return _plugin_hooks[hookname]
+
+def active_get(hookname):
+    return [x[2] for x in _plugin_hooks[hookname]]
+
+_plugins = []
+_plugins_module = None
+_hook_names = ['keyword', 'command', 'msg_regex']
+_reset_variables()
+_this_mod = sys.modules[__name__]
+
+for x in _hook_names:
+    # Dynamically create the decorators for various hooks
+    setattr(_this_mod, "hook_add_%s" % x, functools.partial(hook_add, x))
+    setattr(_this_mod, "hook_get_%ss" % x, functools.partial(hook_get, x))
+    setattr(_this_mod, "active_%ss" % x, functools.partial(active_get, x))
+
 
 class PluginMetaClass(type):
     def __init__(cls, name, bases, attrs):
@@ -28,174 +65,72 @@ class PluginMetaClass(type):
 class Plugin(object):
     __metaclass__ = PluginMetaClass
 
-    _plugins = []
+    def __init__(self, irc, *args, **kwargs):
+        self.irc = irc
 
-    @classmethod
-    def _init_cls_vars(self):
-        self._plugin_instances = []
-        self._keyword_hooks = []
-        self._message_hooks = []
-        self._command_hooks = []
+def _init_plugins(*args, **kwargs):
+    """
+    Create instances of the plugin classes and create a cache
+    of their hook functions
+    """
 
-    def __init__(self, *args, **kwargs):
-        if 'irc' in kwargs:
-            self.irc = kwargs['irc']
+    for cls in Plugin._plugin_classes:
+        # Create instance of 'p'
+        instance = cls(*args, **kwargs)
+        # Store the instance
+        _plugin_instances.append(instance)
 
-    @classmethod
-    def _init_plugins(self, *args, **kwargs):
-        for p in self._plugin_classes:
-            # Create instance of 'p'
-            instance = p(*args, **kwargs)
-            # Store the instance
-            self._plugin_instances.append(instance)
+        # Setup _keyword_hooks by looking at all of the attributes
+        # in the class and finding the ones that have a _is_*_hook
+        # attribute
+        for attr_name in dir(instance):
+            attr = getattr(instance, attr_name)
 
-        # Setup _keyword_hooks
-        for instance in self._plugin_instances:
-            for attr_name in dir(instance):
-                attr = getattr(instance, attr_name)
-                if getattr(attr, '_is_keyword_hook', False):
-                    self._keyword_hooks.append(attr)
-                elif getattr(attr, '_is_command_hook', False):
-                    self._command_hooks.append(attr)
-                elif getattr(attr, '_is_message_hook', False):
-                    self._message_hooks.append(attr)
+            for hook_key in _hook_names:
+                if getattr(attr, "_is_%s_hook" % hook_key, False):
+                    hook_arg = getattr(attr, "_hook_arg", None)
+                    # Append (module, method, arg) tuple 
+                    _plugin_hooks[hook_key].append(
+                            (attr.__module__, attr, hook_arg))
 
-    @classmethod
-    def load_plugins(self, plugindir, *args, **kwargs):
-        self._init_cls_vars()
-        self._plugins_module = __import__(plugindir)
-        for p in dir(self._plugins_module):
-            if not p.startswith('_'):
-                self._plugins.append(p);
-        self._init_plugins(*args, **kwargs)
+def load_plugins(plugindir, *args, **kwargs):
+    global _plugins_module
+    _plugins_module = __import__(plugindir)
+    for p in dir(_plugins_module):
+        if not p.startswith('_'):
+            _plugins.append(p);
+    _init_plugins(*args, **kwargs)
 
-    @classmethod
-    def reload_plugins(self, *args, **kwargs):
-        self._init_cls_vars()
-        self._plugin_classes = []
-        reload(self._plugins_module)
-        for x in self._plugins:
-            reload(getattr(self._plugins_module, x))
-        self._init_plugins(*args, **kwargs)
+def reload_plugins(*args, **kwargs):
+    if not _plugins_module:
+        raise TypeError("load_plugins has never been called")
+    _reset_variables()
+    reload(_plugins_module)
+    # When the modules are reloaded, the meta class will append
+    # all of the classes again, so we need to make sure this is empty
+    Plugin._plugin_classes = []
+    for x in _plugins:
+        reload(getattr(_plugins_module, x))
+    # Add any new modules to _plugins
+    for p in dir(_plugins_module):
+        if not (p.startswith('_') or p in _plugins):
+            _plugins.append(p);
+    _init_plugins(*args, **kwargs)
 
-    @classmethod
-    def plugins_loaded(self):
-        for x in self._plugins:
-            yield x
+def active_plugins():
+    """
+    Get the loaded plugin names
+    """
+    return _plugins
 
-    @classmethod
-    def plugin_classes_loaded(self):
-        for x in self._plugin_classes:
-            yield x
+def active_plugin_classes():
+    """
+    Get the loaded plugin classes
+    """
+    return Plugin._plugin_classes
 
-    @classmethod
-    def keyword_hook(*args, **kwargs):
-        def wrap(f):
-            f._is_keyword_hook = True
-            f._regexp_matches = []
-            f._keywords = args[1:]
-            for arg in args[1:]:
-                f._regexp_matches.append("(^|\s+)%s(\S+)" % arg)
-            return f
-        return wrap
-
-    @classmethod
-    def message_hook(*args, **kwargs):
-        def wrap(f):
-            f._is_message_hook = True
-            f._regexp_matches = args[1:]
-            return f
-        return wrap
-
-    @classmethod
-    def command_hook(*args, **kwargs):
-        def wrap(f):
-            f._is_command_hook = 1
-            f._commands = args[1:]
-            return f
-        return wrap
-
-    @classmethod
-    def keyword_hooks(self):
-        for kw_hook in self._keyword_hooks:
-            yield kw_hook
-
-    @classmethod
-    def active_keywords(self):
-        keywords = []
-        for kw_hook in self._keyword_hooks:
-            keywords.extend(kw_hook._keywords)
-        return keywords
-
-    @classmethod
-    def active_commands(self):
-        commands = []
-        for cmd_hook in self._command_hooks:
-            commands.extend(cmd_hook._commands)
-        return commands
-
-    @classmethod
-    def do_message_hook(self, logger, message, private=False):
-
-        for kw_hook in self._keyword_hooks:
-            for kw_regexp in kw_hook._regexp_matches:
-                m = re.search(kw_regexp, message, re.I)
-                if m:
-                    logger.debug("Calling: %s(\"%s\")" % (kw_hook.__name__, m.group(2)))
-                    kw_hook(m.group(2), private=private,
-                            full_message=message)
-
-        for msg_hook in self._message_hooks:
-            for msg_regexp in msg_hook._regexp_matches:
-                m = re.search(msg_regexp, message, re.I)
-                if m:
-                    logger.debug("Calling: %s(\"%s\")" % (msg_hook.__name__, m))
-                    msg_hook(m, private=private, full_message=message)
-
-    @classmethod
-    def do_command_hook(self, logger, command_prefix, nick,
-            message, private=False):
-
-        for cmd_hook in self._command_hooks:
-            addressed=False
-
-            if private:
-                for cmd in cmd_hook._commands:
-                    m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd),
-                            message, re.I)
-                    if m:
-                        logger.debug("Calling: %s(\"%s\")" % (cmd_hook.__name__, m.group(1)))
-                        cmd_hook(m.group(1), command=cmd, 
-                            private=private, addressed=addressed,
-                            full_message=message)
-
-            if message.startswith(command_prefix):
-                # Strip off command prefix
-                msg_rest = message[len(command_prefix):]
-            else:
-                # Check for command starting with nick being addressed
-                msg_start_upper = message[:len(nick)+1].upper()
-                if msg_start_upper == nick.upper() + ':':
-                    # Get rest of string after "nick:" and white spaces
-                    msg_rest = re.sub("^\s+", "", message[len(nick)+1:])
-                else:
-                    continue
-                addressed=True
-
-            for cmd in cmd_hook._commands:
-                m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd),
-                            msg_rest, re.I)
-                if m:
-                    logger.debug("Calling: %s(\"%s\")" % (cmd_hook.__name__, m.group(1)))
-                    cmd_hook(m.group(1), command=cmd, 
-                            private=private, addressed=addressed,
-                            full_message=message)
-
-
-    @classmethod
-    def get_command_doc(self, command):
-        for cmd_hook in self._command_hooks:
-            for cmd in cmd_hook._commands:
-                if cmd.upper() == command.upper():
-                    return cmd_hook.__doc__
-        return "No command named '%s' found" % command
+def get_command_doc(command):
+    for _, cmd_hook, cmd in _plugin_hooks['command']:
+        if cmd.upper() == command.upper():
+            return cmd_hook.__doc__
+    return "No command named '%s' found" % command

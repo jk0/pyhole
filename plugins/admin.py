@@ -21,13 +21,13 @@ from pyhole import plugin
 class Admin(plugin.Plugin):
     """Provide administration functionality"""
 
-    @plugin.Plugin.command_hook('help')
+    @plugin.hook_add_command('help')
     def help(self, params=None, **kwarg):
         """Learn how to use active plugins (ex: .help <plugin.command>)"""
         if params:
             # Temporarily load the class for __doc__ access
             try:
-                doc = plugin.Plugin.get_command_doc(params)
+                doc = plugin.get_command_doc(params)
                 if doc:
                     self.irc.say(doc)
                 else:
@@ -39,19 +39,19 @@ class Admin(plugin.Plugin):
             self.irc.say("Active commands: %s" % self.irc.active_commands())
             self.irc.say("Active Keywords: %s" % self.irc.active_keywords())
 
-    @plugin.Plugin.command_hook('version')
+    @plugin.hook_add_command('version')
     def version(self, params=None, **kwarg):
         """Display the current version"""
         self.irc.say(self.irc.version)
 
-    @plugin.Plugin.command_hook('reload')
+    @plugin.hook_add_command('reload')
     @utils.admin
     def reload(self, params=None, **kwarg):
         """Reload all plugins"""
         self.irc.load_plugins(reload_plugins=True)
         self.irc.say(self.irc.active_plugins())
 
-    @plugin.Plugin.command_hook('op')
+    @plugin.hook_add_command('op')
     @utils.admin
     def op(self, params=None, **kwarg):
         """Op a user (ex: .op <channel> <nick>)"""
@@ -60,7 +60,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.say(self.op.__doc__)
 
-    @plugin.Plugin.command_hook('deop')
+    @plugin.hook_add_command('deop')
     @utils.admin
     def deop(self, params=None, **kwarg):
         """De-op a user (ex: .deop <channel> <nick>)"""
@@ -69,7 +69,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.say(self.deop.__doc__)
 
-    @plugin.Plugin.command_hook('nick')
+    @plugin.hook_add_command('nick')
     @utils.admin
     def nick(self, params=None, **kwarg):
         """Change IRC nick (ex: .nick <nick>)"""
@@ -78,7 +78,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.say(self.nick.__doc__)
 
-    @plugin.Plugin.command_hook('join')
+    @plugin.hook_add_command('join')
     @utils.admin
     def join(self, params=None, **kwarg):
         """Join a channel (ex: .join #channel [<key>])"""
@@ -87,7 +87,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.say(self.join.__doc__)
 
-    @plugin.Plugin.command_hook('part')
+    @plugin.hook_add_command('part')
     @utils.admin
     def part(self, params=None, **kwarg):
         """Part a channel (ex: .part <channel>)"""

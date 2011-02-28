@@ -68,32 +68,90 @@ class IRC(irclib.SimpleIRCClient):
         """Load plugins and their commands respectively"""
 
         if reload_plugins:
-            plugin.Plugin.reload_plugins(irc=self)
+            plugin.reload_plugins(irc=self)
         else:
-            plugin.Plugin.load_plugins("plugins", irc=self)
+            plugin.load_plugins("plugins", irc=self)
         self.log.info(self.active_plugins())
 
     def active_plugins(self):
         """List active plugins"""
-        return "Loaded Plugins: %s" % ", ".join(plugin.Plugin.plugins_loaded())
+        return "Loaded Plugins: %s" % ", ".join(plugin.active_plugins())
 
     def active_commands(self):
         """List active commands"""
-        return ", ".join(plugin.Plugin.active_commands())
+        return ", ".join(plugin.active_commands())
 
     def active_keywords(self):
         """List active keywords"""
-        return ", ".join(plugin.Plugin.active_keywords())
+        return ", ".join(plugin.active_keywords())
+
+    def run_hook_command(self, mod_name, f, arg, **kwargs):
+        """Make a call to a plugin hook"""
+
+        try:
+            f(arg, **kwargs)
+            if arg:
+                self.log.debug("Calling: %s.%s(\"%s\")" %
+                        (mod_name, f.__name__, arg))
+            else:
+                self.log.debug("Calling: %s.%s(None)" %
+                        (mod_name, f.__name__))
+        except Exception, e:
+            self.log.error(e)
+
+
+    def run_msg_regexp_hooks(self, message, private):
+        for mod_name, f, msg_regex in plugin.hook_get_msg_regexs():
+            m = re.search(msg_regex, message, re.I)
+            if m:
+                self.run_hook_command(mod_name, f, m, private=private,
+                        full_message=message)
+
+    def run_keyword_hooks(self, message, private):
+        for mod_name, f, kw in plugin.hook_get_keywords():
+            m = re.search("(^|\s+)%s(\S+)|(^|\s+)%s(\s|$)" % (kw, kw),
+                    message, re.I)
+            if m:
+                self.run_hook_command(mod_name, f, m.group(2),
+                        private=private, full_message=message)
+
+    def run_command_hooks(self, message, private):
+        addressed = False
+
+        for mod_name, f, cmd in plugin.hook_get_commands():
+            if private:
+                m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message, re.I)
+                if m:
+                    self.run_hook_command(mod_name, f, m.group(1),
+                            private=private, addressed=addressed,
+                            full_message=message)
+
+            if message.startswith(self.command_prefix):
+                # Strip off command prefix
+                msg_rest = message[len(self.command_prefix):]
+            else:
+                # Check for command starting with nick being addressed
+                msg_start_upper = message[:len(self.nick)+1].upper()
+                if msg_start_upper == nick.upper() + ':':
+                    # Get rest of string after "nick:" and white spaces
+                    msg_rest = re.sub("^\s+", "",
+                            message[len(self.nick)+1:])
+                else:
+                    continue
+                addressed=True
+
+            m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
+            if m:
+                self.run_hook_command(mod_name, f, m.group(1),
+                        private=private, addressed=addressed,
+                        full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
 
-        try:
-            plugin.Plugin.do_message_hook(self.log, message, private)
-            plugin.Plugin.do_command_hook(self.log, self.command_prefix,
-                self.nick, message, private)
-        except Exception, e:
-            self.log.error(e)
+        self.run_command_hooks(message, private)
+        self.run_keyword_hooks(message, private)
+        self.run_msg_regexp_hooks(message, private)
 
     def say(self, msg):
         """Send a privmsg"""
