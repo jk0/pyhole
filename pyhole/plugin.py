@@ -135,12 +135,13 @@ class Plugin(object):
         return commands
 
     @classmethod
-    def do_message_hook(self, message, private=False):
+    def do_message_hook(self, logger, message, private=False):
 
         for kw_hook in self._keyword_hooks:
             for kw_regexp in kw_hook._regexp_matches:
                 m = re.search(kw_regexp, message, re.I)
                 if m:
+                    logger.debug("Calling: %s(\"%s\")" % (kw_hook.__name__, m.group(2)))
                     kw_hook(m.group(2), private=private,
                             full_message=message)
 
@@ -148,10 +149,12 @@ class Plugin(object):
             for msg_regexp in msg_hook._regexp_matches:
                 m = re.search(msg_regexp, message, re.I)
                 if m:
+                    logger.debug("Calling: %s(\"%s\")" % (msg_hook.__name__, m))
                     msg_hook(m, private=private, full_message=message)
 
     @classmethod
-    def do_command_hook(self, command_prefix, nick, message, private=False):
+    def do_command_hook(self, logger, command_prefix, nick,
+            message, private=False):
 
         for cmd_hook in self._command_hooks:
             addressed=False
@@ -161,6 +164,7 @@ class Plugin(object):
                     m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd),
                             message, re.I)
                     if m:
+                        logger.debug("Calling: %s(\"%s\")" % (cmd_hook.__name__, m.group(1)))
                         cmd_hook(m.group(1), command=cmd, 
                             private=private, addressed=addressed,
                             full_message=message)
@@ -182,6 +186,8 @@ class Plugin(object):
                 m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd),
                             msg_rest, re.I)
                 if m:
+                    logger.debug("Calling: %s(\"%s\")" % (cmd_hook.__name__, m.group(1)))
                     cmd_hook(m.group(1), command=cmd, 
                             private=private, addressed=addressed,
                             full_message=message)
+

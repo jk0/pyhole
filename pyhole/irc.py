@@ -21,7 +21,7 @@ import time
 import urllib
 
 import irclib
-import plugins
+import plugin
 
 
 class IRC(irclib.SimpleIRCClient):
@@ -66,106 +66,34 @@ class IRC(irclib.SimpleIRCClient):
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
-        self.plugins = []
-        self.commands = []
-        self.keywords = []
 
         if reload_plugins:
-            reload(plugins)
-        for name in dir(plugins):
-            if not name.startswith("_"):
-                plugin = "global %s\n%s = plugins.%s.%s(self)" % (
-                    name, name, name, name.capitalize())
-                if reload_plugins:
-                    exec("reload(plugins.%s)\n%s" % (name, plugin))
-                else:
-                    exec(plugin)
-                self.plugins.append(name)
-                for k, v in inspect.getmembers(eval(name), inspect.ismethod):
-                    if k.startswith("keyword_"):
-                        self.keywords.append("%s.%s" % (name, k))
-                    elif not k.startswith("_"):
-                        self.commands.append("%s.%s" % (name, k))
+            plugin.Plugin.reload_plugins(irc=self)
+        else:
+            plugin.Plugin.load_plugins("plugins", irc=self)
         self.log.info(self.active_plugins())
 
     def active_plugins(self):
         """List active plugins"""
-        return "Loaded Plugins: %s" % ", ".join(self.plugins)
+        return "Loaded Plugins: %s" % ", ".join(plugin.Plugin.plugins_loaded())
 
     def active_commands(self):
         """List active commands"""
-        return ", ".join(self.commands)
+        return ", ".join(plugin.Plugin.active_commands())
 
     def active_keywords(self):
         """List active keywords"""
-        return ", ".join(self.keywords)
-
-    def match_direct(self, pattern_p, pattern, needle, haystack):
-        """Match a direct command in a message"""
-        c = needle.split(".", 1)[1]
-        m = re.match(pattern_p % (self.command_prefix, c), haystack)
-        if m:
-            self.addressed = False
-            self.dispatch_command(needle, m.group(1))
-        elif re.match(pattern % (self.command_prefix, c), haystack):
-            self.addressed = False
-            self.dispatch_command(needle)
-
-    def match_addressed(self, pattern_p, pattern, needle, haystack):
-        """Match an addressed command in a message"""
-        c = needle.split(".", 1)[1]
-        m = re.match(pattern_p % (self.nick, c), haystack)
-        if m:
-            self.addressed = True
-            self.dispatch_command(needle, m.group(1))
-        elif re.match(pattern % (self.nick, c), haystack):
-            self.addressed = True
-            self.dispatch_command(needle)
-
-    def match_private(self, pattern_p, pattern, needle, haystack):
-        """Match a command in a private message"""
-        c = needle.split(".", 1)[1]
-        m = re.match(pattern_p % c, haystack)
-        if m:
-            self.addressed = False
-            self.dispatch_command(needle, m.group(1))
-        elif re.match(pattern % c, haystack):
-            self.addressed = False
-            self.dispatch_command(needle)
-
-    def match_keyword(self, pattern, needle, haystack):
-        """Match a keyword in a message"""
-        k = needle.split("_", 1)[1]
-        words = haystack.split(" ")
-
-        for word in words:
-            m = re.search(pattern % k, word, re.I)
-            if m:
-                params = re.sub("\W+", "", m.group(1))
-                self.dispatch_command(needle, params)
-
-    def dispatch_command(self, command, params=None):
-        """Execute a bot command"""
-        try:
-            if params:
-                self.log.debug("Eval: %s(\"%s\")" % (command, params))
-                exec("%s(\"%s\")" % (command, params))
-            else:
-                self.log.debug("Eval: %s()" % command)
-                exec("%s()" % command)
-        except Exception, e:
-            self.log.error(e)
+        return ", ".join(plugin.Plugin.active_keywords())
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
-        for c in self.commands:
-            self.match_direct("^\%s%s (.+)$", "^\%s%s$", c, message)
-            self.match_addressed("^%s: %s (.+)$", "^%s: %s$", c, message)
-            if private:
-                self.match_private("^%s (.+)$", "^%s$", c, message)
 
-        for k in self.keywords:
-            self.match_keyword("%s(.+)", k, message)
+        try:
+            plugin.Plugin.do_message_hook(self.log, message, private)
+            plugin.Plugin.do_command_hook(self.log, self.command_prefix,
+                self.nick, message, private)
+        except Exception, e:
+            self.log.error(e)
 
     def say(self, msg):
         """Send a privmsg"""
