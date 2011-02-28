@@ -108,12 +108,15 @@ class IRC(irclib.SimpleIRCClient):
                         full_message=message)
 
     def run_keyword_hooks(self, message, private):
+
+        words = message.split(" ")
+
         for mod_name, f, kw in plugin.hook_get_keywords():
-            m = re.search("(^|\s+)%s(\S+)|(^|\s+)%s(\s|$)" % (kw, kw),
-                    message, re.I)
-            if m:
-                self.run_hook_command(mod_name, f, m.group(2),
-                        private=private, full_message=message)
+            for word in words:
+                m = re.search("%s(.+)" % kw, word, re.I)
+                if m:
+                    self.run_hook_command(mod_name, f, m.group(1),
+                            private=private, full_message=message)
 
     def run_command_hooks(self, message, private):
         addressed = False
