@@ -53,7 +53,7 @@ class Redmine(plugin.Plugin):
         else:
             self.irc.say(self.rbugs.__doc__)
 
-    @plugin.hook_add_keyword('rm', **kwargs)
+    @plugin.hook_add_keyword('rm')
     @utils.spawn
     def keyword_rm(self, params=None):
         """Retrieve Redmine bug information (ex: RM12345)"""
