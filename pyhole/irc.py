@@ -167,7 +167,7 @@ class IRC(irclib.SimpleIRCClient):
         else:
             self.connection.privmsg(self.target, msg)
 
-    def privmsg(self, target, msg)
+    def privmsg(self, target, msg):
         """Send a privmsg"""
 
         self.connection.privmsg(target, msg)

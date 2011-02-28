@@ -96,3 +96,13 @@ class Admin(plugin.Plugin):
             self.irc.part_channel(params)
         else:
             self.irc.reply(self.part.__doc__)
+
+    @plugin.hook_add_command('say')
+    @utils.admin
+    def say(self, params=None, **kwargs):
+        """Send a PRIVMSG (ex: .say <channel>|<nick> message)"""
+        if params:
+            (target, msg) = params.split(' ')
+            self.irc.privmsg(target, msg)
+        else:
+            self.irc.reply(self.part.__doc__)
