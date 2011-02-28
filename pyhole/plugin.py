@@ -20,6 +20,7 @@ import functools
 import re
 import sys
 
+
 def _reset_variables():
     """
     Local function to init some variables that are common between
@@ -32,6 +33,7 @@ def _reset_variables():
     _plugin_hooks = {}
     for x in _hook_names:
         _plugin_hooks[x] = []
+
 
 # Decorator for adding a hook
 def hook_add(hookname, arg):
@@ -47,6 +49,7 @@ def hook_add(hookname, arg):
         return f
     return wrap
 
+
 def hook_get(hookname):
     """
     Function to return the list of hooks of a particular type.  Genearlly
@@ -55,6 +58,7 @@ def hook_get(hookname):
     """
 
     return _plugin_hooks[hookname]
+
 
 def active_get(hookname):
     """
@@ -98,6 +102,7 @@ class PluginMetaClass(type):
         else:
             cls._plugin_classes.append(cls)
 
+
 class Plugin(object):
     """
     The class that all plugin classes should inherit from
@@ -112,6 +117,7 @@ class Plugin(object):
         """
 
         self.irc = irc
+
 
 def _init_plugins(*args, **kwargs):
     """
@@ -134,9 +140,10 @@ def _init_plugins(*args, **kwargs):
             for hook_key in _hook_names:
                 if getattr(attr, "_is_%s_hook" % hook_key, False):
                     hook_arg = getattr(attr, "_hook_arg", None)
-                    # Append (module, method, arg) tuple 
+                    # Append (module, method, arg) tuple
                     _plugin_hooks[hook_key].append(
                             (attr.__module__, attr, hook_arg))
+
 
 def load_plugins(plugindir, *args, **kwargs):
     """
@@ -147,8 +154,9 @@ def load_plugins(plugindir, *args, **kwargs):
     _plugins_module = __import__(plugindir)
     for p in dir(_plugins_module):
         if not p.startswith('_'):
-            _plugins.append(p);
+            _plugins.append(p)
     _init_plugins(*args, **kwargs)
+
 
 def reload_plugins(*args, **kwargs):
     """
@@ -169,8 +177,9 @@ def reload_plugins(*args, **kwargs):
     # Add any new modules to _plugins
     for p in dir(_plugins_module):
         if not (p.startswith('_') or p in _plugins):
-            _plugins.append(p);
+            _plugins.append(p)
     _init_plugins(*args, **kwargs)
+
 
 def active_plugins():
     """
@@ -179,6 +188,7 @@ def active_plugins():
 
     return _plugins
 
+
 def active_plugin_classes():
     """
     Get the loaded plugin classes
@@ -186,12 +196,15 @@ def active_plugin_classes():
 
     return Plugin._plugin_classes
 
-# This command should probably be moved somewhat into irc.py, if we
-# can provide the correct interfaces
+
 def get_command_doc(command):
     """
     Get the doc string for a particular command.
     """
+
+
+# This command should probably be moved somewhat into irc.py, if we
+# can provide the correct interfaces
 
     for _, cmd_hook, cmd in _plugin_hooks['command']:
         if cmd.upper() == command.upper():
