@@ -14,28 +14,14 @@
 
 """Pyhole Administration Plugin"""
 
-from pyhole import utils
 from pyhole import plugin
+from pyhole import utils
 
 
 class Admin(plugin.Plugin):
     """Provide administration functionality"""
 
-    def _find_doc_string(self, params):
-        """Find the doc string for a command or keyword hook"""
-
-        for _, cmd_hook, cmd in plugin.hook_get_commands():
-            if cmd.upper() == params.upper():
-                return cmd_hook.__doc__
-
-        for _, kw_hook, kw in plugin.hook_get_keywords():
-            if kw.upper() == params.upper():
-                return kw_hook.__doc__
-
-        return None
-
-
-    @plugin.hook_add_command('help')
+    @plugin.hook_add_command("help")
     def help(self, params=None, **kwargs):
         """Learn how to use active commands (ex: .help <command>)"""
 
@@ -50,19 +36,19 @@ class Admin(plugin.Plugin):
             self.irc.reply("Active commands: %s" % self.irc.active_commands())
             self.irc.reply("Active Keywords: %s" % self.irc.active_keywords())
 
-    @plugin.hook_add_command('version')
+    @plugin.hook_add_command("version")
     def version(self, params=None, **kwargs):
         """Display the current version"""
         self.irc.reply(self.irc.version)
 
-    @plugin.hook_add_command('reload')
+    @plugin.hook_add_command("reload")
     @utils.admin
     def reload(self, params=None, **kwargs):
         """Reload all plugins"""
         self.irc.load_plugins(reload_plugins=True)
         self.irc.reply(self.irc.active_plugins())
 
-    @plugin.hook_add_command('op')
+    @plugin.hook_add_command("op")
     @utils.admin
     def op(self, params=None, **kwargs):
         """Op a user (ex: .op <channel> <nick>)"""
@@ -71,7 +57,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.reply(self.op.__doc__)
 
-    @plugin.hook_add_command('deop')
+    @plugin.hook_add_command("deop")
     @utils.admin
     def deop(self, params=None, **kwargs):
         """De-op a user (ex: .deop <channel> <nick>)"""
@@ -80,7 +66,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.reply(self.deop.__doc__)
 
-    @plugin.hook_add_command('nick')
+    @plugin.hook_add_command("nick")
     @utils.admin
     def nick(self, params=None, **kwargs):
         """Change IRC nick (ex: .nick <nick>)"""
@@ -89,7 +75,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.reply(self.nick.__doc__)
 
-    @plugin.hook_add_command('join')
+    @plugin.hook_add_command("join")
     @utils.admin
     def join(self, params=None, **kwargs):
         """Join a channel (ex: .join #channel [<key>])"""
@@ -98,7 +84,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.reply(self.join.__doc__)
 
-    @plugin.hook_add_command('part')
+    @plugin.hook_add_command("part")
     @utils.admin
     def part(self, params=None, **kwargs):
         """Part a channel (ex: .part <channel>)"""
@@ -107,7 +93,7 @@ class Admin(plugin.Plugin):
         else:
             self.irc.reply(self.part.__doc__)
 
-    @plugin.hook_add_command('say')
+    @plugin.hook_add_command("say")
     @utils.admin
     def say(self, params=None, **kwargs):
         """Send a PRIVMSG (ex: .say <channel>|<nick> message)"""
@@ -116,3 +102,15 @@ class Admin(plugin.Plugin):
             self.irc.privmsg(target, msg)
         else:
             self.irc.reply(self.part.__doc__)
+
+    def _find_doc_string(self, params):
+        """Find the doc string for a command or keyword hook"""
+        for _, cmd_hook, cmd in plugin.hook_get_commands():
+            if cmd.upper() == params.upper():
+                return cmd_hook.__doc__
+
+        for _, kw_hook, kw in plugin.hook_get_keywords():
+            if kw.upper() == params.upper():
+                return kw_hook.__doc__
+
+        return None

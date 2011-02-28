@@ -21,8 +21,8 @@ import urllib
 
 from xml.dom import minidom
 
-from pyhole import utils
 from pyhole import plugin
+from pyhole import utils
 
 
 class Search(plugin.Plugin):
@@ -32,7 +32,7 @@ class Search(plugin.Plugin):
         self.irc = irc
         self.name = self.__class__.__name__
 
-    @plugin.hook_add_command('google')
+    @plugin.hook_add_command("google")
     @utils.spawn
     def google(self, params=None, **kwargs):
         """Search Google (ex: .g <query>)"""
@@ -55,12 +55,12 @@ class Search(plugin.Plugin):
         else:
             self.irc.reply(self.google.__doc__)
 
-    @plugin.hook_add_command('g')
+    @plugin.hook_add_command("g")
     def g(self, params=None, **kwargs):
         """Alias of google"""
         self.google(params, **kwargs)
 
-    @plugin.hook_add_command('imdb')
+    @plugin.hook_add_command("imdb")
     @utils.spawn
     def imdb(self, params=None, **kwargs):
         """Search IMDb (ex: .imdb <query>)"""
@@ -75,7 +75,8 @@ class Search(plugin.Plugin):
 
             if results:
                 for r in results:
-                    self.irc.reply("%s (%s): http://www.imdb.com/title/tt%s/" % (
+                    self.irc.reply(
+                        "%s (%s): http://www.imdb.com/title/tt%s/" % (
                         r["title"],
                         r["year"],
                         r.movieID))
@@ -84,7 +85,7 @@ class Search(plugin.Plugin):
         else:
             self.irc.reply(self.imdb.__doc__)
 
-    @plugin.hook_add_command('twitter')
+    @plugin.hook_add_command("twitter")
     @utils.spawn
     def twitter(self, params=None, **kwargs):
         """Search Twitter (ex: .twitter <query>)"""
@@ -106,7 +107,7 @@ class Search(plugin.Plugin):
         else:
             self.irc.reply(self.twitter.__doc__)
 
-    @plugin.hook_add_command('urban')
+    @plugin.hook_add_command("urban")
     @utils.spawn
     def urban(self, params=None, **kwargs):
         """Search Urban Dictionary (ex: .urban <query>)"""
@@ -132,7 +133,7 @@ class Search(plugin.Plugin):
         else:
             self.irc.reply(self.urban.__doc__)
 
-    @plugin.hook_add_command('wikipedia')
+    @plugin.hook_add_command("wikipedia")
     @utils.spawn
     def wikipedia(self, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)"""
@@ -154,7 +155,7 @@ class Search(plugin.Plugin):
         else:
             self.irc.reply(self.wikipedia.__doc__)
 
-    @plugin.hook_add_command('youtube')
+    @plugin.hook_add_command("youtube")
     @utils.spawn
     def youtube(self, params=None, **kwargs):
         """Search YouTube (ex: .youtube <query>)"""

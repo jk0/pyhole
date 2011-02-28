@@ -16,8 +16,8 @@
 
 from xml.dom import minidom
 
-from pyhole import utils
 from pyhole import plugin
+from pyhole import utils
 
 
 class News(plugin.Plugin):
@@ -27,7 +27,7 @@ class News(plugin.Plugin):
         self.irc = irc
         self.name = self.__class__.__name__
 
-    @plugin.hook_add_command('cnn')
+    @plugin.hook_add_command("cnn")
     @utils.spawn
     def cnn(self, params=None, **kwargs):
         """Display current CNN news (ex: .cnn)"""
@@ -42,7 +42,7 @@ class News(plugin.Plugin):
                     ref[1].firstChild.data,
                     ref[5].firstChild.data))
 
-    @plugin.hook_add_command('digg')
+    @plugin.hook_add_command("digg")
     @utils.spawn
     def digg(self, params=None, **kwargs):
         """Display current Digg news (ex: .digg)"""
@@ -57,7 +57,7 @@ class News(plugin.Plugin):
                     ref[1].firstChild.data.strip(),
                     ref[3].firstChild.data.strip()))
 
-    @plugin.hook_add_command('hackernews')
+    @plugin.hook_add_command("hackernews")
     @utils.spawn
     def hackernews(self, params=None, **kwargs):
         """Display current Hacker News links (ex: .hackernews)"""
@@ -72,7 +72,7 @@ class News(plugin.Plugin):
                     ref[0].firstChild.data.strip(),
                     ref[1].firstChild.data))
 
-    @plugin.hook_add_command('reddit')
+    @plugin.hook_add_command("reddit")
     @utils.spawn
     def reddit(self, params=None, **kwargs):
         """Display current reddit news (ex: .reddit)"""

@@ -87,72 +87,92 @@ class IRC(irclib.SimpleIRCClient):
 
     def run_hook_command(self, mod_name, f, arg, **kwargs):
         """Make a call to a plugin hook"""
-
         try:
             f(arg, **kwargs)
             if arg:
-                self.log.debug("Calling: %s.%s(\"%s\")" %
-                        (mod_name, f.__name__, arg))
+                self.log.debug("Calling: %s.%s(\"%s\")" % (
+                    mod_name,
+                    f.__name__,
+                    arg))
             else:
-                self.log.debug("Calling: %s.%s(None)" %
-                        (mod_name, f.__name__))
+                self.log.debug("Calling: %s.%s(None)" % (
+                    mod_name,
+                    f.__name__))
         except Exception, e:
             self.log.error(e)
 
-
     def run_msg_regexp_hooks(self, message, private):
+        """Run regexp hooks"""
         for mod_name, f, msg_regex in plugin.hook_get_msg_regexs():
             m = re.search(msg_regex, message, re.I)
             if m:
-                self.run_hook_command(mod_name, f, m, private=private,
-                        full_message=message)
+                self.run_hook_command(
+                    mod_name,
+                    f,
+                    m,
+                    private=private,
+                    full_message=message)
 
     def run_keyword_hooks(self, message, private):
-
+        """Run keyword hooks"""
         words = message.split(" ")
 
         for mod_name, f, kw in plugin.hook_get_keywords():
             for word in words:
                 m = re.search("%s(.+)" % kw, word, re.I)
                 if m:
-                    self.run_hook_command(mod_name, f, m.group(1),
-                            private=private, full_message=message)
+                    self.run_hook_command(
+                        mod_name,
+                        f,
+                        m.group(1),
+                        private=private,
+                        full_message=message)
 
     def run_command_hooks(self, message, private):
-
+        """Run command hooks"""
         for mod_name, f, cmd in plugin.hook_get_commands():
             self.addressed = False
 
             if private:
                 m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message, re.I)
                 if m:
-                    self.run_hook_command(mod_name, f, m.group(1),
-                            private=private, addressed=self.addressed,
-                            full_message=message)
+                    self.run_hook_command(
+                        mod_name,
+                        f,
+                        m.group(1),
+                        private=private,
+                        addressed=self.addressed,
+                        full_message=message)
 
             if message.startswith(self.command_prefix):
                 # Strip off command prefix
                 msg_rest = message[len(self.command_prefix):]
             else:
                 # Check for command starting with nick being addressed
-                msg_start_upper = message[:len(self.nick)+1].upper()
+                msg_start_upper = message[:len(self.nick) + 1].upper()
                 if msg_start_upper == self.nick.upper() + ':':
                     # Get rest of string after "nick:" and white spaces
-                    msg_rest = re.sub("^\s+", "",
-                            message[len(self.nick)+1:])
+                    msg_rest = re.sub(
+                        "^\s+",
+                        "",
+                        message[len(self.nick) + 1:])
                 else:
                     continue
-                self.addressed=True
+
+                self.addressed = True
 
             m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
             if m:
-                self.run_hook_command(mod_name, f, m.group(1),
-                        private=private, addressed=self.addressed,
-                        full_message=message)
+                self.run_hook_command(
+                    mod_name,
+                    f,
+                    m.group(1),
+                    private=private,
+                    addressed=self.addressed,
+                    full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
-
         self.addressed = False
 
         self.run_command_hooks(message, private)
@@ -169,7 +189,6 @@ class IRC(irclib.SimpleIRCClient):
 
     def privmsg(self, target, msg):
         """Send a privmsg"""
-
         self.connection.privmsg(target, msg)
 
     def op_user(self, params):

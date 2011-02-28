@@ -16,8 +16,8 @@
 
 import pywapi
 
-from pyhole import utils
 from pyhole import plugin
+from pyhole import utils
 
 
 class Weather(plugin.Plugin):
@@ -26,7 +26,7 @@ class Weather(plugin.Plugin):
     def __init__(self, irc):
         self.irc = irc
 
-    @plugin.hook_add_command('weather')
+    @plugin.hook_add_command("weather")
     @utils.spawn
     def weather(self, params=None, **kwargs):
         """Display current weather report (ex: .w <location>)"""
@@ -58,7 +58,7 @@ class Weather(plugin.Plugin):
         else:
             self.irc.reply(self.weather.__doc__)
 
-    @plugin.hook_add_command('w')
+    @plugin.hook_add_command("w")
     def w(self, params=None, **kwargs):
         """Alias of weather"""
         self.weather(params, **kwargs)

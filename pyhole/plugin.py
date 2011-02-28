@@ -195,4 +195,3 @@ def active_plugin_classes():
     """
 
     return Plugin._plugin_classes
-

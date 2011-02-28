@@ -16,8 +16,8 @@
 
 import simplejson
 
-from pyhole import utils
 from pyhole import plugin
+from pyhole import utils
 
 
 class Redmine(plugin.Plugin):
@@ -30,7 +30,7 @@ class Redmine(plugin.Plugin):
             self.irc.redmine_key,
             self.irc.redmine_domain)
 
-    @plugin.hook_add_command('rbugs')
+    @plugin.hook_add_command("rbugs")
     @utils.spawn
     def rbugs(self, params=None, **kwargs):
         """Redmine bugs for a user (ex: .rbugs <login>)"""
@@ -53,7 +53,7 @@ class Redmine(plugin.Plugin):
         else:
             self.irc.reply(self.rbugs.__doc__)
 
-    @plugin.hook_add_keyword('rm')
+    @plugin.hook_add_keyword("rm")
     @utils.spawn
     def keyword_rm(self, params=None, **kwargs):
         """Retrieve Redmine bug information (ex: RM12345)"""

@@ -16,8 +16,8 @@
 
 import re
 
-from pyhole import utils
 from pyhole import plugin
+from pyhole import utils
 
 
 class Entertainment(plugin.Plugin):
@@ -27,7 +27,7 @@ class Entertainment(plugin.Plugin):
         self.irc = irc
         self.name = self.__class__.__name__
 
-    @plugin.hook_add_command('grouphug')
+    @plugin.hook_add_command("grouphug")
     @utils.spawn
     def grouphug(self, params=None, **kwargs):
         """Display a random Group Hug (ex: .grouphug)"""
@@ -43,7 +43,7 @@ class Entertainment(plugin.Plugin):
         else:
             self.irc.reply("Unable to parse Group Hug data")
 
-    @plugin.hook_add_command('lastnight')
+    @plugin.hook_add_command("lastnight")
     @utils.spawn
     def lastnight(self, params=None, **kwargs):
         """Display a random Text From Last Night (ex: .lastnight)"""
