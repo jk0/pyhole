@@ -97,6 +97,9 @@ class Redmine(plugin.Plugin):
         """Find and display a Redmine issue"""
         issue_id = utils.ensure_int(issue_id)
 
+        if not issue_id:
+            return
+
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
         response = self.irc.fetch_url(url, self.name)
 

@@ -59,6 +59,9 @@ class Launchpad(plugin.Plugin):
         if params:
             params = utils.ensure_int(params)
 
+            if not params:
+                return
+
             try:
                 bug = self.launchpad.bugs[params]
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
