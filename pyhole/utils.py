@@ -74,6 +74,7 @@ def decode_entities(html):
 def ensure_int(param):
     """Ensure the given param is an int"""
     try:
-        int(param)
+        param = re.sub("\W", "", param)
+        return int(param)
     except ValueError:
-        return
+        return None

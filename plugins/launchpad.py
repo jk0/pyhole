@@ -57,7 +57,7 @@ class Launchpad(plugin.Plugin):
     def keyword_lp(self, params=None, **kwargs):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
-            utils.ensure_int(params)
+            params = utils.ensure_int(params)
 
             try:
                 bug = self.launchpad.bugs[params]

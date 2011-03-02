@@ -16,6 +16,6 @@ from plugins import admin
 from plugins import entertainment
 from plugins import launchpad
 from plugins import news
-#from plugins import redmine
+from plugins import redmine
 from plugins import search
 from plugins import weather
