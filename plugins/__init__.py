@@ -18,4 +18,5 @@ from plugins import launchpad
 from plugins import news
 from plugins import redmine
 from plugins import search
+from plugins import urls
 from plugins import weather
