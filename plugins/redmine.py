@@ -58,6 +58,7 @@ class Redmine(plugin.Plugin):
     def keyword_rm(self, params=None, **kwargs):
         """Retrieve Redmine bug information (ex: RM12345)"""
         if params:
+            params = utils.ensure_int(params)
             self._find_issue(params)
 
     def _find_issues(self, user_id):
@@ -95,11 +96,6 @@ class Redmine(plugin.Plugin):
 
     def _find_issue(self, issue_id):
         """Find and display a Redmine issue"""
-        issue_id = utils.ensure_int(issue_id)
-
-        if not issue_id:
-            return
-
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
         response = self.irc.fetch_url(url, self.name)
 
@@ -108,11 +104,11 @@ class Redmine(plugin.Plugin):
         except:
             return
 
-        self.irc.reply("RM Bug #%s: %s [Status: %s, Assignee: %s]" % (
+        self.irc.reply("RM Bug #%s: %s [Status: %s, Assignee: %s] "
+            "https://%s/issues/show/%s" % (
             issue["id"],
             issue["subject"],
             issue["status"]["name"],
-            issue.get("assigned_to", {}).get("name", "N/A")))
-        self.irc.reply("https://%s/issues/show/%s" % (
+            issue.get("assigned_to", {}).get("name", "N/A"),
             self.irc.redmine_domain,
             issue["id"]))
