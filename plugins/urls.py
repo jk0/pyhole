@@ -56,9 +56,9 @@ class Url(plugin.Plugin):
 
         r = re.compile("<title>(.*)</title>")
         m = r.search(response)
-    
+
         if m:
             title = utils.decode_entities(m.group(1))
             self.irc.reply(title)
         else:
-             self.irc.reply("No title found for %s" % url)
+            self.irc.reply("No title found for %s" % url)
