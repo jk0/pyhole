@@ -29,6 +29,7 @@ class Url(plugin.Plugin):
         self.url = None
 
     @plugin.hook_add_command("title")
+    @utils.spawn
     def title(self, params=None, **kwargs):
         """Display the title of the a URL (ex: .title <url>)"""
         if params:
