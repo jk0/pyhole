@@ -25,10 +25,8 @@ class Launchpad(plugin.Plugin):
 
     def __init__(self, irc):
         self.irc = irc
-        self.launchpad = LP.login_anonymously(
-            "pyhole",
-            "production",
-            self.irc.cache)
+        self.launchpad = LP.login_anonymously("pyhole", "production",
+                                              self.irc.cache)
 
     @plugin.hook_add_command("lbugs")
     @utils.spawn
@@ -67,16 +65,13 @@ class Launchpad(plugin.Plugin):
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
 
                 self.irc.reply("LP Bug #%s: %s [Status: %s, Assignee: %s]"
-                    " %s" % (
-                    bug.id,
-                    bug.title,
-                    task.status,
-                    self._find_display_name(task.assignee_link),
-                    bug.web_link))
+                               " %s" % (bug.id, bug.title, task.status,
+                                        self._find_name(task.assignee_link),
+                                        bug.web_link))
             except Exception:
                 return
 
-    def _find_display_name(self, user):
+    def _find_name(self, user):
         """Lookup a Launchpad user's display name"""
         return self.launchpad.people[user].display_name
 
@@ -85,10 +80,10 @@ class Launchpad(plugin.Plugin):
         bugs = project.searchTasks(assignee=person)
         if len(bugs):
             for bug in bugs:
-                self.irc.reply("LP %s [Assignee: %s] %s" % (
-                    bug.title,
-                    person.display_name,
-                    bug.web_link))
+                self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
+                                                            person.\
+                                                            display_name,
+                                                            bug.web_link))
         else:
             if single:
                 self.irc.reply("No bugs found for %s" % (person.display_name))

@@ -12,6 +12,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+"""Active pyhole plugins"""
+
 from plugins import admin
 from plugins import entertainment
 from plugins import launchpad

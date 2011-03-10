@@ -69,9 +69,8 @@ class Redmine(plugin.Plugin):
 
     def _find_issues(self, user_id):
         """Find all issues for a Redmine user"""
-        url = "%s/issues.json?assigned_to_id=%s" % (
-            self.redmine_url,
-            user_id)
+        url = "%s/issues.json?assigned_to_id=%s" % (self.redmine_url,
+                                                    user_id)
 
         response = self.irc.fetch_url(url, self.name)
 
@@ -90,9 +89,8 @@ class Redmine(plugin.Plugin):
     def _find_users(self, offset=None):
         """Find all Redmine users"""
         if offset:
-            url = "%s/users.json?limit=100&offset=%d" % (
-                self.redmine_url,
-                offset)
+            url = "%s/users.json?limit=100&offset=%d" % (self.redmine_url,
+                                                         offset)
         else:
             url = "%s/users.json?limit=100" % self.redmine_url
 
@@ -107,14 +105,13 @@ class Redmine(plugin.Plugin):
 
         try:
             issue = simplejson.loads(response.read())["issue"]
-        except:
+        except Exception:
             return
 
         self.irc.reply("RM Bug #%s: %s [Status: %s, Assignee: %s] "
-            "https://%s/issues/show/%s" % (
-            issue["id"],
-            issue["subject"],
-            issue["status"]["name"],
-            issue.get("assigned_to", {}).get("name", "N/A"),
-            self.redmine_domain,
-            issue["id"]))
+            "https://%s/issues/show/%s" % (issue["id"], issue["subject"],
+                                           issue["status"]["name"],
+                                           issue.get("assigned_to", {}).\
+                                           get("name", "N/A"),
+                                           self.redmine_domain,
+                                           issue["id"]))

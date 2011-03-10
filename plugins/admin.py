@@ -14,6 +14,7 @@
 
 """Pyhole Administration Plugin"""
 
+from pyhole import irc
 from pyhole import plugin
 from pyhole import utils
 
@@ -33,8 +34,8 @@ class Admin(plugin.Plugin):
                 self.irc.reply("No help available for %s" % params)
         else:
             self.irc.reply(self.help.__doc__)
-            self.irc.reply("Active commands: %s" % self.irc.active_commands())
-            self.irc.reply("Active Keywords: %s" % self.irc.active_keywords())
+            self.irc.reply("Active Commands: %s" % irc.active_commands())
+            self.irc.reply("Active Keywords: %s" % irc.active_keywords())
 
     @plugin.hook_add_command("version")
     def version(self, params=None, **kwargs):
@@ -46,7 +47,7 @@ class Admin(plugin.Plugin):
     def reload(self, params=None, **kwargs):
         """Reload all plugins"""
         self.irc.load_plugins(reload_plugins=True)
-        self.irc.reply(self.irc.active_plugins())
+        self.irc.reply("Loaded Plugins: %s" % irc.active_plugins())
 
     @plugin.hook_add_command("op")
     @utils.admin

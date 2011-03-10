@@ -23,9 +23,6 @@ from pyhole import utils
 class Weather(plugin.Plugin):
     """Provide access to current weather data"""
 
-    def __init__(self, irc):
-        self.irc = irc
-
     @plugin.hook_add_command("weather")
     @utils.spawn
     def weather(self, params=None, **kwargs):
@@ -45,13 +42,9 @@ class Weather(plugin.Plugin):
                 wind = w["current_conditions"]["wind_condition"]
                 condition = w["current_conditions"]["condition"]
 
-                result = "%s: %sF/%sC   %s   %s   %s" % (
-                    city,
-                    temp_f,
-                    temp_c,
-                    humidity,
-                    wind,
-                    condition)
+                result = "%s: %sF/%sC   %s   %s   %s" % (city, temp_f, temp_c,
+                                                         humidity, wind,
+                                                         condition)
                 self.irc.reply(result)
             else:
                 self.irc.reply("Location not found: '%s'" % params)
@@ -59,6 +52,6 @@ class Weather(plugin.Plugin):
             self.irc.reply(self.weather.__doc__)
 
     @plugin.hook_add_command("w")
-    def w(self, params=None, **kwargs):
+    def alias_w(self, params=None, **kwargs):
         """Alias of weather"""
         self.weather(params, **kwargs)

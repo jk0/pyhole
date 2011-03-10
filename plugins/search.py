@@ -39,7 +39,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params})
             url = ("http://ajax.googleapis.com/ajax/"
-                "services/search/web?v=1.0&%s" % query)
+                   "services/search/web?v=1.0&%s" % query)
 
             response = self.irc.fetch_url(url, self.name)
 
@@ -56,7 +56,7 @@ class Search(plugin.Plugin):
             self.irc.reply(self.google.__doc__)
 
     @plugin.hook_add_command("g")
-    def g(self, params=None, **kwargs):
+    def alias_g(self, params=None, **kwargs):
         """Alias of google"""
         self.google(params, **kwargs)
 
@@ -121,7 +121,7 @@ class Search(plugin.Plugin):
                 self.irc.reply("No results found: '%s'" % params)
             else:
                 r = (re.compile("<div class=\"definition\">(.*)</div>"
-                    "<div class=\"example\">"))
+                                "<div class=\"example\">"))
                 m = r.search(html)
                 for i, line in enumerate(m.group(1).split("<br/>")):
                     if i <= 4:
@@ -138,12 +138,11 @@ class Search(plugin.Plugin):
     def wikipedia(self, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)"""
         if params:
-            query = urllib.urlencode({
-                "action": "query",
-                "generator": "allpages",
-                "gaplimit": 4,
-                "gapfrom": params,
-                "format": "xml"})
+            query = urllib.urlencode({"action": "query",
+                                      "generator": "allpages",
+                                      "gaplimit": 4,
+                                      "gapfrom": params,
+                                      "format": "xml"})
             url = "http://en.wikipedia.org/w/api.php?%s" % query
             response = self.irc.fetch_url(url, self.name)
 
@@ -160,11 +159,10 @@ class Search(plugin.Plugin):
     def youtube(self, params=None, **kwargs):
         """Search YouTube (ex: .youtube <query>)"""
         if params:
-            query = urllib.urlencode({
-                "q": params,
-                "v": 2,
-                "max-results": 4,
-                "alt": "jsonc"})
+            query = urllib.urlencode({"q": params,
+                                      "v": 2,
+                                      "max-results": 4,
+                                      "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
             response = self.irc.fetch_url(url, self.name)
 

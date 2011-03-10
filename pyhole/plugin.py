@@ -17,7 +17,6 @@
 """Pyhole Plugin Library"""
 
 import functools
-import re
 import sys
 
 

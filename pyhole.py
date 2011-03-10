@@ -35,16 +35,16 @@ DEBUG = CONFIG.get("debug", "bool")
 def network_list(sections):
     """Prepare the list of IRC networks"""
     networks = []
-    for network in sections:
-        if network != "Pyhole" and network != "Redmine":
-            networks.append(network)
+    for _network in sections:
+        if _network != "Pyhole" and _network != "Redmine":
+            networks.append(_network)
     return networks
 
 
-def irc_connection(network):
+def irc_connection(irc_network):
     """IRC network connection"""
-    network_info = config.Config(__CONFIG__, network)
-    log = utils.logger(network, DEBUG)
+    network_info = config.Config(__CONFIG__, irc_network)
+    log = utils.logger(irc_network, DEBUG)
     reconnect_delay = CONFIG.get("reconnect_delay", "int")
 
     while True:

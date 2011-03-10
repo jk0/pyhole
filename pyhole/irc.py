@@ -14,14 +14,13 @@
 
 """Event-based IRC Class"""
 
-import inspect
 import random
 import re
 import time
 import urllib
 
-import irclib
-import plugin
+from pyhole import irclib
+from pyhole import plugin
 
 
 class IRC(irclib.SimpleIRCClient):
@@ -50,16 +49,10 @@ class IRC(irclib.SimpleIRCClient):
 
         self.load_plugins()
 
-        self.log.info("Connecting to %s:%d as %s" % (
-            self.server,
-            self.port,
-            self.nick))
-        self.connect(
-            self.server,
-            self.port,
-            self.nick,
-            self.password,
-            ssl=self.ssl)
+        self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
+                                                     self.nick))
+        self.connect(self.server, self.port, self.nick, self.password,
+                     ssl=self.ssl)
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
@@ -68,33 +61,19 @@ class IRC(irclib.SimpleIRCClient):
             plugin.reload_plugins(irc=self)
         else:
             plugin.load_plugins("plugins", irc=self)
-        self.log.info(self.active_plugins())
-
-    def active_plugins(self):
-        """List active plugins"""
-        return "Loaded Plugins: %s" % ", ".join(plugin.active_plugins())
-
-    def active_commands(self):
-        """List active commands"""
-        return ", ".join(plugin.active_commands())
-
-    def active_keywords(self):
-        """List active keywords"""
-        return ", ".join(plugin.active_keywords())
+        self.log.info("Loaded Plugins: %s" % active_plugins())
 
     def run_hook_command(self, mod_name, f, arg, **kwargs):
         """Make a call to a plugin hook"""
         try:
             f(arg, **kwargs)
             if arg:
-                self.log.debug("Calling: %s.%s(\"%s\")" % (
-                    mod_name,
-                    f.__name__,
-                    arg))
+                self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
+                                                           f.__name__,
+                                                           arg))
             else:
-                self.log.debug("Calling: %s.%s(None)" % (
-                    mod_name,
-                    f.__name__))
+                self.log.debug("Calling: %s.%s(None)" % (mod_name,
+                                                         f.__name__))
         except Exception, e:
             self.log.error(e)
 
@@ -103,12 +82,8 @@ class IRC(irclib.SimpleIRCClient):
         for mod_name, f, msg_regex in plugin.hook_get_msg_regexs():
             m = re.search(msg_regex, message, re.I)
             if m:
-                self.run_hook_command(
-                    mod_name,
-                    f,
-                    m,
-                    private=private,
-                    full_message=message)
+                self.run_hook_command(mod_name, f, m, private=private,
+                                      full_message=message)
 
     def run_keyword_hooks(self, message, private):
         """Run keyword hooks"""
@@ -118,12 +93,9 @@ class IRC(irclib.SimpleIRCClient):
             for word in words:
                 m = re.search("%s(.+)" % kw, word, re.I)
                 if m:
-                    self.run_hook_command(
-                        mod_name,
-                        f,
-                        m.group(1),
-                        private=private,
-                        full_message=message)
+                    self.run_hook_command(mod_name, f, m.group(1),
+                                          private=private,
+                                          full_message=message)
 
     def run_command_hooks(self, message, private):
         """Run command hooks"""
@@ -133,13 +105,10 @@ class IRC(irclib.SimpleIRCClient):
             if private:
                 m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message, re.I)
                 if m:
-                    self.run_hook_command(
-                        mod_name,
-                        f,
-                        m.group(1),
-                        private=private,
-                        addressed=self.addressed,
-                        full_message=message)
+                    self.run_hook_command(mod_name, f, m.group(1),
+                                          private=private,
+                                          addressed=self.addressed,
+                                          full_message=message)
 
             if message.startswith(self.command_prefix):
                 # Strip off command prefix
@@ -149,10 +118,8 @@ class IRC(irclib.SimpleIRCClient):
                 msg_start_upper = message[:len(self.nick) + 1].upper()
                 if msg_start_upper == self.nick.upper() + ':':
                     # Get rest of string after "nick:" and white spaces
-                    msg_rest = re.sub(
-                        "^\s+",
-                        "",
-                        message[len(self.nick) + 1:])
+                    msg_rest = re.sub("^\s+", "",
+                                      message[len(self.nick) + 1:])
                 else:
                     continue
 
@@ -160,13 +127,9 @@ class IRC(irclib.SimpleIRCClient):
 
             m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
             if m:
-                self.run_hook_command(
-                    mod_name,
-                    f,
-                    m.group(1),
-                    private=private,
-                    addressed=self.addressed,
-                    full_message=message)
+                self.run_hook_command(mod_name, f, m.group(1), private=private,
+                                      addressed=self.addressed,
+                                      full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
@@ -252,16 +215,10 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
-        self.log.info("Connecting to %s:%d as %s" % (
-            self.server,
-            self.port,
-            self.nick))
-        self.connect(
-            self.server,
-            self.port,
-            self.nick,
-            self.password,
-            ssl=self.ssl)
+        self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
+                                                     self.nick))
+        self.connect(self.server, self.port, self.nick, self.password,
+                     ssl=self.ssl)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked"""
@@ -269,9 +226,8 @@ class IRC(irclib.SimpleIRCClient):
 
         if event.arguments()[1] == self.nick:
             self.log.info("Kicked from %s" % self.target)
-            self.log.info("Rejoining %s in %d seconds" % (
-                self.target,
-                self.rejoin_delay))
+            self.log.info("Rejoining %s in %d seconds" % (self.target,
+                                                          self.rejoin_delay))
             time.sleep(self.rejoin_delay)
             connection.join(self.target)
 
@@ -294,9 +250,8 @@ class IRC(irclib.SimpleIRCClient):
         elif ctcp == "PING":
             if len(event.arguments()) > 1:
                 self.log.info("Received CTCP PING from %s" % self.source)
-                connection.ctcp_reply(
-                    self.source,
-                    "PING %s" % event.arguments()[1])
+                connection.ctcp_reply(self.source,
+                                      "PING %s" % event.arguments()[1])
 
     def on_action(self, connection, event):
         """Handle IRC actions"""
@@ -326,3 +281,18 @@ class IRC(irclib.SimpleIRCClient):
 
         self.log.info("%s <%s> %s" % (self.target, nick, msg))
         self.poll_messages(msg)
+
+
+def active_plugins():
+    """List active plugins"""
+    return ", ".join(plugin.active_plugins())
+
+
+def active_commands():
+    """List active commands"""
+    return ", ".join(plugin.active_commands())
+
+
+def active_keywords():
+    """List active keywords"""
+    return ", ".join(plugin.active_keywords())
