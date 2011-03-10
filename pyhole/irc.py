@@ -27,7 +27,7 @@ import plugin
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, redmine, network, logger, version):
+    def __init__(self, config, network, logger, version):
         irclib.SimpleIRCClient.__init__(self)
 
         self.log = logger
@@ -38,9 +38,6 @@ class IRC(irclib.SimpleIRCClient):
         self.reconnect_delay = config.get("reconnect_delay", "int")
         self.rejoin_delay = config.get("rejoin_delay", "int")
         self.cache = config.get("cache")
-
-        self.redmine_domain = redmine.get("domain")
-        self.redmine_key = redmine.get("key")
 
         self.server = network.get("server")
         self.password = network.get("password")

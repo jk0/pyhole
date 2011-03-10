@@ -16,8 +16,12 @@
 
 import simplejson
 
+from pyhole import config
 from pyhole import plugin
 from pyhole import utils
+
+
+__CONFIG__ = "pyhole.cfg"
 
 
 class Redmine(plugin.Plugin):
@@ -26,9 +30,11 @@ class Redmine(plugin.Plugin):
     def __init__(self, irc):
         self.irc = irc
         self.name = self.__class__.__name__
-        self.redmine_url = "https://%s:password@%s" % (
-            self.irc.redmine_key,
-            self.irc.redmine_domain)
+        self.redmine = config.Config(__CONFIG__, "Redmine")
+        self.redmine_domain = self.redmine.get("domain")
+        self.redmine_key = self.redmine.get("key")
+        self.redmine_url = "https://%s:password@%s" % (self.redmine_key,
+                                                       self.redmine_domain)
 
     @plugin.hook_add_command("rbugs")
     @utils.spawn
@@ -110,5 +116,5 @@ class Redmine(plugin.Plugin):
             issue["subject"],
             issue["status"]["name"],
             issue.get("assigned_to", {}).get("name", "N/A"),
-            self.irc.redmine_domain,
+            self.redmine_domain,
             issue["id"]))

@@ -25,40 +25,34 @@ from pyhole import irc
 from pyhole import utils
 
 
-__version__ = "pyhole v0.5.1 - http://pyhole.org"
-__config__ = "pyhole.cfg"
+__VERSION__ = "pyhole v0.5.2 - http://pyhole.org"
+__CONFIG__ = "pyhole.cfg"
 
-b_config = config.Config(__config__, "pyhole")
-r_config = config.Config(__config__, "Redmine")
-b_debug = b_config.get("debug", "bool")
+CONFIG = config.Config(__CONFIG__, "Pyhole")
+DEBUG = CONFIG.get("debug", "bool")
 
 
 def network_list(sections):
     """Prepare the list of IRC networks"""
     networks = []
     for network in sections:
-        if network != "pyhole" and network != "Redmine":
+        if network != "Pyhole" and network != "Redmine":
             networks.append(network)
     return networks
 
 
-def irc_connection(b_config, b_network):
+def irc_connection(network):
     """IRC network connection"""
-    n_config = config.Config(__config__, b_network)
-    n_log = utils.logger(b_network, b_debug)
-    reconnect_delay = b_config.get("reconnect_delay", "int")
+    network_info = config.Config(__CONFIG__, network)
+    log = utils.logger(network, DEBUG)
+    reconnect_delay = CONFIG.get("reconnect_delay", "int")
 
     while True:
         try:
-            connection = irc.IRC(
-                b_config,
-                r_config,
-                n_config,
-                n_log,
-                __version__)
+            connection = irc.IRC(CONFIG, network_info, log, __VERSION__)
         except Exception, e:
-            n_log.error(e)
-            n_log.error("Retrying in %d seconds" % reconnect_delay)
+            log.error(e)
+            log.error("Retrying in %d seconds" % reconnect_delay)
             time.sleep(reconnect_delay)
             continue
 
@@ -67,25 +61,23 @@ def irc_connection(b_config, b_network):
         except KeyboardInterrupt:
             sys.exit(1)
         except Exception, e:
-            n_log.error(e)
-            n_log.error("Retrying in %d seconds" % reconnect_delay)
+            log.error(e)
+            log.error("Retrying in %d seconds" % reconnect_delay)
             time.sleep(reconnect_delay)
             continue
 
 
 if __name__ == "__main__":
-    b_log = utils.logger("MAIN", b_debug)
-    b_networks = network_list(b_config.sections())
+    LOG = utils.logger("MAIN", DEBUG)
+    NETWORKS = network_list(CONFIG.sections())
 
-    b_log.info("Connecting to IRC Networks: %s" % ", ".join(b_networks))
-    for b_network in b_networks:
-        p = multiprocessing.Process(
-            target=irc_connection,
-            args=(b_config, b_network))
+    LOG.info("Connecting to IRC Networks: %s" % ", ".join(NETWORKS))
+    for network in NETWORKS:
+        p = multiprocessing.Process(target=irc_connection, args=(network,))
         p.start()
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        b_log.info("Caught KeyboardInterrupt, shutting down")
+        LOG.info("Caught KeyboardInterrupt, shutting down")
