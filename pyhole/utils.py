@@ -16,6 +16,7 @@
 
 import eventlet
 import logging
+import logging.handlers
 import re
 import string
 
@@ -25,10 +26,19 @@ eventlet.monkey_patch()
 
 def logger(name, debug=False):
     """Log handler"""
-    logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO,
-        format="%(asctime)s [%(name)s] %(message)s",
-        datefmt="%H:%M:%S")
+    level = logging.DEBUG if debug else logging.INFO
+    format = "%(asctime)s [%(name)s] %(message)s"
+    datefmt = "%H:%M:%S"
+
+    logging.basicConfig(level=level, format=format, datefmt=datefmt)
+
+    log = logging.handlers.TimedRotatingFileHandler("logs/pyhole.log",
+                                                    "midnight")
+    log.setLevel(level)
+    formatter = logging.Formatter(format, datefmt)
+    log.setFormatter(formatter)
+    logging.getLogger(name).addHandler(log)
+
     return logging.getLogger(name)
 
 
