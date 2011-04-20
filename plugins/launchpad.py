@@ -73,7 +73,10 @@ class Launchpad(plugin.Plugin):
 
     def _find_name(self, user):
         """Lookup a Launchpad user's display name"""
-        return self.launchpad.people[user].display_name
+        try:
+            return self.launchpad.people[user].display_name
+        except ValueError:
+            return "None"
 
     def _find_bugs(self, person, project, single=False):
         """Lookup Launchpad bugs"""
