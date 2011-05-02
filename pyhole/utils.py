@@ -18,7 +18,6 @@ import eventlet
 import logging
 import logging.handlers
 import re
-import string
 
 from pyhole import config
 
@@ -71,18 +70,20 @@ def spawn(func):
 
 def decode_entities(html):
     """Strip HTML entities from a string"""
-    html = re.sub("<[^>]*?>", "", html)
-    html = re.sub("&nbsp;", " ", html)
-    html = re.sub("&amp;", "&", html)
-    html = re.sub("&quot;", "\"", html)
-    html = re.sub("&#8212;", "-", html)
-    html = re.sub("&#8217;", "'", html)
-    html = re.sub("&#8220;", "\"", html)
-    html = re.sub("&#8221;", "\"", html)
-    html = re.sub("&#8230;", "...", html)
-    html = filter(lambda x: x in string.printable, html)
+    entities = [
+        ("<[^>]*?>",""),
+        ("&nbsp;",' '),
+        ("&amp;","&"),
+        ("&quot;","\""),
+        ("&#8212;","-"),
+        ("&#8217;","'"),
+        ("&#8220;","\""),
+        ("&#8221;","\""),
+        ("&#8230;","...")]
 
-    return html.strip()
+    #YARLY
+    html = reduce(lambda a,b: re.sub(b[0], b[1], a), entities, html)
+    return filter(lambda x: ord(x) > 9 and ord(x) < 127, html).strip()
 
 
 def ensure_int(param):
