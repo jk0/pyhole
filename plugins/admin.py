@@ -99,7 +99,7 @@ class Admin(plugin.Plugin):
     def say(self, params=None, **kwargs):
         """Send a PRIVMSG (ex: .say <channel>|<nick> message)"""
         if params:
-            (target, msg) = params.split(' ', 1)
+            (target, msg) = params.split(" ", 1)
             self.irc.privmsg(target, msg)
         else:
             self.irc.reply(self.part.__doc__)

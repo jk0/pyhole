@@ -25,7 +25,7 @@ from pyhole import irc
 from pyhole import utils
 
 
-__VERSION__ = "pyhole v0.5.2 - http://pyhole.org"
+__VERSION__ = "pyhole v0.5.3 - http://pyhole.org"
 __CONFIG__ = "pyhole.cfg"
 
 CONFIG = config.Config(__CONFIG__, "Pyhole")
@@ -34,7 +34,8 @@ DEBUG = CONFIG.get("debug", "bool")
 
 def network_list(sections):
     """Prepare the list of IRC networks"""
-    return [net for net in sections if net not in ['Pyhole', 'Redmine']]
+    return [net for net in sections if net not in ["Pyhole", "Redmine"]]
+
 
 def irc_connection(irc_network):
     """IRC network connection"""

@@ -116,7 +116,7 @@ class IRC(irclib.SimpleIRCClient):
             else:
                 # Check for command starting with nick being addressed
                 msg_start_upper = message[:len(self.nick) + 1].upper()
-                if msg_start_upper == self.nick.upper() + ':':
+                if msg_start_upper == self.nick.upper() + ":":
                     # Get rest of string after "nick:" and white spaces
                     msg_rest = re.sub("^\s+", "",
                                       message[len(self.nick) + 1:])

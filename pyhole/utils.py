@@ -71,18 +71,17 @@ def spawn(func):
 def decode_entities(html):
     """Strip HTML entities from a string"""
     entities = [
-        ("<[^>]*?>",""),
-        ("&nbsp;",' '),
-        ("&amp;","&"),
-        ("&quot;","\""),
-        ("&#8212;","-"),
-        ("&#8217;","'"),
-        ("&#8220;","\""),
-        ("&#8221;","\""),
-        ("&#8230;","...")]
+        ("<[^>]*?>", ""),
+        ("&nbsp;", " "),
+        ("&amp;", "&"),
+        ("&quot;", "\""),
+        ("&#8212;", "-"),
+        ("&#8217;", "'"),
+        ("&#8220;", "\""),
+        ("&#8221;", "\""),
+        ("&#8230;", "...")]
 
-    #YARLY
-    html = reduce(lambda a,b: re.sub(b[0], b[1], a), entities, html)
+    html = reduce(lambda a, b: re.sub(b[0], b[1], a), entities, html)
     return filter(lambda x: ord(x) > 9 and ord(x) < 127, html).strip()
 
 

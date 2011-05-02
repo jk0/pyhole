@@ -43,7 +43,7 @@ def hook_add(hookname, arg):
     """
 
     def wrap(f):
-        setattr(f, '_is_%s_hook' % hookname, True)
+        setattr(f, "_is_%s_hook" % hookname, True)
         f._hook_arg = arg
         return f
     return wrap
@@ -71,7 +71,7 @@ def active_get(hookname):
 
 _plugins = []
 _plugins_module = None
-_hook_names = ['keyword', 'command', 'msg_regex']
+_hook_names = ["keyword", "command", "msg_regex"]
 _reset_variables()
 _this_mod = sys.modules[__name__]
 
@@ -96,7 +96,7 @@ class PluginMetaClass(type):
         that's been subclassed from Plugin (ie, a real plugin class)
         """
 
-        if not hasattr(cls, '_plugin_classes'):
+        if not hasattr(cls, "_plugin_classes"):
             cls._plugin_classes = []
         else:
             cls._plugin_classes.append(cls)
@@ -152,7 +152,7 @@ def load_plugins(plugindir, *args, **kwargs):
     global _plugins_module
     _plugins_module = __import__(plugindir)
     for p in dir(_plugins_module):
-        if not p.startswith('_'):
+        if not p.startswith("_"):
             _plugins.append(p)
     _init_plugins(*args, **kwargs)
 
@@ -175,7 +175,7 @@ def reload_plugins(*args, **kwargs):
         reload(getattr(_plugins_module, x))
     # Add any new modules to _plugins
     for p in dir(_plugins_module):
-        if not (p.startswith('_') or p in _plugins):
+        if not (p.startswith("_") or p in _plugins):
             _plugins.append(p)
     _init_plugins(*args, **kwargs)
 

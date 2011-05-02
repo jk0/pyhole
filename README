@@ -15,6 +15,10 @@ Plugin Requirements
     - simplejson
 
 
+Test Requirements
+
+    - nose
+
 Installation
 
     git clone git://github.com/jk0/pyhole.git
