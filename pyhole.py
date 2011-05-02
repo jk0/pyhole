@@ -34,12 +34,7 @@ DEBUG = CONFIG.get("debug", "bool")
 
 def network_list(sections):
     """Prepare the list of IRC networks"""
-    networks = []
-    for _network in sections:
-        if _network != "Pyhole" and _network != "Redmine":
-            networks.append(_network)
-    return networks
-
+    return [net for net in sections if net not in ['Pyhole', 'Redmine']]
 
 def irc_connection(irc_network):
     """IRC network connection"""
