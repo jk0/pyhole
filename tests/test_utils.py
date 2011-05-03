@@ -64,6 +64,10 @@ class TestUtils(unittest.TestCase):
         test_str = "<]*?>"
         self.assertEqual(utils.decode_entities(test_str), "")
 
+    def test_decode_entities_12(self):
+        test_str = "&#39;"
+        self.assertEqual(utils.decode_entities(test_str), "'")
+
     def test_ensure_int(self):
         self.assertEqual(utils.ensure_int("3"), 3)
 
