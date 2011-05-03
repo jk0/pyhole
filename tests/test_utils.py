@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Unit Tests"""
+"""Pyhole Utils Unit Tests"""
 
 import unittest
 
@@ -52,15 +52,15 @@ class TestUtils(unittest.TestCase):
         test_str = "&#8221;"
         self.assertEqual(utils.decode_entities(test_str), "\"")
 
-    def test_decode_entities_8(self):
+    def test_decode_entities_9(self):
         test_str = "&#8230;"
         self.assertEqual(utils.decode_entities(test_str), "...")
 
-    def test_decode_entities_9(self):
+    def test_decode_entities_10(self):
         test_str = "<[lol^>"
         self.assertEqual(utils.decode_entities(test_str), "")
 
-    def test_decode_entities_10(self):
+    def test_decode_entities_11(self):
         test_str = "<]*?>"
         self.assertEqual(utils.decode_entities(test_str), "")
 

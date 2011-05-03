@@ -14,16 +14,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-echo "Running unit tests..."
-./run_tests.py
+echo "Running unit tests ..."
+python run_tests.py
 
-echo "Running PEP8..."
+echo "Running PEP8 ..."
 pep8 -r .
 
-#echo "Running pylint..."
+#echo "Running pylint ..."
 #pylint pyhole.py -rno
 #pylint pyhole -rno
 #pylint plugins -rno
+#pylint tests -rno
 
-#echo "Running pyflakes..."
+#echo "Running pyflakes ..."
 #pyflakes .
