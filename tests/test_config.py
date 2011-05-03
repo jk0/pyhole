@@ -21,7 +21,7 @@ from pyhole import config
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        self.config = config.Config("../pyhole.cfg", "Pyhole")
+        self.config = config.Config("../pyhole.cfg.dist", "Pyhole")
 
     def test_sections(self):
         sections = self.config.sections()
