@@ -82,11 +82,17 @@ class Launchpad(plugin.Plugin):
         """Lookup Launchpad bugs"""
         bugs = project.searchTasks(assignee=person)
         if len(bugs):
-            for bug in bugs:
-                self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
-                                                            person.\
-                                                            display_name,
-                                                            bug.web_link))
+            i = 0
+            for i, bug in enumerate(bugs):
+                if i <= 4:
+                    self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
+                                                                person.\
+                                                                display_name,
+                                                                bug.web_link))
+                else:
+                    self.irc.reply("[...] truncated last %d bugs" % (
+                        len(bugs) - i))
+                    break
         else:
             if single:
                 self.irc.reply("No bugs found for %s" % (person.display_name))
