@@ -38,13 +38,20 @@ class Launchpad(plugin.Plugin):
                 members = self.launchpad.people[team]
                 proj = self.launchpad.projects[project]
 
-                # Find a single member
-                self._find_bugs(members, proj, True)
-
-                # Find everyone on the team
-                for person in members.members:
-                    self.irc.log.debug("LP: %s" % person.display_name)
-                    self._find_bugs(person, proj)
+                if len(members.members) < 2:
+                    # Find a single member
+                    self._find_bugs(members, proj)
+                else:
+                    # Find everyone on the team
+                    i = 0
+                    for i, person in enumerate(members.members):
+                        if i <= 4:
+                            self.irc.log.debug("LP: %s" % person.display_name)
+                            self._find_bugs(person, proj, False)
+                        else:
+                            self.irc.reply("[...] truncated last %d users" % (
+                                len(members.members) - i))
+                            break
             except KeyError:
                 self.irc.reply("Unable to find user '%s' in Launchpad" % team)
         else:
@@ -78,21 +85,20 @@ class Launchpad(plugin.Plugin):
         except ValueError:
             return "None"
 
-    def _find_bugs(self, person, project, single=False):
+    def _find_bugs(self, person, project, single=True):
         """Lookup Launchpad bugs"""
         bugs = project.searchTasks(assignee=person)
-        if len(bugs):
-            i = 0
-            for i, bug in enumerate(bugs):
-                if i <= 4:
-                    self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
-                                                                person.\
-                                                                display_name,
-                                                                bug.web_link))
-                else:
-                    self.irc.reply("[...] truncated last %d bugs" % (
-                        len(bugs) - i))
-                    break
-        else:
-            if single:
-                self.irc.reply("No bugs found for %s" % (person.display_name))
+        i = 0
+        for i, bug in enumerate(bugs):
+            if i <= 4:
+                self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
+                                                            person.\
+                                                            display_name,
+                                                            bug.web_link))
+            else:
+                self.irc.reply("[...] truncated last %d bugs" % (
+                    len(bugs) - i))
+                break
+
+        if single and i < 1:
+            self.irc.reply("No bugs found for %s" % (person.display_name))
