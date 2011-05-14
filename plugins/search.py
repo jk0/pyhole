@@ -28,7 +28,7 @@ from pyhole import utils
 class Search(plugin.Plugin):
     """Provide access to search engines"""
 
-    def __init__(self, irc):
+    def __init__(self, irc, conf_file):
         self.irc = irc
         self.name = self.__class__.__name__
 

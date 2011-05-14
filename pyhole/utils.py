@@ -24,8 +24,6 @@ from pyhole import config
 
 eventlet.monkey_patch()
 
-__CONFIG__ = "pyhole.cfg"
-
 
 def logger(name, debug=False):
     """Log handler"""
@@ -95,6 +93,6 @@ def ensure_int(param):
         return None
 
 
-def load_config(section):
+def load_config(section, conf_file):
     """Load a config section"""
-    return config.Config(__CONFIG__, section)
+    return config.Config(conf_file, section)
