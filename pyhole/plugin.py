@@ -18,6 +18,7 @@
 
 import functools
 import sys
+import os
 
 
 def _reset_variables():
@@ -69,8 +70,6 @@ def active_get(hookname):
 
     return [x[2] for x in _plugin_hooks[hookname]]
 
-_plugins = []
-_plugins_module = None
 _hook_names = ["keyword", "command", "msg_regex"]
 _reset_variables()
 _this_mod = sys.modules[__name__]
@@ -100,6 +99,7 @@ class PluginMetaClass(type):
             cls._plugin_classes = []
         else:
             cls._plugin_classes.append(cls)
+        cls.__name__ = name
 
 
 class Plugin(object):
@@ -149,34 +149,38 @@ def load_plugins(plugindir, *args, **kwargs):
     Module function that loads plugins from a particular directory
     """
 
-    global _plugins_module
-    _plugins_module = __import__(plugindir)
-    for p in dir(_plugins_module):
-        if not p.startswith("_"):
-            _plugins.append(p)
+    plugins = os.path.dirname(plugindir) or plugindir
+    plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith('.py')
+                    and not x.startswith('_'))
+    for p in plugin_names:
+        try:
+            __import__(plugindir, globals(), locals(), [p])
+        except ImportError:
+            # log something here?
+            pass
     _init_plugins(*args, **kwargs)
 
 
-def reload_plugins(*args, **kwargs):
+def reload_plugins(plugindir, *args, **kwargs):
     """
     Module function that'll reload all of the plugins
     """
 
-    if not _plugins_module:
-        raise TypeError("load_plugins has never been called")
-    _reset_variables()
-    # Reload the main plugins module itself
-    reload(_plugins_module)
     # When the modules are reloaded, the meta class will append
     # all of the classes again, so we need to make sure this is empty
     Plugin._plugin_classes = []
-    # Now reload all of the plugins that the main plugins module loaded
-    for x in _plugins:
-        reload(getattr(_plugins_module, x))
-    # Add any new modules to _plugins
-    for p in dir(_plugins_module):
-        if not (p.startswith("_") or p in _plugins):
-            _plugins.append(p)
+    _reset_variables()
+    # Now reload all of the plugins
+    plugins_to_reload = []
+    for mod, val in sys.modules.items():
+        if plugindir in mod and val and mod != plugindir:
+            plugins_to_reload.append(mod)
+    for p in plugins_to_reload:
+        try:
+            reload(sys.modules[p])
+        except Exception, err:
+            # log something here?
+            pass
     _init_plugins(*args, **kwargs)
 
 
@@ -185,7 +189,7 @@ def active_plugins():
     Get the loaded plugin names
     """
 
-    return _plugins
+    return [x.__name__ for x in Plugin._plugin_classes]
 
 
 def active_plugin_classes():
