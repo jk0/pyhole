@@ -43,7 +43,6 @@ class Launchpad(plugin.Plugin):
                     self._find_bugs(members, proj)
                 else:
                     # Find everyone on the team
-                    i = 0
                     for i, person in enumerate(members.members):
                         if i <= 4:
                             self.irc.log.debug("LP: %s" % person.display_name)
@@ -88,7 +87,6 @@ class Launchpad(plugin.Plugin):
     def _find_bugs(self, person, project, single=True):
         """Lookup Launchpad bugs"""
         bugs = project.searchTasks(assignee=person)
-        i = 0
         for i, bug in enumerate(bugs):
             if i <= 4:
                 self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,

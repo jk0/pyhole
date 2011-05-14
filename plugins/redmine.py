@@ -45,7 +45,6 @@ class Redmine(plugin.Plugin):
             user_id = self._find_user(login)
 
             issues = self._find_issues(user_id)
-            i = 0
             for i, issue in enumerate(issues):
                 if i <= 4:
                     self._find_issue(issue["id"])
