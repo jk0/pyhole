@@ -174,6 +174,11 @@ def reload_plugins(plugindir, *args, **kwargs):
     plugins_to_reload = []
     for mod, val in sys.modules.items():
         if plugindir in mod and val and mod != plugindir:
+            mod_file = val.__file__
+            if mod_file.endswith('.pyc') or mod_file.endswith('.pyo'):
+                source_file_guess = mod_file[:-1]
+                if not os.path.isfile(source_file_guess):
+                    os.unlink(mod_file)
             plugins_to_reload.append(mod)
     for p in plugins_to_reload:
         try:
