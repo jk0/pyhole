@@ -17,8 +17,8 @@
 """Pyhole Plugin Library"""
 
 import functools
-import sys
 import os
+import sys
 
 
 def _reset_variables():
@@ -150,8 +150,8 @@ def load_plugins(plugindir, *args, **kwargs):
     """
 
     plugins = os.path.dirname(plugindir) or plugindir
-    plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith('.py')
-                    and not x.startswith('_'))
+    plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
+                    and not x.startswith("_"))
     for p in plugin_names:
         try:
             __import__(plugindir, globals(), locals(), [p])
