@@ -93,6 +93,6 @@ def ensure_int(param):
         return None
 
 
-def load_config(section, conf_file):
+def load_config(section, conf):
     """Load a config section"""
-    return config.Config(conf_file, section)
+    return config.Config(conf, section)

@@ -23,7 +23,7 @@ from pyhole import utils
 class Entertainment(plugin.Plugin):
     """Provide access to entertaining sites"""
 
-    def __init__(self, irc, conf_file):
+    def __init__(self, irc, conf):
         self.irc = irc
         self.name = self.__class__.__name__
 

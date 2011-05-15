@@ -17,9 +17,9 @@
 """pyhole - A modular IRC bot for Python developers."""
 
 import multiprocessing
+import optparse
 import sys
 import time
-import optparse
 
 from pyhole import config
 from pyhole import irc
@@ -34,16 +34,15 @@ def network_list(sections):
     return [net for net in sections if net not in ["Pyhole", "Redmine"]]
 
 
-def irc_connection(irc_network, conf_file):
+def irc_connection(irc_network, conf):
     """IRC network connection"""
-    network_info = config.Config(conf_file, irc_network)
+    network_info = config.Config(conf, irc_network)
     log = utils.logger(irc_network, DEBUG)
     reconnect_delay = CONFIG.get("reconnect_delay", "int")
 
     while True:
         try:
-            connection = irc.IRC(CONFIG, network_info, log, __VERSION__,
-                                 conf_file)
+            connection = irc.IRC(CONFIG, network_info, log, __VERSION__, conf)
         except Exception, e:
             log.error(e)
             log.error("Retrying in %d seconds" % reconnect_delay)
@@ -63,11 +62,11 @@ def irc_connection(irc_network, conf_file):
 
 if __name__ == "__main__":
     parser = optparse.OptionParser()
-    parser.add_option('-c', '--config', dest='config', default="pyhole.cfg")
+    parser.add_option("-c", "--config", dest="config", default="pyhole.cfg")
     options, args = parser.parse_args()
-    conf_file = options.config
+    conf = options.config
 
-    CONFIG = config.Config(conf_file, "Pyhole")
+    CONFIG = config.Config(conf, "Pyhole")
     DEBUG = CONFIG.get("debug", "bool")
     LOG = utils.logger("MAIN", DEBUG)
     NETWORKS = network_list(CONFIG.sections())
@@ -75,7 +74,7 @@ if __name__ == "__main__":
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(NETWORKS))
     for network in NETWORKS:
         p = multiprocessing.Process(target=irc_connection, args=(network,
-                                                                 conf_file))
+                                                                 conf))
         p.start()
 
     try:
