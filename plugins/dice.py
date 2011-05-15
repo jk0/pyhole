@@ -38,7 +38,7 @@ class Dice(plugin.Plugin):
                     count, sides = query.split("d")
                     count = int(count)
                     sides = int(sides)
-            except TypeError:
+            except (TypeError, ValueError):
                 result = self.roll.__doc__
             else:
                 result = 0
