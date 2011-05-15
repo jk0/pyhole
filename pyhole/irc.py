@@ -26,12 +26,12 @@ from pyhole import plugin
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, network, logger, version, conf_file):
+    def __init__(self, config, network, logger, version, conf):
         irclib.SimpleIRCClient.__init__(self)
 
         self.log = logger
         self.version = version
-        self.conf_file = conf_file
+        self.conf = conf
 
         self.admins = config.get("admins", "list")
         self.command_prefix = config.get("command_prefix")
@@ -59,9 +59,9 @@ class IRC(irclib.SimpleIRCClient):
         """Load plugins and their commands respectively"""
 
         if reload_plugins:
-            plugin.reload_plugins(irc=self, conf_file=self.conf_file)
+            plugin.reload_plugins(irc=self, conf=self.conf)
         else:
-            plugin.load_plugins("plugins", irc=self, conf_file=self.conf_file)
+            plugin.load_plugins("plugins", irc=self, conf=self.conf)
         self.log.info("Loaded Plugins: %s" % active_plugins())
 
     def run_hook_command(self, mod_name, f, arg, **kwargs):
