@@ -18,23 +18,24 @@ import random
 
 from pyhole import plugin
 
+
 class Dice(plugin.Plugin):
     """Roll a die"""
 
     @plugin.hook_add_command("roll")
-    def roll(self, params=None, **kw):
+    def roll(self, params=None, **kwargs):
         """Roll dice (ex: 2d6)"""
         if params:
             query = params.split()[0]
             try:
-                if 'd' not in query:
+                if "d" not in query:
                     count = 1
                     sides = int(query)
-                elif query.startswith('d'):
+                elif query.startswith("d"):
                     count = 1
                     sides = int(query[1:])
                 else:
-                    count, sides = query.split('d')
+                    count, sides = query.split("d")
                     count = int(count)
                     sides = int(sides)
             except TypeError:
