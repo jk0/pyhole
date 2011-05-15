@@ -38,6 +38,7 @@ class IRC(irclib.SimpleIRCClient):
         self.reconnect_delay = config.get("reconnect_delay", "int")
         self.rejoin_delay = config.get("rejoin_delay", "int")
         self.cache = config.get("cache")
+        self.plugin_dir = config.get("plugin_dir") or "plugins"
 
         self.server = network.get("server")
         self.password = network.get("password")
@@ -59,7 +60,7 @@ class IRC(irclib.SimpleIRCClient):
         """Load plugins and their commands respectively"""
 
         if reload_plugins:
-            plugin.reload_plugins(irc=self, conf=self.conf)
+            plugin.reload_plugins(self.plugin_dir, irc=self, conf=self.conf)
         else:
             plugin.load_plugins("plugins", irc=self, conf=self.conf)
         self.log.info("Loaded Plugins: %s" % active_plugins())
