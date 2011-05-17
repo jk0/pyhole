@@ -24,5 +24,5 @@ from nose import core
 if __name__ == "__main__":
     tests = os.path.abspath(os.path.join("tests"))
     tests_config = config.Config(stream=sys.stdout, env=os.environ,
-                                 verbosity=3, workingDir=tests)
+            verbosity=3, workingDir=tests)
     core.run(config=tests_config, argv=sys.argv)

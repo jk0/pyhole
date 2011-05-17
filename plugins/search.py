@@ -39,7 +39,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params})
             url = ("http://ajax.googleapis.com/ajax/"
-                   "services/search/web?v=1.0&%s" % query)
+                    "services/search/web?v=1.0&%s" % query)
 
             response = self.irc.fetch_url(url, self.name)
 
@@ -48,8 +48,8 @@ class Search(plugin.Plugin):
             if results:
                 for r in results:
                     self.irc.reply("%s: %s" % (
-                        r["titleNoFormatting"].encode("ascii", "ignore"),
-                        r["unescapedUrl"]))
+                            r["titleNoFormatting"].encode("ascii", "ignore"),
+                            r["unescapedUrl"]))
             else:
                 self.irc.reply("No results found: '%s'" % params)
         else:
@@ -76,10 +76,8 @@ class Search(plugin.Plugin):
             if results:
                 for r in results:
                     self.irc.reply(
-                        "%s (%s): http://www.imdb.com/title/tt%s/" % (
-                        r["title"],
-                        r["year"],
-                        r.movieID))
+                            "%s (%s): http://www.imdb.com/title/tt%s/" % (
+                            r["title"], r["year"], r.movieID))
             else:
                 self.irc.reply("No results found: '%s'" % params)
         else:
@@ -98,10 +96,9 @@ class Search(plugin.Plugin):
             results = json["results"]
             if results:
                 for r in results:
-                    self.irc.reply("@%s: %s" % (
-                        r["from_user"],
-                        utils.decode_entities(
-                            r["text"].encode("ascii", "ignore"))))
+                    self.irc.reply("@%s: %s" % (r["from_user"],
+                            utils.decode_entities(
+                                    r["text"].encode("ascii", "ignore"))))
             else:
                 self.irc.reply("No results found: '%s'" % params)
         else:
@@ -121,7 +118,7 @@ class Search(plugin.Plugin):
                 self.irc.reply("No results found: '%s'" % params)
             else:
                 r = (re.compile("<div class=\"definition\">(.*)</div>"
-                                "<div class=\"example\">"))
+                        "<div class=\"example\">"))
                 m = r.search(html)
                 for i, line in enumerate(m.group(1).split("<br/>")):
                     if i <= 4:
@@ -139,10 +136,8 @@ class Search(plugin.Plugin):
         """Search Wikipedia (ex: .wikipedia <query>)"""
         if params:
             query = urllib.urlencode({"action": "query",
-                                      "generator": "allpages",
-                                      "gaplimit": 4,
-                                      "gapfrom": params,
-                                      "format": "xml"})
+                    "generator": "allpages", "gaplimit": 4,
+                    "gapfrom": params, "format": "xml"})
             url = "http://en.wikipedia.org/w/api.php?%s" % query
             response = self.irc.fetch_url(url, self.name)
 
@@ -159,10 +154,8 @@ class Search(plugin.Plugin):
     def youtube(self, params=None, **kwargs):
         """Search YouTube (ex: .youtube <query>)"""
         if params:
-            query = urllib.urlencode({"q": params,
-                                      "v": 2,
-                                      "max-results": 4,
-                                      "alt": "jsonc"})
+            query = urllib.urlencode({"q": params, "v": 2, "max-results": 4,
+                    "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
             response = self.irc.fetch_url(url, self.name)
 

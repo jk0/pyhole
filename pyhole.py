@@ -61,20 +61,20 @@ def irc_connection(irc_network, conf):
 
 
 if __name__ == "__main__":
-    parser = optparse.OptionParser()
-    parser.add_option("-c", "--config", dest="config", default="pyhole.cfg")
-    options, args = parser.parse_args()
-    conf = options.config
+    PARSER = optparse.OptionParser()
+    PARSER.add_option("-c", "--config", dest="config", default="pyhole.cfg")
+    OPTIONS, ARGS = PARSER.parse_args()
+    CONF = OPTIONS.config
 
-    CONFIG = config.Config(conf, "Pyhole")
+    CONFIG = config.Config(CONF, "Pyhole")
     DEBUG = CONFIG.get("debug", "bool")
     LOG = utils.logger("MAIN", DEBUG)
     NETWORKS = network_list(CONFIG.sections())
 
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(NETWORKS))
     for network in NETWORKS:
-        p = multiprocessing.Process(target=irc_connection, args=(network,
-                                                                 conf))
+        p = multiprocessing.Process(target=irc_connection,
+                args=(network, CONF))
         p.start()
 
     try:

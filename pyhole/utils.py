@@ -34,7 +34,7 @@ def logger(name, debug=False):
     logging.basicConfig(level=level, format=format, datefmt=datefmt)
 
     log = logging.handlers.TimedRotatingFileHandler("logs/pyhole.log",
-                                                    "midnight")
+            "midnight")
     log.setLevel(level)
     formatter = logging.Formatter(format, datefmt)
     log.setFormatter(formatter)

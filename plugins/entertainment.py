@@ -48,7 +48,7 @@ class Entertainment(plugin.Plugin):
     def lastnight(self, params=None, **kwargs):
         """Display a random Text From Last Night (ex: .lastnight)"""
         url = ("http://www.textsfromlastnight.com/"
-               "Random-Texts-From-Last-Night.html")
+                "Random-Texts-From-Last-Night.html")
 
         response = self.irc.fetch_url(url, self.name)
 

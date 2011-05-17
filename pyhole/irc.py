@@ -52,9 +52,9 @@ class IRC(irclib.SimpleIRCClient):
         self.load_plugins()
 
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
-                                                     self.nick))
+                self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                     ssl=self.ssl)
+                ssl=self.ssl)
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
@@ -71,11 +71,10 @@ class IRC(irclib.SimpleIRCClient):
             f(arg, **kwargs)
             if arg:
                 self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
-                                                           f.__name__,
-                                                           arg))
+                        f.__name__, arg))
             else:
                 self.log.debug("Calling: %s.%s(None)" % (mod_name,
-                                                         f.__name__))
+                        f.__name__))
         except Exception, e:
             self.log.error(e)
 
@@ -85,7 +84,7 @@ class IRC(irclib.SimpleIRCClient):
             m = re.search(msg_regex, message, re.I)
             if m:
                 self.run_hook_command(mod_name, f, m, private=private,
-                                      full_message=message)
+                        full_message=message)
 
     def run_keyword_hooks(self, message, private):
         """Run keyword hooks"""
@@ -96,8 +95,7 @@ class IRC(irclib.SimpleIRCClient):
                 m = re.search("%s(.+)" % kw, word, re.I)
                 if m:
                     self.run_hook_command(mod_name, f, m.group(1),
-                                          private=private,
-                                          full_message=message)
+                            private=private, full_message=message)
 
     def run_command_hooks(self, message, private):
         """Run command hooks"""
@@ -108,9 +106,8 @@ class IRC(irclib.SimpleIRCClient):
                 m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message, re.I)
                 if m:
                     self.run_hook_command(mod_name, f, m.group(1),
-                                          private=private,
-                                          addressed=self.addressed,
-                                          full_message=message)
+                            private=private, addressed=self.addressed,
+                            full_message=message)
 
             if message.startswith(self.command_prefix):
                 # Strip off command prefix
@@ -121,7 +118,7 @@ class IRC(irclib.SimpleIRCClient):
                 if msg_start_upper == self.nick.upper() + ":":
                     # Get rest of string after "nick:" and white spaces
                     msg_rest = re.sub("^\s+", "",
-                                      message[len(self.nick) + 1:])
+                            message[len(self.nick) + 1:])
                 else:
                     continue
 
@@ -130,8 +127,7 @@ class IRC(irclib.SimpleIRCClient):
             m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
             if m:
                 self.run_hook_command(mod_name, f, m.group(1), private=private,
-                                      addressed=self.addressed,
-                                      full_message=message)
+                        addressed=self.addressed, full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
@@ -218,9 +214,9 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
-                                                     self.nick))
+                self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                     ssl=self.ssl)
+                ssl=self.ssl)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked"""
@@ -229,7 +225,7 @@ class IRC(irclib.SimpleIRCClient):
         if event.arguments()[1] == self.nick:
             self.log.info("Kicked from %s" % self.target)
             self.log.info("Rejoining %s in %d seconds" % (self.target,
-                                                          self.rejoin_delay))
+                    self.rejoin_delay))
             time.sleep(self.rejoin_delay)
             connection.join(self.target)
 
@@ -253,7 +249,7 @@ class IRC(irclib.SimpleIRCClient):
             if len(event.arguments()) > 1:
                 self.log.info("Received CTCP PING from %s" % self.source)
                 connection.ctcp_reply(self.source,
-                                      "PING %s" % event.arguments()[1])
+                        "PING %s" % event.arguments()[1])
 
     def on_action(self, connection, event):
         """Handle IRC actions"""

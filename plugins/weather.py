@@ -43,8 +43,7 @@ class Weather(plugin.Plugin):
                 condition = w["current_conditions"]["condition"]
 
                 result = "%s: %sF/%sC   %s   %s   %s" % (city, temp_f, temp_c,
-                                                         humidity, wind,
-                                                         condition)
+                        humidity, wind, condition)
                 self.irc.reply(result)
             else:
                 self.irc.reply("Location not found: '%s'" % params)

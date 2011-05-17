@@ -39,7 +39,7 @@ class News(plugin.Plugin):
             if i >= 21 and i <= 28 and item.childNodes:
                 ref = item.childNodes
                 self.irc.reply("%s: %s" % (ref[1].firstChild.data,
-                                           ref[5].firstChild.data))
+                        ref[5].firstChild.data))
 
     @plugin.hook_add_command("digg")
     @utils.spawn
@@ -53,7 +53,7 @@ class News(plugin.Plugin):
             if i >= 15 and i <= 21 and item.childNodes:
                 ref = item.childNodes
                 self.irc.reply("%s: %s" % (ref[1].firstChild.data.strip(),
-                                           ref[3].firstChild.data.strip()))
+                        ref[3].firstChild.data.strip()))
 
     @plugin.hook_add_command("reddit")
     @utils.spawn
@@ -67,5 +67,5 @@ class News(plugin.Plugin):
             if i >= 4 and i <= 7:
                 ref = item.childNodes
                 self.irc.reply("%s: %s" % (
-                    ref[0].firstChild.data.encode("ascii", "ignore"),
-                    ref[1].firstChild.data.encode("ascii", "ignore")))
+                        ref[0].firstChild.data.encode("ascii", "ignore"),
+                        ref[1].firstChild.data.encode("ascii", "ignore")))

@@ -26,7 +26,7 @@ class Launchpad(plugin.Plugin):
     def __init__(self, irc, conf):
         self.irc = irc
         self.launchpad = LP.login_anonymously("pyhole", "production",
-                                              self.irc.cache)
+                self.irc.cache)
 
     @plugin.hook_add_command("lbugs")
     @utils.spawn
@@ -49,7 +49,7 @@ class Launchpad(plugin.Plugin):
                             self._find_bugs(person, proj, False)
                         else:
                             self.irc.reply("[...] truncated last %d users" % (
-                                len(members.members) - i))
+                                    len(members.members) - i))
                             break
             except KeyError:
                 self.irc.reply("Unable to find user '%s' in Launchpad" % team)
@@ -71,9 +71,8 @@ class Launchpad(plugin.Plugin):
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
 
                 self.irc.reply("LP Bug #%s: %s [Status: %s, Assignee: %s]"
-                               " %s" % (bug.id, bug.title, task.status,
-                                        self._find_name(task.assignee_link),
-                                        bug.web_link))
+                        " %s" % (bug.id, bug.title, task.status,
+                        self._find_name(task.assignee_link), bug.web_link))
             except Exception:
                 return
 
@@ -90,12 +89,10 @@ class Launchpad(plugin.Plugin):
         for i, bug in enumerate(bugs):
             if i <= 4:
                 self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
-                                                            person.\
-                                                            display_name,
-                                                            bug.web_link))
+                        person.display_name, bug.web_link))
             else:
                 self.irc.reply("[...] truncated last %d bugs" % (
-                    len(bugs) - i))
+                        len(bugs) - i))
                 break
 
         if single and i < 1:
