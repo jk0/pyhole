@@ -70,8 +70,8 @@ class Launchpad(plugin.Plugin):
                 bug = self.launchpad.bugs[params]
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
 
-                self.irc.reply("LP Bug #%s: %s [Status: %s, Assignee: %s]"
-                        " %s" % (bug.id, bug.title, task.status,
+                self.irc.reply("LP %s [Status: %s, Assignee: %s] %s" % (
+                        task.title, task.status,
                         self._find_name(task.assignee_link), bug.web_link))
             except Exception:
                 return
