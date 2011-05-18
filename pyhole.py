@@ -61,16 +61,18 @@ def irc_connection(irc_network, conf):
 
 
 if __name__ == "__main__":
-    PARSER = optparse.OptionParser()
+    PARSER = optparse.OptionParser(version=__VERSION__)
     PARSER.add_option("-c", "--config", dest="config", default="pyhole.cfg")
+    PARSER.add_option("-d", "--debug", action="store_true", dest="debug")
     OPTIONS, ARGS = PARSER.parse_args()
     CONF = OPTIONS.config
 
     CONFIG = config.Config(CONF, "Pyhole")
-    DEBUG = CONFIG.get("debug", "bool")
+    DEBUG = OPTIONS.debug or CONFIG.get("debug", "bool")
     LOG = utils.logger("MAIN", DEBUG)
     NETWORKS = network_list(CONFIG.sections())
 
+    LOG.info("Starting %s" % __VERSION__)
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(NETWORKS))
     for network in NETWORKS:
         p = multiprocessing.Process(target=irc_connection,
