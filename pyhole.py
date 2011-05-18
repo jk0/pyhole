@@ -52,7 +52,7 @@ def irc_connection(irc_network, conf):
         try:
             connection.start()
         except KeyboardInterrupt:
-            sys.exit(1)
+            sys.exit(0)
         except Exception, e:
             log.error(e)
             log.error("Retrying in %d seconds" % reconnect_delay)
