@@ -16,6 +16,8 @@
 
 import re
 
+from BeautifulSoup import BeautifulSoup
+
 from pyhole import plugin
 from pyhole import utils
 
@@ -33,15 +35,10 @@ class Entertainment(plugin.Plugin):
         """Display a random Group Hug (ex: .grouphug)"""
         url = "http://grouphug.us/random"
         response = self.irc.fetch_url(url, self.name)
-
-        html = response.read()
-        r = re.compile("<div class=\"content\">\n\s+<p>(.*)</p>\n\s+</div>")
-        m = r.search(html)
-        if m:
-            line = utils.decode_entities(m.group(1))
-            self.irc.reply(line)
-        else:
-            self.irc.reply("Unable to parse Group Hug data")
+        soup = BeautifulSoup(response.read())
+        grouphug = utils.decode_entities(
+                soup.findAll(id=re.compile("node-\d+"))[2].p.contents[0])
+        self.irc.reply(grouphug)
 
     @plugin.hook_add_command("lastnight")
     @utils.spawn
@@ -49,13 +46,9 @@ class Entertainment(plugin.Plugin):
         """Display a random Text From Last Night (ex: .lastnight)"""
         url = ("http://www.textsfromlastnight.com/"
                 "Random-Texts-From-Last-Night.html")
-
         response = self.irc.fetch_url(url, self.name)
-
-        html = response.read()
-        r = re.compile("<p><a href=\"/Text-Replies-.+.html\">(.*)</a></p>")
-        m = r.search(html)
-        if m:
-            self.irc.reply(m.group(1))
-        else:
-            self.irc.reply("Unable to parse Texts From Last Night data")
+        soup = BeautifulSoup(response.read())
+        lastnight = utils.decode_entities(
+                soup.findAll(href=re.compile(
+                        "/Text-Replies-\d+.html"))[0].contents[0])
+        self.irc.reply(lastnight)

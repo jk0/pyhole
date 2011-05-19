@@ -182,6 +182,11 @@ class IRC(irclib.SimpleIRCClient):
 
     def fetch_url(self, url, name):
         """Fetch a URL"""
+        class PyholeURLopener(urllib.FancyURLopener):
+            version = "pyhole"
+
+        urllib._urlopener = PyholeURLopener()
+
         try:
             return urllib.urlopen(url)
         except IOError:
