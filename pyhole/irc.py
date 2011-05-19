@@ -141,9 +141,10 @@ class IRC(irclib.SimpleIRCClient):
         """Send a privmsg"""
         if self.addressed:
             nick = self.source.split("!")[0]
-            self.connection.privmsg(self.target, "%s: %s" % (nick, msg))
+            self.connection.privmsg(self.target, "%s: %s" % (
+                    nick, msg.encode("utf-8")))
         else:
-            self.connection.privmsg(self.target, msg)
+            self.connection.privmsg(self.target, msg.encode("utf-8"))
 
     def privmsg(self, target, msg):
         """Send a privmsg"""
@@ -184,7 +185,7 @@ class IRC(irclib.SimpleIRCClient):
     def fetch_url(self, url, name):
         """Fetch a URL"""
         class PyholeURLopener(urllib.FancyURLopener):
-            version = "pyhole"
+            version = self.version
 
         urllib._urlopener = PyholeURLopener()
 
@@ -263,7 +264,8 @@ class IRC(irclib.SimpleIRCClient):
         nick = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info("%s * %s %s" % (self.target, nick, msg))
+        self.log.info(unicode("%s * %s %s" % (self.target, nick, msg),
+                "utf-8"))
 
     def on_privmsg(self, connection, event):
         """Handle private messages"""
@@ -272,7 +274,7 @@ class IRC(irclib.SimpleIRCClient):
         msg = event.arguments()[0]
 
         if self.target != self.nick:
-            self.log.info("<%s> %s" % (self.target, msg))
+            self.log.info(unicode("<%s> %s" % (self.target, msg), "utf-8"))
             self.poll_messages(msg, private=True)
 
     def on_pubmsg(self, connection, event):
@@ -282,7 +284,8 @@ class IRC(irclib.SimpleIRCClient):
         nick = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info("%s <%s> %s" % (self.target, nick, msg))
+        self.log.info(unicode("%s <%s> %s" % (self.target, nick, msg),
+                "utf-8"))
         self.poll_messages(msg)
 
 
