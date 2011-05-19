@@ -37,7 +37,7 @@ def network_list(sections):
 def irc_connection(irc_network, conf):
     """IRC network connection"""
     network_info = config.Config(conf, irc_network)
-    log = utils.logger(irc_network, DEBUG)
+    log = utils.logger(irc_network, LOG_DIR, DEBUG)
     reconnect_delay = CONFIG.get("reconnect_delay", "int")
 
     while True:
@@ -63,13 +63,14 @@ def irc_connection(irc_network, conf):
 if __name__ == "__main__":
     PARSER = optparse.OptionParser(version=__VERSION__)
     PARSER.add_option("-c", "--config", dest="config", default="pyhole.cfg")
-    PARSER.add_option("-d", "--debug", action="store_true", dest="debug")
+    PARSER.add_option("--debug", action="store_true", dest="debug")
     OPTIONS, ARGS = PARSER.parse_args()
     CONF = OPTIONS.config
 
     CONFIG = config.Config(CONF, "Pyhole")
     DEBUG = OPTIONS.debug or CONFIG.get("debug", "bool")
-    LOG = utils.logger("MAIN", DEBUG)
+    LOG_DIR = CONFIG.get("log_dir")
+    LOG = utils.logger("MAIN", LOG_DIR, DEBUG)
     NETWORKS = network_list(CONFIG.sections())
 
     LOG.info("Starting %s" % __VERSION__)

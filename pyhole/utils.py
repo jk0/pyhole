@@ -17,6 +17,7 @@
 import eventlet
 import logging
 import logging.handlers
+import os
 import re
 
 from pyhole import config
@@ -25,15 +26,18 @@ from pyhole import config
 eventlet.monkey_patch()
 
 
-def logger(name, debug=False):
+def logger(name, log_dir, debug=False):
     """Log handler"""
     level = logging.DEBUG if debug else logging.INFO
     format = "%(asctime)s [%(name)s] %(message)s"
     datefmt = "%H:%M:%S"
 
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
     logging.basicConfig(level=level, format=format, datefmt=datefmt)
 
-    log = logging.handlers.TimedRotatingFileHandler("logs/pyhole.log",
+    log = logging.handlers.TimedRotatingFileHandler("%s/pyhole.log" % log_dir,
             "midnight")
     log.setLevel(level)
     formatter = logging.Formatter(format, datefmt)
