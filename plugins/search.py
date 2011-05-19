@@ -14,11 +14,11 @@
 
 """Pyhole Search Plugin"""
 
-import imdb
 import re
 import simplejson
 import urllib
 
+from BeautifulSoup import BeautifulSoup
 from xml.dom import minidom
 
 from pyhole import plugin
@@ -65,20 +65,28 @@ class Search(plugin.Plugin):
     def imdb(self, params=None, **kwargs):
         """Search IMDb (ex: .imdb <query>)"""
         if params:
-            i = imdb.IMDb()
+            query = urllib.urlencode({"q": params})
+            url = "http://www.imdb.com/find?s=all&%s" % query
+            response = self.irc.fetch_url(url, self.name)
+            soup = BeautifulSoup(response.read())
+            results = soup.findAll("td", {"valign": "top"})
 
-            try:
-                results = i.search_movie(params, results=4)
-            except IOError:
-                self.irc.reply("Unable to fetch IMDb data")
-                return
+            i = 0
+            for result in results:
+                if len(result) > 3 and len(result.contents[2].attrs) > 0:
+                    id = result.contents[2].attrs[0][1]
+                    title = utils.decode_entities(
+                            result.contents[2].contents[0])
+                    year = result.contents[2].nextSibling.strip()[0:6]
 
-            if results:
-                for r in results:
-                    self.irc.reply(
-                            "%s (%s): http://www.imdb.com/title/tt%s/" % (
-                            r["title"], r["year"], r.movieID))
-            else:
+                    if not title.startswith("aka") and len(year):
+                        self.irc.reply("%s %s: http://www.imdb.com%s" % (
+                                title, year, id))
+                        i += 1
+                elif i >= 4:
+                    break
+
+            if i == 0:
                 self.irc.reply("No results found: '%s'" % params)
         else:
             self.irc.reply(self.imdb.__doc__)
@@ -112,21 +120,19 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"term": params})
             url = "http://www.urbandictionary.com/define.php?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            soup = BeautifulSoup(response.read())
+            urban = " ".join(str(x) for x in soup.findAll(
+                    "div", {"class": "definition"})[0].contents)
 
-            html = response.read()
-            if re.search("<i>%s</i>\nisn't defined" % params, html):
-                self.irc.reply("No results found: '%s'" % params)
-            else:
-                r = (re.compile("<div class=\"definition\">(.*)</div>"
-                        "<div class=\"example\">"))
-                m = r.search(html)
-                for i, line in enumerate(m.group(1).split("<br/>")):
+            if len(urban) > 0:
+                for i, line in enumerate(urban.split("<br/>")):
                     if i <= 4:
-                        line = utils.decode_entities(line)
-                        self.irc.reply(line)
+                        self.irc.reply(utils.decode_entities(line))
                     else:
                         self.irc.reply("[...] %s" % url)
                         break
+            else:
+                self.irc.reply("No results found: '%s'" % params)
         else:
             self.irc.reply(self.urban.__doc__)
 

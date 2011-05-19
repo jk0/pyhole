@@ -68,6 +68,14 @@ class TestUtils(unittest.TestCase):
         test_str = "&#39;"
         self.assertEqual(utils.decode_entities(test_str), "'")
 
+    def test_decode_entities_13(self):
+        test_str = "&#x22;"
+        self.assertEqual(utils.decode_entities(test_str), "\"")
+
+    def test_decode_entities_14(self):
+        test_str = "&#x27;"
+        self.assertEqual(utils.decode_entities(test_str), "'")
+
     def test_ensure_int(self):
         self.assertEqual(utils.ensure_int("3"), 3)
 

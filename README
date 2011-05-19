@@ -10,7 +10,6 @@ Core Requirements
 Plugin Requirements
 
     - BeautifulSoup
-    - IMDbPY
     - launchpadlib
     - pywapi
     - simplejson
