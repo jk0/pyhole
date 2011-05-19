@@ -76,3 +76,7 @@ class TestUtils(unittest.TestCase):
 
     def test_ensure_int_3(self):
         self.assertEqual(utils.ensure_int("a"), None)
+
+    def test_version(self):
+        test_ver = "pyhole v0 - http://pyhole.org"
+        self.assertEqual(utils.version("0"), test_ver)

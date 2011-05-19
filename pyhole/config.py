@@ -15,6 +15,7 @@
 """Intelligent Configuration Library"""
 
 import ConfigParser
+import os
 import sys
 
 
@@ -44,5 +45,9 @@ class Config(object):
             return self.config.getboolean(self.section, key)
         elif param_type == "list":
             return self.config.get(self.section, key).split(", ")
+        elif param_type == "dir":
+            path = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]),
+                    key))
+            return self.config.get(self.section, path)
         else:
             return self.config.get(self.section, key)

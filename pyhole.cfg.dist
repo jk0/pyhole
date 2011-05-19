@@ -5,10 +5,10 @@ admins: nick!ident, nick2!ident
 command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
-cache: /tmp/pyhole/cache
+debug: False
+cache_dir: /tmp/pyhole/cache
 plugin_dir: plugins
 log_dir: logs
-debug: False
 
 [Redmine]
 domain: redmine.example.com

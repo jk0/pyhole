@@ -37,8 +37,8 @@ class IRC(irclib.SimpleIRCClient):
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", "int")
         self.rejoin_delay = config.get("rejoin_delay", "int")
-        self.cache = config.get("cache")
-        self.plugin_dir = config.get("plugin_dir") or "plugins"
+        self.cache_dir = config.get("cache_dir", "dir")
+        self.plugin_dir = config.get("plugin_dir", "dir") or "plugins"
 
         self.server = network.get("server")
         self.password = network.get("password")
@@ -58,11 +58,10 @@ class IRC(irclib.SimpleIRCClient):
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
-
         if reload_plugins:
             plugin.reload_plugins(self.plugin_dir, irc=self, conf=self.conf)
         else:
-            plugin.load_plugins("plugins", irc=self, conf=self.conf)
+            plugin.load_plugins(self.plugin_dir, irc=self, conf=self.conf)
         self.log.info("Loaded Plugins: %s" % active_plugins())
 
     def run_hook_command(self, mod_name, f, arg, **kwargs):

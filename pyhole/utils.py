@@ -19,6 +19,7 @@ import logging
 import logging.handlers
 import os
 import re
+import sys
 
 from pyhole import config
 
@@ -100,3 +101,18 @@ def ensure_int(param):
 def load_config(section, conf):
     """Load a config section"""
     return config.Config(conf, section)
+
+
+def version(number):
+    """Prepare the version string"""
+    git_path = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]),
+            ".git/refs/heads/master"))
+
+    if not os.path.exists(git_path):
+        return "pyhole v%s - http://pyhole.org" % number
+
+    git = open(git_path, "r")
+    git_commit = git.read()
+    git.close()
+
+    return "pyhole v%s (%s) - http://pyhole.org" % (number, git_commit[0:5])

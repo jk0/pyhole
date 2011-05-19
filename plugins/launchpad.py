@@ -26,7 +26,7 @@ class Launchpad(plugin.Plugin):
     def __init__(self, irc, conf):
         self.irc = irc
         self.launchpad = LP.login_anonymously("pyhole", "production",
-                self.irc.cache)
+                self.irc.cache_dir)
 
     @plugin.hook_add_command("lbugs")
     @utils.spawn

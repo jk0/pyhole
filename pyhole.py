@@ -25,7 +25,7 @@ from pyhole import irc
 from pyhole import utils
 
 
-__VERSION__ = "pyhole v0.5.3 - http://pyhole.org"
+__VERSION__ = utils.version("0.5.3")
 
 
 def network_list(sections):
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     CONFIG = utils.load_config("Pyhole", CONF)
     DEBUG = OPTIONS.debug or CONFIG.get("debug", "bool")
-    LOG_DIR = CONFIG.get("log_dir")
+    LOG_DIR = CONFIG.get("log_dir", "dir")
     LOG = utils.logger("MAIN", LOG_DIR, DEBUG)
     NETWORKS = network_list(CONFIG.sections())
 
