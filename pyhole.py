@@ -21,7 +21,6 @@ import optparse
 import sys
 import time
 
-from pyhole import config
 from pyhole import irc
 from pyhole import utils
 
@@ -36,7 +35,7 @@ def network_list(sections):
 
 def irc_connection(irc_network, conf):
     """IRC network connection"""
-    network_info = config.Config(conf, irc_network)
+    network_info = utils.load_config(irc_network, conf)
     log = utils.logger(irc_network, LOG_DIR, DEBUG)
     reconnect_delay = CONFIG.get("reconnect_delay", "int")
 
@@ -67,7 +66,7 @@ if __name__ == "__main__":
     OPTIONS, ARGS = PARSER.parse_args()
     CONF = OPTIONS.config
 
-    CONFIG = config.Config(CONF, "Pyhole")
+    CONFIG = utils.load_config("Pyhole", CONF)
     DEBUG = OPTIONS.debug or CONFIG.get("debug", "bool")
     LOG_DIR = CONFIG.get("log_dir")
     LOG = utils.logger("MAIN", LOG_DIR, DEBUG)
