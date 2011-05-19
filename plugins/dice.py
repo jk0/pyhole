@@ -46,4 +46,5 @@ class Dice(plugin.Plugin):
                     result += random.randint(1, sides)
         else:
             result = self.roll.__doc__
+
         self.irc.reply(result)

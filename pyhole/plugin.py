@@ -116,6 +116,7 @@ class Plugin(object):
         """
 
         self.irc = irc
+        self.name = self.__class__.__name__
 
 
 def _init_plugins(*args, **kwargs):

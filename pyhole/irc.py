@@ -193,7 +193,7 @@ class IRC(irclib.SimpleIRCClient):
             return urllib.urlopen(url)
         except IOError:
             self.reply("Unable to fetch %s data" % name)
-            return
+            return None
 
     def on_nicknameinuse(self, connection, event):
         """Ensure the use of unique IRC nick"""

@@ -21,12 +21,12 @@ from pyhole import utils
 
 class TestUtils(unittest.TestCase):
     def test_decode_entities(self):
-        test_str = "<derp>herp a derp</derp>"
-        self.assertEqual(utils.decode_entities(test_str), "herp a derp")
+        test_str = "<foo>bar</foo>"
+        self.assertEqual(utils.decode_entities(test_str), "bar")
 
     def test_decode_entities_2(self):
-        test_str = "pewp&nbsp;shute"
-        self.assertEqual(utils.decode_entities(test_str), "pewp shute")
+        test_str = "foo&nbsp;bar"
+        self.assertEqual(utils.decode_entities(test_str), "foo bar")
 
     def test_decode_entities_3(self):
         test_str = "&amp;"

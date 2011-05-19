@@ -28,10 +28,6 @@ from pyhole import utils
 class Search(plugin.Plugin):
     """Provide access to search engines"""
 
-    def __init__(self, irc, conf):
-        self.irc = irc
-        self.name = self.__class__.__name__
-
     @plugin.hook_add_command("google")
     @utils.spawn
     def google(self, params=None, **kwargs):
@@ -40,8 +36,9 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params})
             url = ("http://ajax.googleapis.com/ajax/"
                     "services/search/web?v=1.0&%s" % query)
-
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             json = simplejson.loads(response.read())
             results = json["responseData"]["results"]
@@ -68,6 +65,9 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params})
             url = "http://www.imdb.com/find?s=all&%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
+
             soup = BeautifulSoup(response.read())
             results = soup.findAll("td", {"valign": "top"})
 
@@ -99,6 +99,8 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params, "rpp": 4})
             url = "http://search.twitter.com/search.json?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             json = simplejson.loads(response.read())
             results = json["results"]
@@ -120,6 +122,9 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"term": params})
             url = "http://www.urbandictionary.com/define.php?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
+
             soup = BeautifulSoup(response.read())
             urban = " ".join(str(x) for x in soup.findAll(
                     "div", {"class": "definition"})[0].contents)
@@ -146,6 +151,8 @@ class Search(plugin.Plugin):
                     "gapfrom": params, "format": "xml"})
             url = "http://en.wikipedia.org/w/api.php?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             xml = minidom.parseString(response.read())
             for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
@@ -164,6 +171,8 @@ class Search(plugin.Plugin):
                     "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             json = simplejson.loads(response.read())
             results = json["data"]

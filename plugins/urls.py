@@ -52,6 +52,8 @@ class Url(plugin.Plugin):
             url = "http://" + url
 
         response = self.irc.fetch_url(url, self.name).read()
+        if not response:
+            return
         response = re.sub("\n", "", response)
         response = re.sub("  +", "", response)
 

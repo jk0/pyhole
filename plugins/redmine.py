@@ -26,31 +26,34 @@ class Redmine(plugin.Plugin):
     def __init__(self, irc, conf):
         self.irc = irc
         self.name = self.__class__.__name__
+        self.disabled = False
 
         try:
             self.redmine = utils.load_config("Redmine", conf)
             self.redmine_domain = self.redmine.get("domain")
             self.redmine_key = self.redmine.get("key")
-            self.redmine_url = "https://%s:password@%s" % (self.redmine_key,
-                                                           self.redmine_domain)
+            self.redmine_url = "https://%s:password@%s" % (
+                    self.redmine_key, self.redmine_domain)
         except Exception:
+            self.disabled = True
             self.irc.log.error("Unable to load %s configuration." % self.name)
 
     @plugin.hook_add_command("rbugs")
     @utils.spawn
     def rbugs(self, params=None, **kwargs):
         """Redmine bugs for a user (ex: .rbugs <login>)"""
-        if params:
+        if params and not self.disabled:
             login = params.split(" ", 1)[0]
             user_id = self._find_user(login)
 
+            i = 0
             issues = self._find_issues(user_id)
             for i, issue in enumerate(issues):
                 if i <= 4:
                     self._find_issue(issue["id"])
                 else:
                     self.irc.reply("[...] truncated last %d bugs" % (
-                        len(issues) - i))
+                            len(issues) - i))
                     break
             else:
                 if i <= 0:
@@ -62,16 +65,17 @@ class Redmine(plugin.Plugin):
     @utils.spawn
     def keyword_rm(self, params=None, **kwargs):
         """Retrieve Redmine bug information (ex: RM12345)"""
-        if params:
+        if params and not self.disabled:
             params = utils.ensure_int(params)
             self._find_issue(params)
 
     def _find_issues(self, user_id):
         """Find all issues for a Redmine user"""
-        url = "%s/issues.json?assigned_to_id=%s" % (self.redmine_url,
-                                                    user_id)
-
+        url = "%s/issues.json?assigned_to_id=%s" % (
+                self.redmine_url, user_id)
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         return simplejson.loads(response.read())["issues"]
 
@@ -88,12 +92,13 @@ class Redmine(plugin.Plugin):
     def _find_users(self, offset=None):
         """Find all Redmine users"""
         if offset:
-            url = "%s/users.json?limit=100&offset=%d" % (self.redmine_url,
-                                                         offset)
+            url = "%s/users.json?limit=100&offset=%d" % (
+                    self.redmine_url, offset)
         else:
             url = "%s/users.json?limit=100" % self.redmine_url
-
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         return simplejson.loads(response.read())["users"]
 
@@ -101,6 +106,8 @@ class Redmine(plugin.Plugin):
         """Find and display a Redmine issue"""
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         try:
             issue = simplejson.loads(response.read())["issue"]
@@ -108,10 +115,8 @@ class Redmine(plugin.Plugin):
             return
 
         self.irc.reply("RM %s #%s: %s [Status: %s, Assignee: %s] "
-            "https://%s/issues/show/%s" % (issue["tracker"]["name"],
-                                           issue["id"], issue["subject"],
-                                           issue["status"]["name"],
-                                           issue.get("assigned_to", {}).\
-                                           get("name", "N/A"),
-                                           self.redmine_domain,
-                                           issue["id"]))
+                "https://%s/issues/show/%s" % (
+                issue["tracker"]["name"], issue["id"], issue["subject"],
+                issue["status"]["name"],
+                issue.get("assigned_to", {}).get("name", "N/A"),
+                self.redmine_domain, issue["id"]))

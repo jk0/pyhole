@@ -23,16 +23,14 @@ from pyhole import utils
 class News(plugin.Plugin):
     """Provide access to news feeds"""
 
-    def __init__(self, irc, conf):
-        self.irc = irc
-        self.name = self.__class__.__name__
-
     @plugin.hook_add_command("cnn")
     @utils.spawn
     def cnn(self, params=None, **kwargs):
         """Display current CNN news (ex: .cnn)"""
         url = "http://rss.cnn.com/rss/cnn_topstories.rss"
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[2].childNodes[0].childNodes):
@@ -47,6 +45,8 @@ class News(plugin.Plugin):
         """Display current Digg news (ex: .digg)"""
         url = "http://services.digg.com/2.0/story.getTopNews?type=rss"
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[0].childNodes[1].childNodes):
@@ -61,6 +61,8 @@ class News(plugin.Plugin):
         """Display current reddit news (ex: .reddit)"""
         url = "http://www.reddit.com/.rss"
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[0].childNodes[0].childNodes):

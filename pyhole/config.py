@@ -23,31 +23,35 @@ class Config(object):
     """A configuration object"""
 
     def __init__(self, config, section):
-        self.config = ConfigParser.ConfigParser()
+        self.config = os.path.abspath(config)
+        self.config_parser = ConfigParser.ConfigParser()
         self.section = section
 
         try:
-            conf_file = open(config)
-            self.config.readfp(conf_file)
+            conf_file = open(self.config)
+            self.config_parser.readfp(conf_file)
             conf_file.close()
         except IOError:
-            sys.exit("No such file: '%s'" % config)
+            sys.exit("Unable to load configuration file: %s" % self.config)
 
     def sections(self):
         """Return a list of sections"""
-        return self.config.sections()
+        return self.config_parser.sections()
 
     def get(self, key, param_type="string"):
         """Retrieve configuration values"""
-        if param_type == "int":
-            return self.config.getint(self.section, key)
-        elif param_type == "bool":
-            return self.config.getboolean(self.section, key)
-        elif param_type == "list":
-            return self.config.get(self.section, key).split(", ")
-        elif param_type == "dir":
-            path = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]),
-                    key))
-            return self.config.get(self.section, path)
-        else:
-            return self.config.get(self.section, key)
+        try:
+            if param_type == "int":
+                return self.config_parser.getint(self.section, key)
+            elif param_type == "bool":
+                return self.config_parser.getboolean(self.section, key)
+            elif param_type == "list":
+                return self.config_parser.get(self.section, key).split(", ")
+            elif param_type == "dir":
+                path = os.path.normpath(os.path.join(
+                        os.path.dirname(sys.argv[0]), key))
+                return self.config_parser.get(self.section, path)
+            else:
+                return self.config_parser.get(self.section, key)
+        except ConfigParser.NoOptionError:
+            sys.exit("Unable to locate '%s' in %s" % (key, self.config))

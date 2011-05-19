@@ -25,16 +25,15 @@ from pyhole import utils
 class Entertainment(plugin.Plugin):
     """Provide access to entertaining sites"""
 
-    def __init__(self, irc, conf):
-        self.irc = irc
-        self.name = self.__class__.__name__
-
     @plugin.hook_add_command("grouphug")
     @utils.spawn
     def grouphug(self, params=None, **kwargs):
         """Display a random Group Hug (ex: .grouphug)"""
         url = "http://grouphug.us/random"
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
+
         soup = BeautifulSoup(response.read())
         grouphug = utils.decode_entities(
                 soup.findAll(id=re.compile("node-\d+"))[2].p.contents[0])
@@ -47,6 +46,9 @@ class Entertainment(plugin.Plugin):
         url = ("http://www.textsfromlastnight.com/"
                 "Random-Texts-From-Last-Night.html")
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
+
         soup = BeautifulSoup(response.read())
         lastnight = utils.decode_entities(
                 soup.findAll(href=re.compile(
