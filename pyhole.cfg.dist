@@ -17,10 +17,11 @@ key: abcd1234
 # IRC Network Configuration
 
 [FreeNode]
-server: irc.freenode.net
+server: verne.freenode.net
 password:
-port: 6667
-ssl: False
+port: 7000
+ssl: True
+ipv6: True
 nick: mynick
 channels: #mychannel key, #mychannel2
 
@@ -29,5 +30,6 @@ server: irc.efnet.net
 password:
 port: 6667
 ssl: False
+ipv6: False
 nick: mynick
 channels: #mychannel key, #mychannel2
