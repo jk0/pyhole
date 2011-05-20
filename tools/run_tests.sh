@@ -21,7 +21,7 @@ echo "Running PEP8 ..."
 pep8 -r .
 
 #echo "Running pylint ..."
-#pylint pyhole.py -rno
+#pylint bin/pyhole -rno
 #pylint pyhole -rno
 #pylint plugins -rno
 #pylint tests -rno
