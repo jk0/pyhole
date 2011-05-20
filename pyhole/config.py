@@ -45,14 +45,14 @@ class Config(object):
 
     def get(self, option, **kwargs):
         """Retrieve configuration values"""
-        type = kwargs.get("type", "str")
+        _type = kwargs.get("type", "str")
 
         try:
-            if type == "int":
+            if _type == "int":
                 return self.config_parser.getint(self.section, option)
-            elif type == "bool":
+            elif _type == "bool":
                 return self.config_parser.getboolean(self.section, option)
-            elif type == "list":
+            elif _type == "list":
                 return self.config_parser.get(self.section, option).split(", ")
             else:
                 return self.config_parser.get(self.section, option)
