@@ -33,20 +33,20 @@ class IRC(irclib.SimpleIRCClient):
         self.version = version
         self.conf = conf
 
-        self.admins = config.get("admins", "list")
+        self.admins = config.get("admins", type="list")
         self.command_prefix = config.get("command_prefix")
-        self.reconnect_delay = config.get("reconnect_delay", "int")
-        self.rejoin_delay = config.get("rejoin_delay", "int")
+        self.reconnect_delay = config.get("reconnect_delay", type="int")
+        self.rejoin_delay = config.get("rejoin_delay", type="int")
         self.cache_dir = config.get("cache_dir")
         self.plugin_dir = config.get("plugin_dir")
 
         self.server = network.get("server")
-        self.password = network.get("password")
-        self.port = network.get("port", "int")
-        self.ssl = network.get("ssl", "bool")
-        self.ipv6 = network.get("ipv6", "bool")
+        self.password = network.get("password", default="")
+        self.port = network.get("port", type="int", default=6667)
+        self.ssl = network.get("ssl", type="bool", default=False)
+        self.ipv6 = network.get("ipv6", type="bool", default=False)
         self.nick = network.get("nick")
-        self.channels = network.get("channels", "list")
+        self.channels = network.get("channels", type="list")
 
         self.addressed = False
 

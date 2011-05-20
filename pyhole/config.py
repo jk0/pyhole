@@ -43,19 +43,24 @@ class Config(object):
         """Return a list of sections"""
         return self.config_parser.sections()
 
-    def get(self, key, param_type="string"):
+    def get(self, option, **kwargs):
         """Retrieve configuration values"""
+        type = kwargs.get("type", "str")
+
         try:
-            if param_type == "int":
-                return self.config_parser.getint(self.section, key)
-            elif param_type == "bool":
-                return self.config_parser.getboolean(self.section, key)
-            elif param_type == "list":
-                return self.config_parser.get(self.section, key).split(", ")
+            if type == "int":
+                return self.config_parser.getint(self.section, option)
+            elif type == "bool":
+                return self.config_parser.getboolean(self.section, option)
+            elif type == "list":
+                return self.config_parser.get(self.section, option).split(", ")
             else:
-                return self.config_parser.get(self.section, key)
+                return self.config_parser.get(self.section, option)
         except ConfigParser.NoOptionError:
-            print "Unable to locate '%s' in %s" % (key, self.config)
+            if "default" in kwargs:
+                return kwargs["default"]
+
+            print "Unable to locate '%s' in %s" % (option, self.config)
             print "[%s]" % self.section
-            print "%s: value" % key
+            print "%s: value" % option
             sys.exit(1)

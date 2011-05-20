@@ -35,15 +35,15 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(len(sections) > 1)
 
     def test_get_int(self):
-        test_int = self.config.get("reconnect_delay", "int")
+        test_int = self.config.get("reconnect_delay", type="int")
         self.assertTrue(isinstance(test_int, int))
 
     def test_get_bool(self):
-        test_bool = self.config.get("debug", "bool")
+        test_bool = self.config.get("debug", type="bool")
         self.assertTrue(isinstance(test_bool, bool))
 
     def test_get_list(self):
-        test_list = self.config.get("admins", "list")
+        test_list = self.config.get("admins", type="list")
         self.assertTrue(isinstance(test_list, list))
 
     def test_get_str(self):

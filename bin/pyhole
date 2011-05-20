@@ -45,7 +45,7 @@ def irc_connection(irc_network, conf):
     """IRC network connection"""
     network_info = utils.load_config(irc_network, conf)
     log = utils.logger(irc_network, LOG_DIR, DEBUG)
-    reconnect_delay = CONFIG.get("reconnect_delay", "int")
+    reconnect_delay = CONFIG.get("reconnect_delay", type="int")
 
     while True:
         try:
@@ -77,8 +77,8 @@ if __name__ == "__main__":
     CONF = OPTIONS.config
 
     CONFIG = utils.load_config("Pyhole", CONF)
-    DEBUG = OPTIONS.debug or CONFIG.get("debug", "bool")
-    LOG_DIR = CONFIG.get("log_dir", "dir")
+    DEBUG = OPTIONS.debug or CONFIG.get("debug", type="bool")
+    LOG_DIR = CONFIG.get("log_dir")
     LOG = utils.logger("MAIN", LOG_DIR, DEBUG)
     NETWORKS = network_list(CONFIG.sections())
 
