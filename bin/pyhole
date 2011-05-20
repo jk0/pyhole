@@ -69,8 +69,10 @@ def irc_connection(irc_network, conf):
 
 if __name__ == "__main__":
     PARSER = optparse.OptionParser(version=__VERSION__)
-    PARSER.add_option("-c", "--config", dest="config", default="pyhole.cfg")
-    PARSER.add_option("--debug", action="store_true", dest="debug")
+    PARSER.add_option("-c", "--config", dest="config", default="pyhole.cfg",
+            help="specify the path to a configuration file")
+    PARSER.add_option("-d", "--debug", action="store_true", dest="debug",
+            help="show debugging output")
     OPTIONS, ARGS = PARSER.parse_args()
     CONF = OPTIONS.config
 
