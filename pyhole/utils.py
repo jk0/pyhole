@@ -14,6 +14,8 @@
 
 """Pyhole Utility Library"""
 
+from __future__ import with_statement
+
 import eventlet
 import logging
 import logging.handlers
@@ -113,8 +115,8 @@ def version(number):
     if not os.path.exists(git_path):
         return "pyhole v%s - http://pyhole.org" % number
 
-    git = open(git_path, "r")
-    git_commit = git.read()
-    git.close()
+    with open(git_path, "r") as git:
+        git_commit = git.read()
+    git.closed
 
     return "pyhole v%s (%s) - http://pyhole.org" % (number, git_commit[0:5])

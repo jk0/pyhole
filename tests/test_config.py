@@ -23,13 +23,16 @@ class TestConfig(unittest.TestCase):
     def setUp(self):
         self.config = config.Config("../pyhole.cfg.dist", "Pyhole")
 
+    def test_missing_config(self):
+        self.assertRaises(SystemExit, config.Config, "pyhole.cfg", "Pyhole")
+
+    def test_missing_parameter(self):
+        self.assertRaises(SystemExit, self.config.get, "foo")
+
     def test_sections(self):
         sections = self.config.sections()
         self.assertTrue(isinstance(sections, list))
         self.assertTrue(len(sections) > 1)
-
-    def test_missing_parameter(self):
-        self.assertRaises(SystemExit, self.config.get, "foo")
 
     def test_get_int(self):
         test_int = self.config.get("reconnect_delay", "int")

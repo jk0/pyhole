@@ -14,6 +14,8 @@
 
 """Intelligent Configuration Library"""
 
+from __future__ import with_statement
+
 import ConfigParser
 import os
 import sys
@@ -28,9 +30,9 @@ class Config(object):
         self.section = section
 
         try:
-            conf_file = open(self.config)
-            self.config_parser.readfp(conf_file)
-            conf_file.close()
+            with open(self.config) as conf_file:
+                self.config_parser.readfp(conf_file)
+            conf_file.closed
         except IOError:
             sys.exit("Unable to load configuration file: %s" % self.config)
 
