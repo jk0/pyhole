@@ -34,7 +34,10 @@ class Config(object):
                 self.config_parser.readfp(conf_file)
             conf_file.closed
         except IOError:
-            sys.exit("Unable to load configuration file: %s" % self.config)
+            print "Unable to load configuration file: %s" % self.config
+            print "Try specifying a location:"
+            print "    %s -c path/to/config.cfg" % sys.argv[0]
+            sys.exit(1)
 
     def sections(self):
         """Return a list of sections"""
