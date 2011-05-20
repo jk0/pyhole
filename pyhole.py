@@ -25,7 +25,7 @@ from pyhole import irc
 from pyhole import utils
 
 
-__VERSION__ = utils.version("0.5.3")
+__VERSION__ = utils.version("0.5.4")
 
 
 def network_list(sections):
