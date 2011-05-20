@@ -7,8 +7,8 @@ reconnect_delay: 60
 rejoin_delay: 5
 debug: False
 cache_dir: /tmp/pyhole/cache
-plugin_dir: plugins
-log_dir: logs
+plugin_dir: /home/pyhole/plugins
+log_dir: /home/pyhole/logs
 
 [Redmine]
 domain: redmine.example.com

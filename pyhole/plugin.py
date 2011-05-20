@@ -150,12 +150,12 @@ def load_plugins(plugindir, *args, **kwargs):
     Module function that loads plugins from a particular directory
     """
 
-    plugins = os.path.dirname(plugindir) or plugindir
+    plugins = os.path.abspath(plugindir)
     plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
             and not x.startswith("_"))
     for p in plugin_names:
         try:
-            __import__(plugindir, globals(), locals(), [p])
+            __import__(os.path.basename(plugindir), globals(), locals(), [p])
         except ImportError:
             # log something here?
             pass

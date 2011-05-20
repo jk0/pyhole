@@ -49,11 +49,10 @@ class Config(object):
                 return self.config_parser.getboolean(self.section, key)
             elif param_type == "list":
                 return self.config_parser.get(self.section, key).split(", ")
-            elif param_type == "dir":
-                path = os.path.normpath(os.path.join(
-                        os.path.dirname(sys.argv[0]), key))
-                return self.config_parser.get(self.section, path)
             else:
                 return self.config_parser.get(self.section, key)
         except ConfigParser.NoOptionError:
-            sys.exit("Unable to locate '%s' in %s" % (key, self.config))
+            print "Unable to locate '%s' in %s" % (key, self.config)
+            print "[%s]" % self.section
+            print "%s: value" % key
+            sys.exit(1)

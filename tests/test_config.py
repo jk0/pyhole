@@ -46,10 +46,6 @@ class TestConfig(unittest.TestCase):
         test_list = self.config.get("admins", "list")
         self.assertTrue(isinstance(test_list, list))
 
-    def test_get_dir(self):
-        test_dir = self.config.get("cache_dir", "dir")
-        self.assertEqual(test_dir, "/tmp/pyhole/cache")
-
     def test_get_str(self):
         test_str = self.config.get("command_prefix")
         self.assertTrue(isinstance(test_str, str))

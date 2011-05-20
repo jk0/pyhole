@@ -109,8 +109,8 @@ def load_config(section, conf):
 
 def version(number):
     """Prepare the version string"""
-    git_path = os.path.normpath(os.path.join(os.path.dirname(sys.argv[0]),
-            ".git/refs/heads/master"))
+    git_path = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
+            os.pardir, os.pardir, ".git/refs/heads/master"))
 
     if not os.path.exists(git_path):
         return "pyhole v%s - http://pyhole.org" % number

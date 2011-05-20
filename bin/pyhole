@@ -18,8 +18,16 @@
 
 import multiprocessing
 import optparse
+import os
 import sys
 import time
+
+
+PYHOLE_PATH = os.path.normpath(os.path.join(
+        os.path.abspath(sys.argv[0]), os.pardir, os.pardir))
+if os.path.exists(os.path.join(PYHOLE_PATH, "pyhole", "__init__.py")):
+    sys.path.insert(0, PYHOLE_PATH)
+
 
 from pyhole import irc
 from pyhole import utils
