@@ -26,4 +26,4 @@ Installation
     cp pyhole.cfg.dist pyhole.cfg
     vi pyhole.cfg
 
-    ./pyhole.py
+    ./bin/pyhole
