@@ -171,8 +171,11 @@ def reload_plugins(plugindir, *args, **kwargs):
     # all of the classes again, so we need to make sure this is empty
     Plugin._plugin_classes = []
     _reset_variables()
+
     # Now reload all of the plugins
     plugins_to_reload = []
+    plugindir = os.path.basename(plugindir)
+
     for mod, val in sys.modules.items():
         if plugindir in mod and val and mod != plugindir:
             mod_file = val.__file__
