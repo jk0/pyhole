@@ -145,11 +145,11 @@ class IRC(irclib.SimpleIRCClient):
         msg = msg.encode("utf-8")
         if self.addressed:
             nick = self.source.split("!")[0]
-            self.connection.privmsg(self.target, "%s: %s" % (
-                    nick, msg.encode("utf-8")))
-            self.log.info("%s <%s> %s: %s" % (self.target, self.nick, nick, msg))
+            self.connection.privmsg(self.target, "%s: %s" % (nick, msg))
+            self.log.info("%s <%s> %s: %s" % (self.target, self.nick, nick,
+                    msg))
         else:
-            self.connection.privmsg(self.target, msg.encode("utf-8"))
+            self.connection.privmsg(self.target, msg)
             if irclib.is_channel(self.target):
                 self.log.info("%s <%s> %s" % (self.target, self.nick, msg))
             else:
