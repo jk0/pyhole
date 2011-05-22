@@ -142,12 +142,18 @@ class IRC(irclib.SimpleIRCClient):
 
     def reply(self, msg):
         """Send a privmsg"""
+        msg = msg.encode("utf-8")
         if self.addressed:
             nick = self.source.split("!")[0]
             self.connection.privmsg(self.target, "%s: %s" % (
                     nick, msg.encode("utf-8")))
+            self.log.info("%s <%s> %s: %s" % (self.target, self.nick, nick, msg))
         else:
             self.connection.privmsg(self.target, msg.encode("utf-8"))
+            if irclib.is_channel(self.target):
+                self.log.info("%s <%s> %s" % (self.target, self.nick, msg))
+            else:
+                self.log.info("<%s> %s" % (self.nick, msg))
 
     def privmsg(self, target, msg):
         """Send a privmsg"""
