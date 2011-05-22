@@ -36,7 +36,7 @@ class Config(object):
         except IOError:
             print "Unable to load configuration file: %s" % self.config
             print "Try specifying a location:"
-            print "    %s -c path/to/config.cfg" % sys.argv[0]
+            print "    %s -c path/to/config.conf" % sys.argv[0]
             sys.exit(1)
 
     def sections(self):
