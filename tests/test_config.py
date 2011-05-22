@@ -21,10 +21,10 @@ from pyhole import config
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        self.config = config.Config("../pyhole.cfg.dist", "Pyhole")
+        self.config = config.Config("../pyhole.conf.example", "Pyhole")
 
     def test_missing_config(self):
-        self.assertRaises(SystemExit, config.Config, "pyhole.cfg", "Pyhole")
+        self.assertRaises(SystemExit, config.Config, "pyhole.conf", "Pyhole")
 
     def test_missing_parameter(self):
         self.assertRaises(SystemExit, self.config.get, "foo")

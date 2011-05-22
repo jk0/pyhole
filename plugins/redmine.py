@@ -23,13 +23,13 @@ from pyhole import utils
 class Redmine(plugin.Plugin):
     """Provide access to the Redmine API"""
 
-    def __init__(self, irc, conf):
+    def __init__(self, irc, conf_file):
         self.irc = irc
         self.name = self.__class__.__name__
         self.disabled = False
 
         try:
-            self.redmine = utils.load_config("Redmine", conf)
+            self.redmine = utils.load_config("Redmine", conf_file)
             self.redmine_domain = self.redmine.get("domain")
             self.redmine_key = self.redmine.get("key")
             self.redmine_url = "https://%s:password@%s" % (

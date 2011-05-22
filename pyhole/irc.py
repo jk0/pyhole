@@ -26,12 +26,12 @@ from pyhole import plugin
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, network, logger, version, conf):
+    def __init__(self, config, network, log, version, conf_file):
         irclib.SimpleIRCClient.__init__(self)
 
-        self.log = logger
+        self.log = log
         self.version = version
-        self.conf = conf
+        self.conf_file = conf_file
 
         self.admins = config.get("admins", type="list")
         self.command_prefix = config.get("command_prefix")
@@ -60,9 +60,11 @@ class IRC(irclib.SimpleIRCClient):
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
         if reload_plugins:
-            plugin.reload_plugins(self.plugin_dir, irc=self, conf=self.conf)
+            plugin.reload_plugins(self.plugin_dir, irc=self,
+                    conf_file=self.conf_file)
         else:
-            plugin.load_plugins(self.plugin_dir, irc=self, conf=self.conf)
+            plugin.load_plugins(self.plugin_dir, irc=self,
+                    conf_file=self.conf_file)
 
         self.log.info("Loaded Plugins: %s" % active_plugins())
 
@@ -292,14 +294,14 @@ class IRC(irclib.SimpleIRCClient):
 
 def active_plugins():
     """List active plugins"""
-    return ", ".join(plugin.active_plugins())
+    return ", ".join(sorted(plugin.active_plugins()))
 
 
 def active_commands():
     """List active commands"""
-    return ", ".join(plugin.active_commands())
+    return ", ".join(sorted(plugin.active_commands()))
 
 
 def active_keywords():
     """List active keywords"""
-    return ", ".join(plugin.active_keywords())
+    return ", ".join(sorted(plugin.active_keywords()))

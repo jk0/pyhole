@@ -198,7 +198,7 @@ def active_plugins():
     Get the loaded plugin names
     """
 
-    return sorted(x.__name__ for x in Plugin._plugin_classes)
+    return [x.__name__ for x in Plugin._plugin_classes]
 
 
 def active_plugin_classes():

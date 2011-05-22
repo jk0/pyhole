@@ -16,6 +16,8 @@
 
 """pyhole - A modular IRC bot for Python developers."""
 
+from __future__ import with_statement
+
 import multiprocessing
 import optparse
 import os
@@ -36,61 +38,98 @@ from pyhole import utils
 __VERSION__ = utils.version("0.5.4")
 
 
+class IRCConnection(multiprocessing.Process):
+    """IRC network connection process"""
+    def __init__(self, irc_network, conf_file):
+        super(IRCConnection, self).__init__()
+        self.irc_network = irc_network
+        self.conf_file = conf_file
+
+    def run(self):
+        """IRC network connection"""
+        network_info = utils.load_config(self.irc_network, self.conf_file)
+        log = utils.logger(self.irc_network, LOG_DIR, DEBUG)
+        reconnect_delay = CONFIG.get("reconnect_delay", type="int")
+
+        while True:
+            try:
+                connection = irc.IRC(CONFIG, network_info, log, __VERSION__,
+                        self.conf_file)
+            except Exception, e:
+                log.error(e)
+                log.error("Retrying in %d seconds" % reconnect_delay)
+                time.sleep(reconnect_delay)
+                continue
+
+            try:
+                connection.start()
+            except KeyboardInterrupt:
+                sys.exit(0)
+            except Exception, e:
+                log.error(e)
+                log.error("Retrying in %d seconds" % reconnect_delay)
+                time.sleep(reconnect_delay)
+                continue
+
+
 def network_list(sections):
     """Prepare the list of IRC networks"""
     return [net for net in sections if net not in ["Pyhole", "Redmine"]]
 
 
-def irc_connection(irc_network, conf):
-    """IRC network connection"""
-    network_info = utils.load_config(irc_network, conf)
-    log = utils.logger(irc_network, LOG_DIR, DEBUG)
-    reconnect_delay = CONFIG.get("reconnect_delay", type="int")
+def build_options():
+    """Generate command line options"""
+    parser = optparse.OptionParser(version=__VERSION__)
 
-    while True:
-        try:
-            connection = irc.IRC(CONFIG, network_info, log, __VERSION__, conf)
-        except Exception, e:
-            log.error(e)
-            log.error("Retrying in %d seconds" % reconnect_delay)
-            time.sleep(reconnect_delay)
-            continue
-
-        try:
-            connection.start()
-        except KeyboardInterrupt:
-            sys.exit(0)
-        except Exception, e:
-            log.error(e)
-            log.error("Retrying in %d seconds" % reconnect_delay)
-            time.sleep(reconnect_delay)
-            continue
-
-
-if __name__ == "__main__":
-    PARSER = optparse.OptionParser(version=__VERSION__)
-    PARSER.add_option("-c", "--config", dest="config", default="pyhole.cfg",
+    parser.add_option("-c", "--config", dest="conf_file", default="pyhole.conf",
             help="specify the path to a configuration file")
-    PARSER.add_option("-d", "--debug", action="store_true", dest="debug",
+    parser.add_option("-d", "--debug", action="store_true", dest="debug",
             help="show debugging output")
-    OPTIONS, ARGS = PARSER.parse_args()
-    CONF = OPTIONS.config
+    parser.add_option("-b", "--background", action="store_true",
+            dest="background", help="run in the background")
 
-    CONFIG = utils.load_config("Pyhole", CONF)
-    DEBUG = OPTIONS.debug or CONFIG.get("debug", type="bool")
-    LOG_DIR = CONFIG.get("log_dir")
-    LOG = utils.logger("MAIN", LOG_DIR, DEBUG)
-    NETWORKS = network_list(CONFIG.sections())
+    return parser.parse_args()
 
-    LOG.info("Starting %s" % __VERSION__)
-    LOG.info("Connecting to IRC Networks: %s" % ", ".join(NETWORKS))
-    for network in NETWORKS:
-        p = multiprocessing.Process(target=irc_connection,
-                args=(network, CONF))
+
+def main():
+    """Main loop"""
+    log = utils.logger("MAIN", LOG_DIR, DEBUG)
+    networks = network_list(CONFIG.sections())
+
+    log.info("Starting %s" % __VERSION__)
+    log.info("Connecting to IRC Networks: %s" % ", ".join(networks))
+    for network in networks:
+        p = IRCConnection(network, CONF_FILE)
         p.start()
 
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        LOG.info("Caught KeyboardInterrupt, shutting down")
+        log.info("Caught KeyboardInterrupt, shutting down")
+
+
+if __name__ == "__main__":
+    OPTIONS, ARGS = build_options()
+    CONF_FILE = OPTIONS.conf_file
+
+    CONFIG = utils.load_config("Pyhole", CONF_FILE)
+    DEBUG = OPTIONS.debug or CONFIG.get("debug", type="bool")
+    LOG_DIR = CONFIG.get("log_dir")
+
+    if OPTIONS.background and not OPTIONS.debug:
+        try:
+            pid = os.fork()
+            if pid == 0:
+                os.setsid()
+                with open(os.devnull, "r+b") as null:
+                    for desc in (0, 1, 2):
+                        try:
+                            os.dup2(null.fileno(), desc)
+                        except OSError:
+                            pass
+                main()
+        except OSError, e:
+            sys.exit(e)
+    else:
+        main()

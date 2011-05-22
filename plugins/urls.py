@@ -23,7 +23,7 @@ from pyhole import utils
 class Url(plugin.Plugin):
     """Provide access to URL data"""
 
-    def __init__(self, irc, conf):
+    def __init__(self, irc, conf_file):
         self.irc = irc
         self.name = self.__class__.__name__
         self.url = None
