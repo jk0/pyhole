@@ -81,12 +81,13 @@ def build_options():
     """Generate command line options"""
     parser = optparse.OptionParser(version=__VERSION__)
 
-    parser.add_option("-c", "--config", dest="conf_file", default="pyhole.conf",
+    parser.add_option("-c", "--config", dest="config",
+            default="pyhole.conf",
             help="specify the path to a configuration file")
-    parser.add_option("-d", "--debug", action="store_true", dest="debug",
-            help="show debugging output")
     parser.add_option("-b", "--background", action="store_true",
             dest="background", help="run in the background")
+    parser.add_option("-d", "--debug", action="store_true", dest="debug",
+            help="show debugging output")
 
     return parser.parse_args()
 
@@ -111,7 +112,7 @@ def main():
 
 if __name__ == "__main__":
     OPTIONS, ARGS = build_options()
-    CONF_FILE = OPTIONS.conf_file
+    CONF_FILE = OPTIONS.config
 
     CONFIG = utils.load_config("Pyhole", CONF_FILE)
     DEBUG = OPTIONS.debug or CONFIG.get("debug", type="bool")
