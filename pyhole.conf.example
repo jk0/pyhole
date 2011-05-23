@@ -23,6 +23,7 @@ port: 7000
 ssl: True
 ipv6: True
 nick: mynick
+identify_password: mypass
 channels: #mychannel key, #mychannel2
 
 [EFnet]
@@ -32,4 +33,5 @@ port: 6667
 ssl: False
 ipv6: False
 nick: mynick
+identify_password:
 channels: #mychannel key, #mychannel2

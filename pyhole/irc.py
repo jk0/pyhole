@@ -46,6 +46,7 @@ class IRC(irclib.SimpleIRCClient):
         self.ssl = network.get("ssl", type="bool", default=False)
         self.ipv6 = network.get("ipv6", type="bool", default=False)
         self.nick = network.get("nick")
+        self.identify_password = network.get("identify_password", default="")
         self.channels = network.get("channels", type="list")
 
         self.addressed = False
@@ -214,6 +215,9 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_welcome(self, connection, event):
         """Join channels upon successful connection"""
+        if self.identify_password:
+            self.privmsg("NickServ", "IDENTIFY %s" % self.identify_password)
+
         for channel in self.channels:
             c = channel.split(" ", 1)
             if irclib.is_channel(c[0]):
@@ -274,6 +278,26 @@ class IRC(irclib.SimpleIRCClient):
         msg = event.arguments()[0]
 
         self.log.info(unicode("%s * %s %s" % (self.target, nick, msg),
+                "utf-8"))
+
+    def on_privnotice(self, connection, event):
+        """Handle private notices"""
+        self.source = event.source().split("@", 1)[0]
+        self.target = irclib.nm_to_n(event.source())
+        msg = event.arguments()[0]
+
+        if self.target != self.nick:
+            self.log.info(unicode("-%s- %s" % (self.target, msg), "utf-8"))
+            self.poll_messages(msg, private=True)
+
+    def on_pubnotice(self, connection, event):
+        """Handle public notices"""
+        self.source = event.source().split("@", 1)[0]
+        self.target = event.target()
+        nick = irclib.nm_to_n(event.source())
+        msg = event.arguments()[0]
+
+        self.log.info(unicode("-%s- <%s> %s" % (self.target, nick, msg),
                 "utf-8"))
 
     def on_privmsg(self, connection, event):

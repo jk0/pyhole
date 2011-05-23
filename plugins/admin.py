@@ -102,7 +102,7 @@ class Admin(plugin.Plugin):
             (target, msg) = params.split(" ", 1)
             self.irc.privmsg(target, msg)
         else:
-            self.irc.reply(self.part.__doc__)
+            self.irc.reply(self.say.__doc__)
 
     def _find_doc_string(self, params):
         """Find the doc string for a command or keyword hook"""
