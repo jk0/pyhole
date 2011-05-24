@@ -38,7 +38,7 @@ class Url(plugin.Plugin):
             if self.url:
                 self._find_title(self.url)
 
-    @plugin.hook_add_msg_regex("http:\/\/|www\.")
+    @plugin.hook_add_msg_regex("https?:\/\/|www\.")
     def _watch_for_url(self, params=None, **kwargs):
         """Watch and keep track of the latest URL"""
         try:
