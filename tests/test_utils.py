@@ -84,6 +84,14 @@ class TestUtils(unittest.TestCase):
         test_str = "&#x26;"
         self.assertEqual(utils.decode_entities(test_str), "&")
 
+    def test_decode_entities_16(self):
+        test_str = "&ndash;"
+        self.assertEqual(utils.decode_entities(test_str), "-")
+
+    def test_decode_entities_17(self):
+        test_str = "&#64;"
+        self.assertEqual(utils.decode_entities(test_str), "@")
+
     def test_ensure_int(self):
         self.assertEqual(utils.ensure_int("3"), 3)
 

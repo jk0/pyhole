@@ -14,7 +14,7 @@
 
 """Pyhole URL Plugin"""
 
-import re
+from BeautifulSoup import BeautifulSoup
 
 from pyhole import plugin
 from pyhole import utils
@@ -51,17 +51,14 @@ class Url(plugin.Plugin):
         if not url.startswith("http://"):
             url = "http://" + url
 
-        response = self.irc.fetch_url(url, self.name).read()
+        response = self.irc.fetch_url(url, self.name)
         if not response:
             return
-        response = re.sub("\n", "", response)
-        response = re.sub("  +", "", response)
 
-        r = re.compile("<title>(.*)</title>")
-        m = r.search(response)
+        soup = BeautifulSoup(response.read())
 
-        if m:
-            title = utils.decode_entities(m.group(1))
+        if soup.head:
+            title = utils.decode_entities(soup.head.title.string)
             self.irc.reply(title)
         else:
             self.irc.reply("No title found for %s" % url)

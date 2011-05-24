@@ -96,7 +96,7 @@ class IRC(irclib.SimpleIRCClient):
 
         for mod_name, f, kw in plugin.hook_get_keywords():
             for word in words:
-                m = re.search("%s(.+)" % kw, word, re.I)
+                m = re.search("^%s(.+)" % kw, word, re.I)
                 if m:
                     self.run_hook_command(mod_name, f, m.group(1),
                             private=private, full_message=message)

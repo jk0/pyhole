@@ -88,7 +88,9 @@ def decode_entities(html):
         ("&#8230;", "..."),
         ("&#x22;", "\""),
         ("&#x27;", "'"),
-        ("&#x26;", "&")]
+        ("&#x26;", "&"),
+        ("&ndash;", "-"),
+        ("&#64;", "@")]
 
     html = reduce(lambda a, b: re.sub(b[0], b[1], a), entities, html)
     return filter(lambda x: ord(x) > 9 and ord(x) < 127, html).strip()
