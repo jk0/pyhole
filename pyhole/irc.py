@@ -223,7 +223,6 @@ class IRC(irclib.SimpleIRCClient):
         for channel in self.channels:
             c = channel.split(" ", 1)
             if irclib.is_channel(c[0]):
-                self.log.info("Joining %s" % c[0])
                 if len(c) > 1:
                     connection.join(c[0], c[1])
                 else:
@@ -241,14 +240,20 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked"""
+        self.source = irclib.nm_to_n(event.source())
         self.target = event.target()
+        nick, reason = event.arguments()
 
-        if event.arguments()[1] == self.nick:
-            self.log.info("Kicked from %s" % self.target)
+        if nick == self.nick:
+            self.log.info("Kicked from %s by %s: %s" % (self.target,
+                    self.source, reason))
             self.log.info("Rejoining %s in %d seconds" % (self.target,
                     self.rejoin_delay))
             time.sleep(self.rejoin_delay)
             connection.join(self.target)
+        else:
+            self.log.info("%s was kicked from %s by %s: %s" % (nick,
+                    self.target, self.source, reason))
 
     def on_invite(self, connection, event):
         """Join a channel upon invitation"""
@@ -271,6 +276,23 @@ class IRC(irclib.SimpleIRCClient):
                 self.log.info("Received CTCP PING from %s" % self.source)
                 connection.ctcp_reply(self.source,
                         "PING %s" % event.arguments()[1])
+
+    def on_join(self, connection, event):
+        """Handle joins"""
+        target = event.target()
+        nick = irclib.nm_to_n(event.source())
+        self.log.info("%s joined %s" % (nick, target))
+
+    def on_part(self, connection, event):
+        """Handle parts"""
+        target = event.target()
+        nick = irclib.nm_to_n(event.source())
+        self.log.info("%s left %s" % (nick, target))
+
+    def on_quit(self, connection, event):
+        """Handle quits"""
+        nick = irclib.nm_to_n(event.source())
+        self.log.info("%s quit" % nick)
 
     def on_action(self, connection, event):
         """Handle IRC actions"""
