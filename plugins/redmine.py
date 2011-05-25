@@ -69,6 +69,18 @@ class Redmine(plugin.Plugin):
             params = utils.ensure_int(params)
             self._find_issue(params)
 
+    @plugin.hook_add_msg_regex("https?:\/\/redmine\..*/issues")
+    def _watch_for_rm_bug_url(self, params=None, **kwargs):
+        """Watch for Redmine bug URLs"""
+        try:
+            line = kwargs["full_message"].split("/")
+            for i, word in enumerate(line):
+                if word == "issues":
+                    bug_id = line[i + 1].split(" ", 1)[0]
+                    self.keyword_rm(bug_id)
+        except TypeError:
+            return
+
     def _find_issues(self, user_id):
         """Find all issues for a Redmine user"""
         url = "%s/issues.json?assigned_to_id=%s" % (
