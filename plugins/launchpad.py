@@ -88,6 +88,18 @@ class Launchpad(plugin.Plugin):
         except TypeError:
             return
 
+    @plugin.hook_add_msg_regex("https?:\/\/bugs\.launchpad\.net\/bugs")
+    def _watch_for_short_lp_bug_url(self, params=None, **kwargs):
+        """Watch for short Launchpad bug URLs"""
+        try:
+            line = kwargs["full_message"].split("/")
+            for i, word in enumerate(line):
+                if word == "bugs":
+                    bug_id = line[i + 1].split(" ", 1)[0]
+                    self.keyword_lp(bug_id)
+        except TypeError:
+            return
+
     def _find_name(self, user):
         """Lookup a Launchpad user's display name"""
         try:
