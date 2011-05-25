@@ -67,7 +67,7 @@ class Kernel(plugin.Plugin):
     def _watch_for_k_bug_url(self, params=None, **kwargs):
         """Watch for kernel.org Bugzilla bug URLs"""
         try:
-            bug_id = kwargs["full_message"].split("id=")[1].split(" ", 1)[0]
+            bug_id = kwargs["full_message"].split("id=", 1)[1].split(" ", 1)[0]
             self.keyword_k(bug_id)
         except TypeError:
             return
