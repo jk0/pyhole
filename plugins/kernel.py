@@ -54,13 +54,17 @@ class Kernel(plugin.Plugin):
 
             soup = BeautifulSoup(response.read())
             desc = utils.decode_entities(soup.head.title.string)
-            status = soup.find("span",
-                    {"id": "static_bug_status"}).string.strip().capitalize()
-            assignee = utils.decode_entities(soup.findAll("span",
-                    {"class": "vcard"})[0].contents[0].string)
 
-            self.irc.reply("Kernel.org %s [Status: %s, Assignee: %s] %s" % (
-                    desc, status, assignee, url))
+            try:
+                status = soup.find("span", {"id":
+                        "static_bug_status"}).string.strip().capitalize()
+                assignee = utils.decode_entities(soup.findAll("span",
+                        {"class": "vcard"})[0].contents[0].string)
+
+                self.irc.reply("Kernel.org %s [Status: %s, Assignee: %s] %s" %
+                        (desc, status, assignee, url))
+            except TypeError:
+                return
 
     @plugin.hook_add_msg_regex(
             "https?:\/\/bugzilla\.kernel\.org\/show\_bug\.cgi\?id\=")
