@@ -155,8 +155,8 @@ class IRC(irclib.SimpleIRCClient):
             if self.addressed:
                 nick = self.source.split("!")[0]
                 self.connection.privmsg(self.target, "%s: %s" % (nick, line))
-                self.log.info("-%s- <%s> %s: %s" % (self.target, self.nick, nick,
-                        line))
+                self.log.info("-%s- <%s> %s: %s" % (self.target, self.nick,
+                        nick, line))
             else:
                 self.connection.privmsg(self.target, line)
                 if irclib.is_channel(self.target):
