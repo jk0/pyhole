@@ -1,6 +1,6 @@
 *.pyc
 *.pyo
 *.swp
+*.log
 pyhole.conf
 logs/
-pyhole.log

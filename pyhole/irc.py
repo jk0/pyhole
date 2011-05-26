@@ -149,6 +149,7 @@ class IRC(irclib.SimpleIRCClient):
             except Exception:
                 self.log.error("msg cannot be converted to string")
                 return
+
         msg = msg.encode("utf-8").split("\n")
         for line in msg:
             if self.addressed:
