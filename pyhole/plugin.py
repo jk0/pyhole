@@ -180,6 +180,8 @@ def reload_plugins(plugins, *args, **kwargs):
     for mod, val in sys.modules.items():
         if plugindir in mod and val and mod != plugindir:
             mod_file = val.__file__
+            if not os.path.isfile(mod_file):
+                continue
             if mod_file.endswith('.pyc') or mod_file.endswith('.pyo'):
                 source_file_guess = mod_file[:-1]
                 if not os.path.isfile(source_file_guess):
