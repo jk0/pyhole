@@ -3,3 +3,4 @@
 *.swp
 pyhole.conf
 logs/
+pyhole.log

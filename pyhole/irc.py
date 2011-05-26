@@ -143,6 +143,12 @@ class IRC(irclib.SimpleIRCClient):
 
     def reply(self, msg):
         """Send a privmsg"""
+        if not hasattr(msg, "encode"):
+            try:
+                msg = str(msg)
+            except Exception:
+                self.log.error("msg cannot be converted to string")
+                return
         msg = msg.encode("utf-8").split("\n")
         for line in msg:
             if self.addressed:
