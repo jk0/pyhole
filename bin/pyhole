@@ -94,7 +94,7 @@ def build_options():
 
 def main():
     """Main loop"""
-    log = utils.logger("MAIN", LOG_DIR, DEBUG)
+    log = utils.logger("Pyhole", LOG_DIR, DEBUG)
     networks = network_list(CONFIG.sections())
 
     log.info("Starting %s" % __VERSION__)

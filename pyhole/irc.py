@@ -155,12 +155,12 @@ class IRC(irclib.SimpleIRCClient):
             if self.addressed:
                 nick = self.source.split("!")[0]
                 self.connection.privmsg(self.target, "%s: %s" % (nick, line))
-                self.log.info("%s <%s> %s: %s" % (self.target, self.nick, nick,
+                self.log.info("-%s- <%s> %s: %s" % (self.target, self.nick, nick,
                         line))
             else:
                 self.connection.privmsg(self.target, line)
                 if irclib.is_channel(self.target):
-                    self.log.info("%s <%s> %s" % (self.target, self.nick,
+                    self.log.info("-%s- <%s> %s" % (self.target, self.nick,
                             line))
                 else:
                     self.log.info("<%s> %s" % (self.nick, line))
@@ -247,88 +247,80 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked"""
-        self.source = irclib.nm_to_n(event.source())
-        self.target = event.target()
+        source = irclib.nm_to_n(event.source())
+        target = event.target()
         nick, reason = event.arguments()
 
         if nick == self.nick:
-            self.log.info("Kicked from %s by %s: %s" % (self.target,
-                    self.source, reason))
-            self.log.info("Rejoining %s in %d seconds" % (self.target,
+            self.log.info("-%s- kicked by %s: %s" % (target, source, reason))
+            self.log.info("-%s- rejoining in %d seconds" % (target,
                     self.rejoin_delay))
             time.sleep(self.rejoin_delay)
-            connection.join(self.target)
+            connection.join(target)
         else:
-            self.log.info("%s was kicked from %s by %s: %s" % (nick,
-                    self.target, self.source, reason))
+            self.log.info("-%s- %s was kicked by %s: %s" % (target, nick,
+                    source, reason))
 
     def on_invite(self, connection, event):
         """Join a channel upon invitation"""
-        self.source = event.source().split("@", 1)[0]
-        self.target = irclib.nm_to_n(event.source())
+        source = event.source().split("@", 1)[0]
 
-        if self.source in self.admins:
+        if source in self.admins:
             self.join_channel(event.arguments()[0])
 
     def on_ctcp(self, connection, event):
         """Respond to CTCP events"""
-        self.source = irclib.nm_to_n(event.source())
+        source = irclib.nm_to_n(event.source())
         ctcp = event.arguments()[0]
 
         if ctcp == "VERSION":
-            self.log.info("Received CTCP VERSION from %s" % self.source)
-            connection.ctcp_reply(self.source, "VERSION %s" % self.version)
+            self.log.info("Received CTCP VERSION from %s" % source)
+            connection.ctcp_reply(source, "VERSION %s" % self.version)
         elif ctcp == "PING":
             if len(event.arguments()) > 1:
-                self.log.info("Received CTCP PING from %s" % self.source)
-                connection.ctcp_reply(self.source,
+                self.log.info("Received CTCP PING from %s" % source)
+                connection.ctcp_reply(source,
                         "PING %s" % event.arguments()[1])
 
     def on_join(self, connection, event):
         """Handle joins"""
         target = event.target()
-        nick = irclib.nm_to_n(event.source())
-        self.log.info("%s joined %s" % (nick, target))
+        source = irclib.nm_to_n(event.source())
+        self.log.info("-%s- %s joined" % (target, source))
 
     def on_part(self, connection, event):
         """Handle parts"""
         target = event.target()
-        nick = irclib.nm_to_n(event.source())
-        self.log.info("%s left %s" % (nick, target))
+        source = irclib.nm_to_n(event.source())
+        self.log.info("-%s- %s left" % (target, source))
 
     def on_quit(self, connection, event):
         """Handle quits"""
-        nick = irclib.nm_to_n(event.source())
-        self.log.info("%s quit" % nick)
+        source = irclib.nm_to_n(event.source())
+        self.log.info("%s quit" % source)
 
     def on_action(self, connection, event):
         """Handle IRC actions"""
-        self.source = event.source().split("@", 1)[0]
-        self.target = event.target()
-        nick = irclib.nm_to_n(event.source())
+        target = event.target()
+        source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info(unicode("%s * %s %s" % (self.target, nick, msg),
-                "utf-8"))
+        self.log.info(unicode("%s * %s %s" % (target, source, msg), "utf-8"))
 
     def on_privnotice(self, connection, event):
         """Handle private notices"""
-        self.source = event.source().split("@", 1)[0]
-        self.target = irclib.nm_to_n(event.source())
+        source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        if self.target != self.nick:
-            self.log.info(unicode("-%s- %s" % (self.target, msg), "utf-8"))
-            self.poll_messages(msg, private=True)
+        self.log.info(unicode("-%s- %s" % (source, msg), "utf-8"))
 
     def on_pubnotice(self, connection, event):
         """Handle public notices"""
-        self.source = event.source().split("@", 1)[0]
-        self.target = event.target()
-        nick = irclib.nm_to_n(event.source())
+        target = event.target()
+        source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info(unicode("-%s- <%s> %s" % (self.target, nick, msg),
+        self.log.info(unicode("-%s- <%s> %s" % (target, source, msg),
                 "utf-8"))
 
     def on_privmsg(self, connection, event):
@@ -348,7 +340,7 @@ class IRC(irclib.SimpleIRCClient):
         nick = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info(unicode("%s <%s> %s" % (self.target, nick, msg),
+        self.log.info(unicode("-%s- <%s> %s" % (self.target, nick, msg),
                 "utf-8"))
         self.poll_messages(msg)
 
