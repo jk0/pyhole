@@ -105,7 +105,11 @@ class Admin(plugin.Plugin):
             self.irc.reply(self.say.__doc__)
 
     def _find_doc_string(self, params):
-        """Find the doc string for a command or keyword hook"""
+        """Find the doc string for a plugin, command or keyword hook"""
+        for p in plugin.active_plugin_classes():
+            if p.__name__.upper() == params.upper():
+                return p.__doc__
+
         for _, cmd_hook, cmd in plugin.hook_get_commands():
             if cmd.upper() == params.upper():
                 return cmd_hook.__doc__

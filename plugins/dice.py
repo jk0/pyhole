@@ -20,11 +20,11 @@ from pyhole import plugin
 
 
 class Dice(plugin.Plugin):
-    """Roll a die"""
+    """Provide access to dice games"""
 
     @plugin.hook_add_command("roll")
     def roll(self, params=None, **kwargs):
-        """Roll dice (ex: 2d6)"""
+        """Roll dice (ex: .roll 2d6)"""
         if params:
             query = params.split()[0]
             try:
