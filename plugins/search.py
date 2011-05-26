@@ -126,8 +126,12 @@ class Search(plugin.Plugin):
                 return
 
             soup = BeautifulSoup(response.read())
-            urban = " ".join(str(x) for x in soup.findAll(
-                    "div", {"class": "definition"})[0].contents)
+            results = soup.findAll("div", {"class": "definition"})
+
+            urban = ""
+            if len(results):
+                urban = " ".join(str(x) for x in soup.findAll(
+                        "div", {"class": "definition"})[0].contents)
 
             if len(urban) > 0:
                 for i, line in enumerate(urban.split("<br/>")):
