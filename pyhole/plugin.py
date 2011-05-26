@@ -153,12 +153,14 @@ def load_plugins(plugindir, *args, **kwargs):
     plugins = os.path.abspath(plugindir)
     plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
             and not x.startswith("_"))
+
     for p in plugin_names:
         try:
             __import__(os.path.basename(plugindir), globals(), locals(), [p])
         except ImportError:
             # log something here?
             pass
+
     _init_plugins(*args, **kwargs)
 
 
@@ -176,7 +178,7 @@ def reload_plugins(plugins, *args, **kwargs):
     plugins_to_reload = []
     plugindir = os.path.basename(plugins)
 
-    # reload plugins
+    # Reload existing plugins
     for mod, val in sys.modules.items():
         if plugindir in mod and val and mod != plugindir:
             mod_file = val.__file__
@@ -187,13 +189,15 @@ def reload_plugins(plugins, *args, **kwargs):
                 if not os.path.isfile(source_file_guess):
                     os.unlink(mod_file)
             plugins_to_reload.append(mod)
+
     for p in plugins_to_reload:
         try:
             reload(sys.modules[p])
         except Exception, err:
             # log something here?
             pass
-    # look for new plugins to load
+
+    # Load new plugins
     plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
             and not x.startswith("_") and x not in plugins_to_reload)
     for p in plugin_names:
@@ -202,6 +206,7 @@ def reload_plugins(plugins, *args, **kwargs):
         except ImportError:
             # log something here?
             pass
+
     _init_plugins(*args, **kwargs)
 
 
