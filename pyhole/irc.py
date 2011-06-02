@@ -226,6 +226,8 @@ class IRC(irclib.SimpleIRCClient):
         self.nick = "%s%d" % (self.nick, random_int)
         self.log.info("Setting IRC nick to '%s'" % self.nick)
         connection.nick("%s" % self.nick)
+        # Try to prevent nick flooding
+        time.sleep(1)
 
     def on_welcome(self, connection, event):
         """Join channels upon successful connection"""
