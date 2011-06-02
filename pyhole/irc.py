@@ -33,8 +33,6 @@ class IRC(irclib.SimpleIRCClient):
         self.version = version
         self.conf_file = conf_file
 
-        self.max_lines = 10
-
         self.admins = config.get("admins", type="list")
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", type="int")
@@ -153,9 +151,11 @@ class IRC(irclib.SimpleIRCClient):
                 return
 
         msg = msg.encode("utf-8").split("\n")
-        if len(msg) > self.max_lines:
-            msg = msg[0:self.max_lines-2]
-            msg.append('...')
+        # 10 is completely arbitrary for now
+        if len(msg) > 10:
+            msg = msg[0:8]
+            msg.append("...")
+
         for line in msg:
             if self.addressed:
                 source = self.source.split("!")[0]
