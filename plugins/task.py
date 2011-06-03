@@ -31,8 +31,6 @@ class Task(plugin.Plugin):
             verb = params.split()[0]
             source = self.irc.source.split("!")[0]
             params = "%s project:%s" % (params,source)
-            # r = re.compile("(.* mainline .*)")
-            # m = r.search(response.read())
             for w in ['list', 'add', '^\d+']:
                 r = re.compile(w)
                 m = r.search(verb)
