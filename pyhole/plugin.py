@@ -159,8 +159,9 @@ def load_plugins(plugindir, *args, **kwargs):
     for p in plugin_names:
         try:
             __import__(os.path.basename(plugindir), globals(), locals(), [p])
-        except ImportError:
-            # log something here?
+        except Exception, e:
+            # Catch all because this could be many things
+            kwargs.get("irc").log.error(e)
             pass
 
     _init_plugins(*args, **kwargs)
@@ -194,8 +195,9 @@ def reload_plugins(plugins, *args, **kwargs):
     for p in plugins_to_reload:
         try:
             reload(sys.modules[p])
-        except Exception, err:
-            # log something here?
+        except Exception, e:
+            # Catch all because this could be many things
+            kwargs.get("irc").log.error(e)
             pass
 
     # Load new plugins
