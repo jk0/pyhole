@@ -14,4 +14,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-git shortlog -se | cut -c8- > AUTHORS
+git shortlog -se > AUTHORS
