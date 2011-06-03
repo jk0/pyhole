@@ -9,6 +9,7 @@ debug: False
 cache_dir: /tmp/pyhole/cache
 plugin_dir: /home/pyhole/plugins
 log_dir: /home/pyhole/logs
+plugins: admin, dice, entertainment, news, search, urls, weather
 
 [Redmine]
 domain: redmine.example.com

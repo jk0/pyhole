@@ -20,6 +20,8 @@ import functools
 import os
 import sys
 
+from pyhole import utils
+
 
 def _reset_variables():
     """
@@ -149,10 +151,10 @@ def load_plugins(plugindir, *args, **kwargs):
     """
     Module function that loads plugins from a particular directory
     """
+    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
 
     plugins = os.path.abspath(plugindir)
-    plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
-            and not x.startswith("_"))
+    plugin_names = config.get("plugins", type="list")
 
     for p in plugin_names:
         try:
@@ -168,6 +170,7 @@ def reload_plugins(plugins, *args, **kwargs):
     """
     Module function that'll reload all of the plugins
     """
+    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
 
     # When the modules are reloaded, the meta class will append
     # all of the classes again, so we need to make sure this is empty
@@ -184,11 +187,9 @@ def reload_plugins(plugins, *args, **kwargs):
             mod_file = val.__file__
             if not os.path.isfile(mod_file):
                 continue
-            if mod_file.endswith('.pyc') or mod_file.endswith('.pyo'):
-                source_file_guess = mod_file[:-1]
-                if not os.path.isfile(source_file_guess):
-                    os.unlink(mod_file)
-            plugins_to_reload.append(mod)
+            for p in config.get("plugins", type="list"):
+                if plugindir + "." + p == mod:
+                    plugins_to_reload.append(mod)
 
     for p in plugins_to_reload:
         try:
@@ -198,16 +199,7 @@ def reload_plugins(plugins, *args, **kwargs):
             pass
 
     # Load new plugins
-    plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
-            and not x.startswith("_") and x not in plugins_to_reload)
-    for p in plugin_names:
-        try:
-            __import__(os.path.basename(plugindir), globals(), locals(), [p])
-        except ImportError:
-            # log something here?
-            pass
-
-    _init_plugins(*args, **kwargs)
+    load_plugins(plugindir, *args, **kwargs)
 
 
 def active_plugins():

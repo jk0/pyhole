@@ -120,8 +120,8 @@ if __name__ == "__main__":
 
     if OPTIONS.background and not OPTIONS.debug:
         try:
-            pid = os.fork()
-            if pid == 0:
+            PID = os.fork()
+            if PID == 0:
                 os.setsid()
                 with open(os.devnull, "r+b") as null:
                     for desc in (0, 1, 2):
