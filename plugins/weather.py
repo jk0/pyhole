@@ -27,12 +27,10 @@ class Weather(plugin.Plugin):
     @utils.spawn
     def weather(self, params=None, **kwargs):
         """Display current weather report (ex: .w [set] [<location>])"""
-        if hasattr(params, "split"):
-            params = params.split(" ", 1)
-            location = params[0]
-
-            if location == "set":
-                location = params[1]
+        if params:
+            location = params
+            if location.startswith("set"):
+                location = location[4:]
                 utils.write_file("weather", self.irc.source, location)
                 self.irc.reply("Location information saved")
         else:
