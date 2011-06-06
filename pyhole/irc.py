@@ -312,7 +312,7 @@ class IRC(irclib.SimpleIRCClient):
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info(unicode("%s * %s %s" % (target, source, msg), "utf-8"))
+        self.log.info(unicode("-%s- * %s %s" % (target, source, msg), "utf-8"))
 
     def on_privnotice(self, connection, event):
         """Handle private notices"""
