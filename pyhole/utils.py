@@ -123,3 +123,45 @@ def version(number):
     git.closed
 
     return "pyhole v%s (%s) - http://pyhole.org" % (number, git_commit[0:5])
+
+
+def get_home_directory():
+    """Return the home directory"""
+    return os.getenv("HOME") + "/.pyhole/"
+
+
+def get_directory(new_dir):
+    """Return a directory"""
+    home_dir = get_home_directory()
+    new_dir = home_dir + new_dir
+
+    if not os.path.exists(home_dir):
+        os.makedirs(home_dir)
+
+    if not os.path.exists(new_dir):
+        os.makedirs(new_dir)
+
+    return new_dir + "/"
+
+
+def write_file(dir, file, data):
+    """Write data to file"""
+    dir = get_directory(dir)
+
+    with open(dir + file, "w") as f:
+        f.write(str(data).strip())
+    f.closed
+
+
+def read_file(dir, file):
+    """Read and return the data in file"""
+    dir = get_directory(dir)
+
+    try:
+        with open(dir + file, "r") as f:
+            data = f.read()
+        f.closed
+
+        return data
+    except IOError:
+        return None

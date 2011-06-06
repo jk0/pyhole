@@ -26,29 +26,40 @@ class Weather(plugin.Plugin):
     @plugin.hook_add_command("weather")
     @utils.spawn
     def weather(self, params=None, **kwargs):
-        """Display current weather report (ex: .w <location>)"""
-        if params:
-            try:
-                w = pywapi.get_weather_from_google(params)
-            except Exception:
-                self.irc.reply("Unable to fetch weather data")
+        """Display current weather report (ex: .w [set] [<location>])"""
+        if hasattr(params, "split"):
+            params = params.split(" ", 1)
+            location = params[0]
+
+            if location == "set":
+                location = params[1]
+                utils.write_file("weather", self.irc.source, location)
+                self.irc.reply("Location information saved")
+        else:
+            location = utils.read_file("weather", self.irc.source)
+            if not location:
+                self.irc.reply(self.weather.__doc__)
                 return
 
-            if w["current_conditions"]:
-                city = w["forecast_information"]["city"]
-                temp_f = w["current_conditions"]["temp_f"]
-                temp_c = w["current_conditions"]["temp_c"]
-                humidity = w["current_conditions"]["humidity"]
-                wind = w["current_conditions"]["wind_condition"]
-                condition = w["current_conditions"]["condition"]
+        try:
+            w = pywapi.get_weather_from_google(location)
+        except Exception:
+            self.irc.reply("Unable to fetch weather data")
+            return
 
-                result = "%s: %sF/%sC   %s   %s   %s" % (city, temp_f, temp_c,
-                        humidity, wind, condition)
-                self.irc.reply(result)
-            else:
-                self.irc.reply("Location not found: '%s'" % params)
+        if w["current_conditions"]:
+            city = w["forecast_information"]["city"]
+            temp_f = w["current_conditions"]["temp_f"]
+            temp_c = w["current_conditions"]["temp_c"]
+            humidity = w["current_conditions"]["humidity"]
+            wind = w["current_conditions"]["wind_condition"]
+            condition = w["current_conditions"]["condition"]
+
+            result = "%s: %sF/%sC   %s   %s   %s" % (city, temp_f, temp_c,
+                    humidity, wind, condition)
+            self.irc.reply(result)
         else:
-            self.irc.reply(self.weather.__doc__)
+            self.irc.reply("Location not found: '%s'" % location)
 
     @plugin.hook_add_command("w")
     def alias_w(self, params=None, **kwargs):
