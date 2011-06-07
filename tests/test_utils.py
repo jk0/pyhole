@@ -24,6 +24,22 @@ from pyhole import utils
 
 
 class TestUtils(unittest.TestCase):
+    def setUp(self):
+        utils.write_file("tests", "pyhole_test_file", "foo")
+        self.new_file = utils.get_home_directory() + "tests/pyhole_test_file"
+
+    def tearDown(self):
+        os.unlink(self.new_file)
+        os.rmdir(self.new_file[:-16])
+
+    def test_logger(self):
+        test_log_dir = "/tmp/pyhole_log_test"
+        log = utils.logger("TEST", test_log_dir, True)
+        self.assertEqual("TEST", log.name)
+        self.assertEqual(log.level, 0)
+        os.unlink(test_log_dir + "/test.log")
+        os.rmdir(test_log_dir)
+
     def test_decode_entities(self):
         test_str = "<foo>bar</foo>"
         self.assertEqual(utils.decode_entities(test_str), "bar")
@@ -101,6 +117,10 @@ class TestUtils(unittest.TestCase):
     def test_ensure_int_3(self):
         self.assertEqual(utils.ensure_int("a"), None)
 
+    def test_load_config(self):
+        test_config = utils.load_config("Pyhole", "../pyhole.conf.example")
+        self.assertTrue(isinstance(test_config, object))
+
     def test_version(self):
         git_path = os.path.normpath(os.path.join(os.path.abspath(
                 sys.argv[0]), os.pardir, os.pardir, ".git/refs/heads/master"))
@@ -111,3 +131,19 @@ class TestUtils(unittest.TestCase):
 
         test_ver = "pyhole v0 (%s) - http://pyhole.org" % git_commit[0:5]
         self.assertEqual(utils.version("0"), test_ver)
+
+    def test_get_home_directory(self):
+        self.assertTrue(utils.get_home_directory().endswith("/.pyhole/"))
+
+    def test_get_directory(self):
+        new_dir = utils.get_home_directory() + "test_dir"
+        self.assertFalse(os.path.exists(new_dir))
+        utils.get_directory("test_dir")
+        self.assertTrue(os.path.exists(new_dir))
+        os.rmdir(new_dir)
+
+    def test_write_file(self):
+        self.assertTrue(os.path.exists(self.new_file))
+
+    def test_read_file(self):
+        self.assertEquals(utils.read_file("tests", "pyhole_test_file"), "foo")

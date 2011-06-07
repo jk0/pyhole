@@ -29,7 +29,7 @@ class Weather(plugin.Plugin):
         """Display current weather report (ex: .w [set] [<location>])"""
         if params:
             location = params
-            if location.startswith("set"):
+            if location.startswith("set "):
                 location = location[4:]
                 utils.write_file(self.name, self.irc.source, location)
                 self.irc.reply("Location information saved")
