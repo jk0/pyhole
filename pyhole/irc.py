@@ -44,6 +44,7 @@ class IRC(irclib.SimpleIRCClient):
         self.port = network.get("port", type="int", default=6667)
         self.ssl = network.get("ssl", type="bool", default=False)
         self.ipv6 = network.get("ipv6", type="bool", default=False)
+        self.bind_to = network.get("bind_to", default="")
         self.nick = network.get("nick")
         self.identify_password = network.get("identify_password", default="")
         self.channels = network.get("channels", type="list")
@@ -55,7 +56,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                ssl=self.ssl, ipv6=self.ipv6)
+                ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to)
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
