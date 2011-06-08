@@ -63,7 +63,6 @@ class Launchpad(plugin.Plugin):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
             params = utils.ensure_int(params)
-
             if not params:
                 return
 

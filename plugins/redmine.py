@@ -67,7 +67,8 @@ class Redmine(plugin.Plugin):
         """Retrieve Redmine bug information (ex: RM12345)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
-            self._find_issue(params)
+            if params:
+                self._find_issue(params)
 
     @plugin.hook_add_msg_regex("https?:\/\/redmine\..*/issues")
     def _watch_for_rm_bug_url(self, params=None, **kwargs):

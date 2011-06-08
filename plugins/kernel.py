@@ -46,6 +46,9 @@ class Kernel(plugin.Plugin):
         """Retrieve kernel.org Bugzilla bug information (ex: K12345)"""
         if params:
             params = utils.ensure_int(params)
+            if not params:
+                return
+
             query = urllib.urlencode({"id": params})
             url = "http://bugzilla.kernel.org/show_bug.cgi?%s" % query
             response = self.irc.fetch_url(url, self.name)
