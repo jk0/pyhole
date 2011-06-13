@@ -1,0 +1,136 @@
+#!/usr/bin/env python
+
+#   Copyright 2010-2011 Josh Kearney
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+"""pyhole - A modular IRC bot for Python developers."""
+
+from __future__ import with_statement
+
+import multiprocessing
+import optparse
+import os
+import sys
+import time
+
+
+PYHOLE_PATH = os.path.normpath(os.path.join(
+        os.path.abspath(sys.argv[0]), os.pardir, os.pardir))
+if os.path.exists(os.path.join(PYHOLE_PATH, "pyhole", "__init__.py")):
+    sys.path.insert(0, PYHOLE_PATH)
+
+
+from pyhole import irc
+from pyhole import utils
+
+
+__VERSION__ = utils.version()
+
+
+class IRCConnection(multiprocessing.Process):
+    """IRC network connection process"""
+    def __init__(self, irc_network, conf_file):
+        super(IRCConnection, self).__init__()
+        self.irc_network = irc_network
+        self.conf_file = conf_file
+
+    def run(self):
+        """IRC network connection"""
+        network_info = utils.load_config(self.irc_network, self.conf_file)
+        log = utils.logger(self.irc_network, LOG_DIR, DEBUG)
+        reconnect_delay = CONFIG.get("reconnect_delay", type="int")
+
+        while True:
+            try:
+                connection = irc.IRC(CONFIG, network_info, log, __VERSION__,
+                        self.conf_file)
+            except Exception, e:
+                log.error(e)
+                log.error("Retrying in %d seconds" % reconnect_delay)
+                time.sleep(reconnect_delay)
+                continue
+
+            try:
+                connection.start()
+            except KeyboardInterrupt:
+                sys.exit(0)
+            except Exception, e:
+                log.error(e)
+                log.error("Retrying in %d seconds" % reconnect_delay)
+                time.sleep(reconnect_delay)
+                continue
+
+
+def network_list(sections):
+    """Prepare the list of IRC networks"""
+    return [net for net in sections if net not in ["Pyhole", "Redmine"]]
+
+
+def build_options():
+    """Generate command line options"""
+    parser = optparse.OptionParser(version=__VERSION__)
+
+    parser.add_option("-c", "--config", dest="config",
+            default="pyhole.conf",
+            help="specify the path to a configuration file")
+    parser.add_option("-b", "--background", action="store_true",
+            dest="background", help="run in the background")
+    parser.add_option("-d", "--debug", action="store_true", dest="debug",
+            help="show debugging output")
+
+    return parser.parse_args()
+
+
+def main():
+    """Main loop"""
+    log = utils.logger("Pyhole", LOG_DIR, DEBUG)
+    networks = network_list(CONFIG.sections())
+
+    log.info("Starting %s" % __VERSION__)
+    log.info("Connecting to IRC Networks: %s" % ", ".join(networks))
+    for network in networks:
+        p = IRCConnection(network, CONF_FILE)
+        p.start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        log.info("Caught KeyboardInterrupt, shutting down")
+
+
+if __name__ == "__main__":
+    OPTIONS, ARGS = build_options()
+    CONF_FILE = OPTIONS.config
+
+    CONFIG = utils.load_config("Pyhole", CONF_FILE)
+    DEBUG = OPTIONS.debug or CONFIG.get("debug", type="bool")
+    LOG_DIR = CONFIG.get("log_dir")
+
+    if OPTIONS.background and not OPTIONS.debug:
+        try:
+            PID = os.fork()
+            if PID == 0:
+                os.setsid()
+                with open(os.devnull, "r+b") as null:
+                    for desc in (0, 1, 2):
+                        try:
+                            os.dup2(null.fileno(), desc)
+                        except OSError:
+                            pass
+                main()
+        except OSError, e:
+            sys.exit(e)
+    else:
+        main()

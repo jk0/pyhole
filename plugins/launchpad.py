@@ -23,12 +23,11 @@ from pyhole import utils
 class Launchpad(plugin.Plugin):
     """Provide access to the Launchpad API"""
 
-    def __init__(self, irc):
+    def __init__(self, irc, conf_file):
         self.irc = irc
-        self.launchpad = LP.login_anonymously(
-            "pyhole",
-            "production",
-            self.irc.cache)
+        self.name = self.__class__.__name__
+        self.launchpad = LP.login_anonymously("pyhole", "production",
+                utils.get_directory(self.name))
 
     @plugin.hook_add_command("lbugs")
     @utils.spawn
@@ -40,13 +39,19 @@ class Launchpad(plugin.Plugin):
                 members = self.launchpad.people[team]
                 proj = self.launchpad.projects[project]
 
-                # Find a single member
-                self._find_bugs(members, proj, True)
-
-                # Find everyone on the team
-                for person in members.members:
-                    self.irc.log.debug("LP: %s" % person.display_name)
-                    self._find_bugs(person, proj)
+                if len(members.members) < 2:
+                    # Find a single member
+                    self._find_bugs(members, proj)
+                else:
+                    # Find everyone on the team
+                    for i, person in enumerate(members.members):
+                        if i <= 4:
+                            self.irc.log.debug("LP: %s" % person.display_name)
+                            self._find_bugs(person, proj, False)
+                        else:
+                            self.irc.reply("[...] truncated last %d users" % (
+                                    len(members.members) - i))
+                            break
             except KeyError:
                 self.irc.reply("Unable to find user '%s' in Launchpad" % team)
         else:
@@ -58,7 +63,6 @@ class Launchpad(plugin.Plugin):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
             params = utils.ensure_int(params)
-
             if not params:
                 return
 
@@ -66,29 +70,54 @@ class Launchpad(plugin.Plugin):
                 bug = self.launchpad.bugs[params]
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
 
-                self.irc.reply("LP Bug #%s: %s [Status: %s, Assignee: %s]"
-                    " %s" % (
-                    bug.id,
-                    bug.title,
-                    task.status,
-                    self._find_display_name(task.assignee_link),
-                    bug.web_link))
+                self.irc.reply("LP %s [Status: %s, Assignee: %s] %s" % (
+                        task.title, task.status,
+                        self._find_name(task.assignee_link), bug.web_link))
             except Exception:
                 return
 
-    def _find_display_name(self, user):
-        """Lookup a Launchpad user's display name"""
-        return self.launchpad.people[user].display_name
+    @plugin.hook_add_msg_regex("https?:\/\/bugs\.launchpad\.net\/.*\/\+bug")
+    def _watch_for_lp_bug_url(self, params=None, **kwargs):
+        """Watch for Launchpad bug URLs"""
+        try:
+            line = kwargs["full_message"].split("/")
+            for i, word in enumerate(line):
+                if word == "+bug":
+                    bug_id = line[i + 1].split(" ", 1)[0]
+                    self.keyword_lp(bug_id)
+        except TypeError:
+            return
 
-    def _find_bugs(self, person, project, single=False):
+    @plugin.hook_add_msg_regex("https?:\/\/bugs\.launchpad\.net\/bugs")
+    def _watch_for_short_lp_bug_url(self, params=None, **kwargs):
+        """Watch for short Launchpad bug URLs"""
+        try:
+            line = kwargs["full_message"].split("/")
+            for i, word in enumerate(line):
+                if word == "bugs":
+                    bug_id = line[i + 1].split(" ", 1)[0]
+                    self.keyword_lp(bug_id)
+        except TypeError:
+            return
+
+    def _find_name(self, user):
+        """Lookup a Launchpad user's display name"""
+        try:
+            return self.launchpad.people[user].display_name
+        except ValueError:
+            return "None"
+
+    def _find_bugs(self, person, project, single=True):
         """Lookup Launchpad bugs"""
         bugs = project.searchTasks(assignee=person)
-        if len(bugs):
-            for bug in bugs:
-                self.irc.reply("LP %s [Assignee: %s] %s" % (
-                    bug.title,
-                    person.display_name,
-                    bug.web_link))
-        else:
-            if single:
-                self.irc.reply("No bugs found for %s" % (person.display_name))
+        for i, bug in enumerate(bugs):
+            if i <= 4:
+                self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
+                        person.display_name, bug.web_link))
+            else:
+                self.irc.reply("[...] truncated last %d bugs" % (
+                        len(bugs) - i))
+                break
+
+        if single and i < 1:
+            self.irc.reply("No bugs found for %s" % (person.display_name))

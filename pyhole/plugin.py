@@ -17,8 +17,10 @@
 """Pyhole Plugin Library"""
 
 import functools
-import re
+import os
 import sys
+
+from pyhole import utils
 
 
 def _reset_variables():
@@ -44,7 +46,7 @@ def hook_add(hookname, arg):
     """
 
     def wrap(f):
-        setattr(f, '_is_%s_hook' % hookname, True)
+        setattr(f, "_is_%s_hook" % hookname, True)
         f._hook_arg = arg
         return f
     return wrap
@@ -70,9 +72,7 @@ def active_get(hookname):
 
     return [x[2] for x in _plugin_hooks[hookname]]
 
-_plugins = []
-_plugins_module = None
-_hook_names = ['keyword', 'command', 'msg_regex']
+_hook_names = ["keyword", "command", "msg_regex"]
 _reset_variables()
 _this_mod = sys.modules[__name__]
 
@@ -97,10 +97,11 @@ class PluginMetaClass(type):
         that's been subclassed from Plugin (ie, a real plugin class)
         """
 
-        if not hasattr(cls, '_plugin_classes'):
+        if not hasattr(cls, "_plugin_classes"):
             cls._plugin_classes = []
         else:
             cls._plugin_classes.append(cls)
+        cls.__name__ = name
 
 
 class Plugin(object):
@@ -117,6 +118,7 @@ class Plugin(object):
         """
 
         self.irc = irc
+        self.name = self.__class__.__name__
 
 
 def _init_plugins(*args, **kwargs):
@@ -149,36 +151,57 @@ def load_plugins(plugindir, *args, **kwargs):
     """
     Module function that loads plugins from a particular directory
     """
+    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
 
-    global _plugins_module
-    _plugins_module = __import__(plugindir)
-    for p in dir(_plugins_module):
-        if not p.startswith('_'):
-            _plugins.append(p)
+    plugins = os.path.abspath(plugindir)
+    plugin_names = config.get("plugins", type="list")
+
+    for p in plugin_names:
+        try:
+            __import__(os.path.basename(plugindir), globals(), locals(), [p])
+        except Exception, e:
+            # Catch all because this could be many things
+            kwargs.get("irc").log.error(e)
+            pass
+
     _init_plugins(*args, **kwargs)
 
 
-def reload_plugins(*args, **kwargs):
+def reload_plugins(plugins, *args, **kwargs):
     """
     Module function that'll reload all of the plugins
     """
+    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
 
-    if not _plugins_module:
-        raise TypeError("load_plugins has never been called")
-    _reset_variables()
-    # Reload the main plugins module itself
-    reload(_plugins_module)
     # When the modules are reloaded, the meta class will append
     # all of the classes again, so we need to make sure this is empty
     Plugin._plugin_classes = []
-    # Now reload all of the plugins that the main plugins module loaded
-    for x in _plugins:
-        reload(getattr(_plugins_module, x))
-    # Add any new modules to _plugins
-    for p in dir(_plugins_module):
-        if not (p.startswith('_') or p in _plugins):
-            _plugins.append(p)
-    _init_plugins(*args, **kwargs)
+    _reset_variables()
+
+    # Now reload all of the plugins
+    plugins_to_reload = []
+    plugindir = os.path.basename(plugins)
+
+    # Reload existing plugins
+    for mod, val in sys.modules.items():
+        if plugindir in mod and val and mod != plugindir:
+            mod_file = val.__file__
+            if not os.path.isfile(mod_file):
+                continue
+            for p in config.get("plugins", type="list"):
+                if plugindir + "." + p == mod:
+                    plugins_to_reload.append(mod)
+
+    for p in plugins_to_reload:
+        try:
+            reload(sys.modules[p])
+        except Exception, e:
+            # Catch all because this could be many things
+            kwargs.get("irc").log.error(e)
+            pass
+
+    # Load new plugins
+    load_plugins(plugindir, *args, **kwargs)
 
 
 def active_plugins():
@@ -186,7 +209,7 @@ def active_plugins():
     Get the loaded plugin names
     """
 
-    return _plugins
+    return [x.__name__ for x in Plugin._plugin_classes]
 
 
 def active_plugin_classes():

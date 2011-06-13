@@ -1,12 +1,14 @@
 # Global Configuration
 
-[pyhole]
+[Pyhole]
 admins: nick!ident, nick2!ident
 command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
-cache: /tmp/pyhole/cache
 debug: False
+plugin_dir: /home/pyhole/plugins
+log_dir: /home/pyhole/logs
+plugins: admin, dice, entertainment, news, search, urls, weather
 
 [Redmine]
 domain: redmine.example.com
@@ -15,11 +17,14 @@ key: abcd1234
 # IRC Network Configuration
 
 [FreeNode]
-server: irc.freenode.net
+server: verne.freenode.net
 password:
-port: 6667
-ssl: False
+port: 7000
+ssl: True
+ipv6: True
+bind_to: fe80::1
 nick: mynick
+identify_password: mypass
 channels: #mychannel key, #mychannel2
 
 [EFnet]
@@ -27,5 +32,8 @@ server: irc.efnet.net
 password:
 port: 6667
 ssl: False
+ipv6: False
+bind_to:
 nick: mynick
+identify_password:
 channels: #mychannel key, #mychannel2

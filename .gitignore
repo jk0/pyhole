@@ -1,2 +1,9 @@
 *.pyc
-pyhole.cfg
+*.pyo
+*.swp
+*.log
+*.xml
+*.conf
+.DS_Store
+.coverage
+logs/

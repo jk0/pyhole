@@ -1,0 +1,1304 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pyhole Modules &mdash; pyhole v0.5.4-875e4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.5.4-875e4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyhole v0.5.4-875e4 documentation" href="index.html" />
+    <link rel="next" title="Pyhole Plugins" href="plugins.html" />
+    <link rel="prev" title="Submitting Code" href="github.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plugins.html" title="Pyhole Plugins"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="github.html" title="Submitting Code"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyhole v0.5.4-875e4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyhole-modules">
+<h1>Pyhole Modules<a class="headerlink" href="#pyhole-modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-pyhole.config">
+<span id="pyhole-config"></span><h2><a class="reference internal" href="#module-pyhole.config" title="pyhole.config"><tt class="xref py py-mod docutils literal"><span class="pre">pyhole.config</span></tt></a><a class="headerlink" href="#module-pyhole.config" title="Permalink to this headline">¶</a></h2>
+<p>Intelligent Configuration Library</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.config.</tt><tt class="descname">Config</tt><big>(</big><em>config</em>, <em>section</em><big>)</big><a class="reference internal" href="_modules/pyhole/config.html#Config"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A configuration object</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Config.</tt><tt class="descname">get</tt><big>(</big><em>option</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyhole/config.html#Config.get"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Retrieve configuration values</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Config.</tt><tt class="descname">sections</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/config.html#Config.sections"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Return a list of sections</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyhole.irc">
+<span id="pyhole-irc"></span><h2><a class="reference internal" href="#module-pyhole.irc" title="pyhole.irc"><tt class="xref py py-mod docutils literal"><span class="pre">pyhole.irc</span></tt></a><a class="headerlink" href="#module-pyhole.irc" title="Permalink to this headline">¶</a></h2>
+<p>Event-based IRC Class</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.irc.</tt><tt class="descname">IRC</tt><big>(</big><em>config</em>, <em>network</em>, <em>log</em>, <em>version</em>, <em>conf_file</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.irclib.SimpleIRCClient</span></tt></p>
+<p>An IRC connection</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">deop_user</tt><big>(</big><em>params</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.deop_user"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>De-op a user</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">fetch_url</tt><big>(</big><em>url</em>, <em>name</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.fetch_url"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Fetch a URL</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">join_channel</tt><big>(</big><em>params</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.join_channel"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Join a channel</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">load_plugins</tt><big>(</big><em>reload_plugins=False</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.load_plugins"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Load plugins and their commands respectively</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_action</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_action"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle IRC actions</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_ctcp</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_ctcp"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Respond to CTCP events</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_disconnect</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_disconnect"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Attempt to reconnect after disconnection</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_invite</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_invite"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Join a channel upon invitation</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_join</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_join"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle joins</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_kick</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_kick"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Automatically rejoin channel if kicked</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_nicknameinuse</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_nicknameinuse"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Ensure the use of unique IRC nick</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_part</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_part"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle parts</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_privmsg</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_privmsg"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle private messages</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_privnotice</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_privnotice"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle private notices</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_pubmsg</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_pubmsg"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle public messages</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_pubnotice</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_pubnotice"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle public notices</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_quit</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_quit"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Handle quits</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">on_welcome</tt><big>(</big><em>connection</em>, <em>event</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.on_welcome"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Join channels upon successful connection</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">op_user</tt><big>(</big><em>params</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.op_user"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Op a user</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">part_channel</tt><big>(</big><em>params</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.part_channel"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Part a channel</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">poll_messages</tt><big>(</big><em>message</em>, <em>private=False</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.poll_messages"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Watch for known commands</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">privmsg</tt><big>(</big><em>target</em>, <em>msg</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.privmsg"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a privmsg</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">reply</tt><big>(</big><em>msg</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.reply"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a privmsg</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">run_command_hooks</tt><big>(</big><em>message</em>, <em>private</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.run_command_hooks"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Run command hooks</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">run_hook_command</tt><big>(</big><em>mod_name</em>, <em>f</em>, <em>arg</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.run_hook_command"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Make a call to a plugin hook</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">run_keyword_hooks</tt><big>(</big><em>message</em>, <em>private</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.run_keyword_hooks"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Run keyword hooks</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">run_msg_regexp_hooks</tt><big>(</big><em>message</em>, <em>private</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.run_msg_regexp_hooks"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Run regexp hooks</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">set_nick</tt><big>(</big><em>params</em><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#IRC.set_nick"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Set IRC nick</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irc.</tt><tt class="descname">active_commands</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#active_commands"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>List active commands</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irc.</tt><tt class="descname">active_keywords</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#active_keywords"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>List active keywords</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irc.</tt><tt class="descname">active_plugins</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irc.html#active_plugins"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>List active plugins</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyhole.irclib">
+<span id="pyhole-irclib"></span><h2><a class="reference internal" href="#module-pyhole.irclib" title="pyhole.irclib"><tt class="xref py py-mod docutils literal"><span class="pre">pyhole.irclib</span></tt></a><a class="headerlink" href="#module-pyhole.irclib" title="Permalink to this headline">¶</a></h2>
+<p>irclib &#8211; Internet Relay Chat (IRC) protocol client library.</p>
+<p>This library is intended to encapsulate the IRC protocol at a quite
+low level.  It provides an event-driven IRC client framework.  It has
+a fairly thorough support for the basic IRC protocol, CTCP, DCC chat,
+but DCC file transfers is not yet supported.</p>
+<p>In order to understand how to make an IRC client, I&#8217;m afraid you more
+or less must understand the IRC specifications.  They are available
+here: [IRC specifications].</p>
+<p>The main features of the IRC client framework are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Abstraction of the IRC protocol.</li>
+<li>Handles multiple simultaneous IRC server connections.</li>
+<li>Handles server PONGing transparently.</li>
+<li>Messages to the IRC server are done by calling methods on an IRC
+connection object.</li>
+<li>Messages from an IRC server triggers events, which can be caught
+by event handlers.</li>
+<li>Reading from and writing to IRC server sockets are normally done
+by an internal select() loop, but the select()ing may be done by
+an external main loop.</li>
+<li>Functions can be registered to execute at specified times by the
+event-loop.</li>
+<li>Decodes CTCP tagging correctly (hopefully); I haven&#8217;t seen any
+other IRC client implementation that handles the CTCP
+specification subtilties.</li>
+<li>A kind of simple, single-server, object-oriented IRC client class
+that dispatches events to instance methods is included.</li>
+</ul>
+</div></blockquote>
+<p>Current limitations:</p>
+<blockquote>
+<div><ul class="simple">
+<li>The IRC protocol shines through the abstraction a bit too much.</li>
+<li>Data is not written asynchronously to the server, i.e. the write()
+may block if the TCP buffers are stuffed.</li>
+<li>There are no support for DCC file transfers.</li>
+<li>The author haven&#8217;t even read RFC 2810, 2811, 2812 and 2813.</li>
+<li>Like most projects, documentation is lacking...</li>
+</ul>
+</div></blockquote>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">Connection</tt><big>(</big><em>irclibobj</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Connection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Base class for IRC connections.</p>
+<p>Must be overridden.</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Connection.</tt><tt class="descname">execute_at</tt><big>(</big><em>at</em>, <em>function</em>, <em>arguments=()</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Connection.execute_at"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Connection.</tt><tt class="descname">execute_delayed</tt><big>(</big><em>delay</em>, <em>function</em>, <em>arguments=()</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Connection.execute_delayed"><span class="viewcode-link">[source]</span></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">DCCConnection</tt><big>(</big><em>irclibobj</em>, <em>dcctype</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#DCCConnection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.irclib.Connection</span></tt></p>
+<p>This class represents a DCC connection.</p>
+<p>DCCConnection objects are instantiated by calling the dcc
+method on an IRC object.</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">DCCConnection.</tt><tt class="descname">connect</tt><big>(</big><em>address</em>, <em>port</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#DCCConnection.connect"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Connect/reconnect to a DCC peer.</p>
+<dl class="docutils">
+<dt>Arguments:</dt>
+<dd><p class="first">address &#8211; Host/IP address of the peer.</p>
+<p class="last">port &#8211; The port number to connect to.</p>
+</dd>
+</dl>
+<p>Returns the DCCConnection object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">DCCConnection.</tt><tt class="descname">disconnect</tt><big>(</big><em>message=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#DCCConnection.disconnect"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Hang up the connection and close the object.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>message &#8211; Quit message.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">DCCConnection.</tt><tt class="descname">listen</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#DCCConnection.listen"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Wait for a connection/reconnection from a DCC peer.</p>
+<p>Returns the DCCConnection object.</p>
+<p>The local IP address and port are available as
+self.localaddress and self.localport.  After connection from a
+peer, the peer address and port are available as
+self.peeraddress and self.peerport.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">DCCConnection.</tt><tt class="descname">privmsg</tt><big>(</big><em>string</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#DCCConnection.privmsg"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send data to DCC peer.</p>
+<p>The string will be padded with appropriate LF if it&#8217;s a DCC
+CHAT session.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">DCCConnection.</tt><tt class="descname">process_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#DCCConnection.process_data"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>[Internal]</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt>
+<em class="property">exception </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">DCCConnectionError</tt><a class="reference internal" href="_modules/pyhole/irclib.html#DCCConnectionError"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.irclib.IRCError</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">Event</tt><big>(</big><em>eventtype</em>, <em>source</em>, <em>target</em>, <em>arguments=None</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Event"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Class representing an IRC event.</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Event.</tt><tt class="descname">arguments</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Event.arguments"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the event arguments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Event.</tt><tt class="descname">eventtype</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Event.eventtype"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the event type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Event.</tt><tt class="descname">source</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Event.source"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the event source.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Event.</tt><tt class="descname">target</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#Event.target"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the event target.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">IRC</tt><big>(</big><em>fn_to_add_socket=None</em>, <em>fn_to_remove_socket=None</em>, <em>fn_to_add_timeout=None</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Class that handles one or several IRC server connections.</p>
+<p>When an IRC object has been instantiated, it can be used to create
+Connection objects that represent the IRC connections.  The
+responsibility of the IRC object is to provide an event-driven
+framework for the connections and to keep the connections alive.
+It runs a select loop to poll each connection&#8217;s TCP socket and
+hands over the sockets with incoming data for processing by the
+corresponding connection.</p>
+<p>The methods of most interest for an IRC client writer are server,
+add_global_handler, remove_global_handler, execute_at,
+execute_delayed, process_once and process_forever.</p>
+<p>Here is an example:</p>
+<blockquote>
+<div>irc = irclib.IRC()
+server = irc.server()
+server.connect(&#8220;irc.some.where&#8221;, 6667, &#8220;my_nickname&#8221;)
+server.privmsg(&#8220;a_nickname&#8221;, &#8220;Hi there!&#8221;)
+irc.process_forever()</div></blockquote>
+<p>This will connect to the IRC server irc.some.where on port 6667
+using the nickname my_nickname and send the message &#8220;Hi there!&#8221;
+to the nickname a_nickname.</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">add_global_handler</tt><big>(</big><em>event</em>, <em>handler</em>, <em>priority=0</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.add_global_handler"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Adds a global handler function for a specific event type.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>event &#8211; Event type (a string).  Check the values of the
+numeric_events dictionary in irclib.py for possible event
+types.</p>
+<p>handler &#8211; Callback function.</p>
+<p>priority &#8211; A number (the lower number, the higher priority).</p>
+</div></blockquote>
+<p>The handler function is called whenever the specified event is
+triggered in any of the connections.  See documentation for
+the Event class.</p>
+<p>The handler functions are called in priority order (lowest
+number is highest priority).  If a handler function returns
+&#8220;NO MORE&#8221;, no more handlers will be called.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">dcc</tt><big>(</big><em>dcctype='chat'</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.dcc"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Creates and returns a DCCConnection object.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>dcctype &#8211; &#8220;chat&#8221; for DCC CHAT connections or &#8220;raw&#8221; for</dt>
+<dd>DCC SEND (or other DCC types). If &#8220;chat&#8221;,
+incoming data will be split in newline-separated
+chunks. If &#8220;raw&#8221;, incoming data is not touched.</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">disconnect_all</tt><big>(</big><em>message=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.disconnect_all"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Disconnects all connections.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">execute_at</tt><big>(</big><em>at</em>, <em>function</em>, <em>arguments=()</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.execute_at"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Execute a function at a specified time.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>at &#8211; Execute at this time (standard &#8220;time_t&#8221; time).</p>
+<p>function &#8211; Function to call.</p>
+<p>arguments &#8211; Arguments to give the function.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">execute_delayed</tt><big>(</big><em>delay</em>, <em>function</em>, <em>arguments=()</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.execute_delayed"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Execute a function after a specified time.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>delay &#8211; How many seconds to wait.</p>
+<p>function &#8211; Function to call.</p>
+<p>arguments &#8211; Arguments to give the function.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">process_data</tt><big>(</big><em>sockets</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.process_data"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Called when there is more data to read on connection sockets.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>sockets &#8211; A list of socket objects.</div></blockquote>
+<p>See documentation for IRC.__init__.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">process_forever</tt><big>(</big><em>timeout=0.20000000000000001</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.process_forever"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Run an infinite loop, processing data from connections.</p>
+<p>This method repeatedly calls process_once.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>timeout &#8211; Parameter to pass to process_once.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">process_once</tt><big>(</big><em>timeout=0</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.process_once"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Process data from connections once.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>timeout &#8211; How long the select() call should wait if no</dt>
+<dd>data is available.</dd>
+</dl>
+</div></blockquote>
+<p>This method should be called periodically to check and process
+incoming data, if there are any.  If that seems boring, look
+at the process_forever method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">process_timeout</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.process_timeout"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Called when a timeout notification is due.</p>
+<p>See documentation for IRC.__init__.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">remove_global_handler</tt><big>(</big><em>event</em>, <em>handler</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.remove_global_handler"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Removes a global handler function.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>event &#8211; Event type (a string).</p>
+<p>handler &#8211; Callback function.</p>
+</div></blockquote>
+<p>Returns 1 on success, otherwise 0.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">IRC.</tt><tt class="descname">server</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#IRC.server"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Creates and returns a ServerConnection object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt>
+<em class="property">exception </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">IRCError</tt><a class="reference internal" href="_modules/pyhole/irclib.html#IRCError"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Represents an IRC exception.</p>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">ServerConnection</tt><big>(</big><em>irclibobj</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.irclib.Connection</span></tt></p>
+<p>This class represents an IRC server connection.</p>
+<p>ServerConnection objects are instantiated by calling the server
+method on an IRC object.</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">action</tt><big>(</big><em>target</em>, <em>action</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.action"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a CTCP ACTION command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">add_global_handler</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.add_global_handler"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Add global handler.</p>
+<p>See documentation for IRC.add_global_handler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">admin</tt><big>(</big><em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.admin"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send an ADMIN command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.close"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Close the connection.</p>
+<p>This method closes the connection permanently; after it has
+been called, the object is unusable.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">connect</tt><big>(</big><em>server</em>, <em>port</em>, <em>nickname</em>, <em>password=None</em>, <em>username=None</em>, <em>ircname=None</em>, <em>localaddress=''</em>, <em>localport=0</em>, <em>ssl=False</em>, <em>ipv6=False</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.connect"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Connect/reconnect to a server.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>server &#8211; Server name.</p>
+<p>port &#8211; Port number.</p>
+<p>nickname &#8211; The nickname.</p>
+<p>password &#8211; Password (if any).</p>
+<p>username &#8211; The username.</p>
+<p>ircname &#8211; The IRC name (&#8220;realname&#8221;).</p>
+<p>localaddress &#8211; Bind the connection to a specific local IP address.</p>
+<p>localport &#8211; Bind the connection to a specific local port.</p>
+<p>ssl &#8211; Enable support for ssl.</p>
+<p>ipv6 &#8211; Enable support for ipv6.</p>
+</div></blockquote>
+<p>This function can be called to reconnect a closed connection.</p>
+<p>Returns the ServerConnection object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">ctcp</tt><big>(</big><em>ctcptype</em>, <em>target</em>, <em>parameter=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.ctcp"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a CTCP command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">ctcp_reply</tt><big>(</big><em>target</em>, <em>parameter</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.ctcp_reply"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a CTCP REPLY command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">disconnect</tt><big>(</big><em>message=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.disconnect"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Hang up the connection.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>message &#8211; Quit message.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">get_nickname</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.get_nickname"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the (real) nick name.</p>
+<p>This method returns the (real) nickname.  The library keeps
+track of nick changes, so it might not be the nick name that
+was passed to the connect() method.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">get_server_name</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.get_server_name"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the (real) server name.</p>
+<p>This method returns the (real) server name, or, more
+specifically, what the server calls itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">globops</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.globops"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a GLOBOPS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">info</tt><big>(</big><em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.info"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send an INFO command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">invite</tt><big>(</big><em>nick</em>, <em>channel</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.invite"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send an INVITE command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">is_connected</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.is_connected"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Return connection status.</p>
+<p>Returns true if connected, otherwise false.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">ison</tt><big>(</big><em>nicks</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.ison"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send an ISON command.</p>
+<p>Arguments:</p>
+<blockquote>
+<div>nicks &#8211; List of nicks.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">join</tt><big>(</big><em>channel</em>, <em>key=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.join"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a JOIN command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">kick</tt><big>(</big><em>channel</em>, <em>nick</em>, <em>comment=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.kick"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a KICK command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">links</tt><big>(</big><em>remote_server=''</em>, <em>server_mask=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.links"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a LINKS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">list</tt><big>(</big><em>channels=None</em>, <em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.list"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a LIST command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">lusers</tt><big>(</big><em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.lusers"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a LUSERS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">mode</tt><big>(</big><em>target</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.mode"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a MODE command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">motd</tt><big>(</big><em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.motd"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send an MOTD command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">names</tt><big>(</big><em>channels=None</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.names"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a NAMES command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">nick</tt><big>(</big><em>newnick</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.nick"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a NICK command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">notice</tt><big>(</big><em>target</em>, <em>text</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.notice"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a NOTICE command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">oper</tt><big>(</big><em>nick</em>, <em>password</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.oper"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send an OPER command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">part</tt><big>(</big><em>channels</em>, <em>message=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.part"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a PART command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">pass_</tt><big>(</big><em>password</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.pass_"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a PASS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">ping</tt><big>(</big><em>target</em>, <em>target2=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.ping"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a PING command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">pong</tt><big>(</big><em>target</em>, <em>target2=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.pong"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a PONG command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">privmsg</tt><big>(</big><em>target</em>, <em>text</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.privmsg"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a PRIVMSG command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">privmsg_many</tt><big>(</big><em>targets</em>, <em>text</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.privmsg_many"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a PRIVMSG command to multiple targets.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">process_data</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.process_data"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>[Internal]</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">quit</tt><big>(</big><em>message=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.quit"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a QUIT command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">remove_global_handler</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.remove_global_handler"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Remove global handler.</p>
+<p>See documentation for IRC.remove_global_handler.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">send_raw</tt><big>(</big><em>string</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.send_raw"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send raw string to the server.</p>
+<p>The string will be padded with appropriate CR LF.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">squit</tt><big>(</big><em>server</em>, <em>comment=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.squit"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send an SQUIT command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">stats</tt><big>(</big><em>statstype</em>, <em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.stats"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a STATS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">time</tt><big>(</big><em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.time"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a TIME command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">topic</tt><big>(</big><em>channel</em>, <em>new_topic=None</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.topic"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a TOPIC command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">trace</tt><big>(</big><em>target=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.trace"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a TRACE command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">user</tt><big>(</big><em>username</em>, <em>realname</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.user"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a USER command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">userhost</tt><big>(</big><em>nicks</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.userhost"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a USERHOST command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">users</tt><big>(</big><em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.users"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a USERS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">version</tt><big>(</big><em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.version"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a VERSION command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">wallops</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.wallops"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a WALLOPS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">who</tt><big>(</big><em>target=''</em>, <em>op=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.who"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a WHO command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">whois</tt><big>(</big><em>targets</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.whois"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a WHOIS command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">ServerConnection.</tt><tt class="descname">whowas</tt><big>(</big><em>nick</em>, <em>max=''</em>, <em>server=''</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnection.whowas"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a WHOWAS command.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt>
+<em class="property">exception </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">ServerConnectionError</tt><a class="reference internal" href="_modules/pyhole/irclib.html#ServerConnectionError"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.irclib.IRCError</span></tt></p>
+</dd></dl>
+
+<dl class="exception">
+<dt>
+<em class="property">exception </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">ServerNotConnectedError</tt><a class="reference internal" href="_modules/pyhole/irclib.html#ServerNotConnectedError"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.irclib.ServerConnectionError</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.irclib.</tt><tt class="descname">SimpleIRCClient</tt><a class="reference internal" href="_modules/pyhole/irclib.html#SimpleIRCClient"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>A simple single-server IRC client class.</p>
+<p>This is an example of an object-oriented wrapper of the IRC
+framework.  A real IRC client can be made by subclassing this
+class and adding appropriate methods.</p>
+<p>The method on_join will be called when a &#8220;join&#8221; event is created
+(which is done when the server sends a JOIN messsage/command),
+on_privmsg will be called for &#8220;privmsg&#8221; events, and so on.  The
+handler methods get two arguments: the connection object (same as
+self.connection) and the event object.</p>
+<p>Instance attributes that can be used by sub classes:</p>
+<blockquote>
+<div><p>ircobj &#8211; The IRC instance.</p>
+<p>connection &#8211; The ServerConnection instance.</p>
+<p>dcc_connections &#8211; A list of DCCConnection instances.</p>
+</div></blockquote>
+<dl class="method">
+<dt>
+<tt class="descclassname">SimpleIRCClient.</tt><tt class="descname">connect</tt><big>(</big><em>server</em>, <em>port</em>, <em>nickname</em>, <em>password=None</em>, <em>username=None</em>, <em>ircname=None</em>, <em>localaddress=''</em>, <em>localport=0</em>, <em>ssl=False</em>, <em>ipv6=False</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#SimpleIRCClient.connect"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Connect/reconnect to a server.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>server &#8211; Server name.</p>
+<p>port &#8211; Port number.</p>
+<p>nickname &#8211; The nickname.</p>
+<p>password &#8211; Password (if any).</p>
+<p>username &#8211; The username.</p>
+<p>ircname &#8211; The IRC name.</p>
+<p>localaddress &#8211; Bind the connection to a specific local IP address.</p>
+<p>localport &#8211; Bind the connection to a specific local port.</p>
+<p>ssl &#8211; Enable support for ssl.</p>
+<p>ipv6 &#8211; Enable support for ipv6.</p>
+</div></blockquote>
+<p>This function can be called to reconnect a closed connection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">SimpleIRCClient.</tt><tt class="descname">dcc_connect</tt><big>(</big><em>address</em>, <em>port</em>, <em>dcctype='chat'</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#SimpleIRCClient.dcc_connect"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Connect to a DCC peer.</p>
+<p>Arguments:</p>
+<blockquote>
+<div><p>address &#8211; IP address of the peer.</p>
+<p>port &#8211; Port to connect to.</p>
+</div></blockquote>
+<p>Returns a DCCConnection instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">SimpleIRCClient.</tt><tt class="descname">dcc_listen</tt><big>(</big><em>dcctype='chat'</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#SimpleIRCClient.dcc_listen"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Listen for connections from a DCC peer.</p>
+<p>Returns a DCCConnection instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">SimpleIRCClient.</tt><tt class="descname">start</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#SimpleIRCClient.start"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Start the IRC client.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">ip_numstr_to_quad</tt><big>(</big><em>num</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ip_numstr_to_quad"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Convert an IP number as an integer given in ASCII
+representation (e.g. &#8216;3232235521&#8217;) to an IP address string
+(e.g. &#8216;192.168.0.1&#8217;).</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">ip_quad_to_numstr</tt><big>(</big><em>quad</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#ip_quad_to_numstr"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Convert an IP address string (e.g. &#8216;192.168.0.1&#8217;) to an IP
+number as an integer given in ASCII representation
+(e.g. &#8216;3232235521&#8217;).</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">irc_lower</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#irc_lower"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Returns a lowercased string.</p>
+<p>The definition of lowercased comes from the IRC specification (RFC
+1459).</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">is_channel</tt><big>(</big><em>string</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#is_channel"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Check if a string is a channel name.</p>
+<p>Returns true if the argument is a channel name, otherwise false.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">mask_matches</tt><big>(</big><em>nick</em>, <em>mask</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#mask_matches"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Check if a nick matches a mask.</p>
+<p>Returns true if the nick matches, otherwise false.</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">nm_to_h</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#nm_to_h"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the host part of a nickmask.</p>
+<p>(The source of an Event is a nickmask.)</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">nm_to_n</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#nm_to_n"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the nick part of a nickmask.</p>
+<p>(The source of an Event is a nickmask.)</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">nm_to_u</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#nm_to_u"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the user part of a nickmask.</p>
+<p>(The source of an Event is a nickmask.)</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">nm_to_uh</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#nm_to_uh"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the userhost part of a nickmask.</p>
+<p>(The source of an Event is a nickmask.)</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">parse_channel_modes</tt><big>(</big><em>mode_string</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#parse_channel_modes"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Parse a channel mode string.</p>
+<p>The function returns a list of lists with three members: sign,
+mode and argument.  The sign is &#8220;+&#8221; or &#8220;-&#8221;.  The argument is
+None if mode isn&#8217;t one of &#8220;b&#8221;, &#8220;k&#8221;, &#8220;l&#8221;, &#8220;v&#8221; or &#8220;o&#8221;.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">irclib</span><span class="o">.</span><span class="n">parse_channel_modes</span><span class="p">(</span><span class="s">&quot;+ab-c foo&quot;</span><span class="p">)</span>
+<span class="go">[[&#39;+&#39;, &#39;a&#39;, None], [&#39;+&#39;, &#39;b&#39;, &#39;foo&#39;], [&#39;-&#39;, &#39;c&#39;, None]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.irclib.</tt><tt class="descname">parse_nick_modes</tt><big>(</big><em>mode_string</em><big>)</big><a class="reference internal" href="_modules/pyhole/irclib.html#parse_nick_modes"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Parse a nick mode string.</p>
+<p>The function returns a list of lists with three members: sign,
+mode and argument.  The sign is &#8220;+&#8221; or &#8220;-&#8221;.  The argument is
+always None.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">irclib</span><span class="o">.</span><span class="n">parse_nick_modes</span><span class="p">(</span><span class="s">&quot;+ab-c&quot;</span><span class="p">)</span>
+<span class="go">[[&#39;+&#39;, &#39;a&#39;, None], [&#39;+&#39;, &#39;b&#39;, None], [&#39;-&#39;, &#39;c&#39;, None]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyhole.plugin">
+<span id="pyhole-plugin"></span><h2><a class="reference internal" href="#module-pyhole.plugin" title="pyhole.plugin"><tt class="xref py py-mod docutils literal"><span class="pre">pyhole.plugin</span></tt></a><a class="headerlink" href="#module-pyhole.plugin" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Plugin Library</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.plugin.</tt><tt class="descname">Plugin</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#Plugin"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>The class that all plugin classes should inherit from</p>
+</dd></dl>
+
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">pyhole.plugin.</tt><tt class="descname">PluginMetaClass</tt><big>(</big><em>name</em>, <em>bases</em>, <em>attrs</em><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#PluginMetaClass"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">type</span></tt></p>
+<p>The metaclass that makes all of the plugin magic work.  All subclassing
+gets caught here, which we can use to have plugins automagically
+register themselves</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.plugin.</tt><tt class="descname">active_get</tt><big>(</big><em>hookname</em><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#active_get"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Function to return the list of hook arguments.  Genearlly
+this is not called directly.  Callers tend to use the dynamically
+generated calls &#8216;active_get_*&#8217; that are created below with the
+setattrs</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.plugin.</tt><tt class="descname">active_plugin_classes</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#active_plugin_classes"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the loaded plugin classes</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.plugin.</tt><tt class="descname">active_plugins</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#active_plugins"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Get the loaded plugin names</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.plugin.</tt><tt class="descname">hook_add</tt><big>(</big><em>hookname</em>, <em>arg</em><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#hook_add"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Generic decorator to add hooks.  Generally, this is not called
+directly by plugins.  Decorators that plugins use are automatically
+generated below with the setattrs you&#8217;ll see</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.plugin.</tt><tt class="descname">hook_get</tt><big>(</big><em>hookname</em><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#hook_get"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Function to return the list of hooks of a particular type.  Genearlly
+this is not called directly.  Callers tend to use the dynamically
+generated calls &#8216;hook_get_*&#8217; that are created below with the setattrs</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.plugin.</tt><tt class="descname">load_plugins</tt><big>(</big><em>plugindir</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#load_plugins"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Module function that loads plugins from a particular directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.plugin.</tt><tt class="descname">reload_plugins</tt><big>(</big><em>plugins</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyhole/plugin.html#reload_plugins"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Module function that&#8217;ll reload all of the plugins</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyhole.utils">
+<span id="pyhole-utils"></span><h2><a class="reference internal" href="#module-pyhole.utils" title="pyhole.utils"><tt class="xref py py-mod docutils literal"><span class="pre">pyhole.utils</span></tt></a><a class="headerlink" href="#module-pyhole.utils" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Utility Library</p>
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">admin</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#admin"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Administration Decorator</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">decode_entities</tt><big>(</big><em>html</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#decode_entities"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Strip HTML entities from a string</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">ensure_int</tt><big>(</big><em>param</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#ensure_int"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Ensure the given param is an int</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">get_directory</tt><big>(</big><em>new_dir</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#get_directory"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Return a directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">get_home_directory</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#get_home_directory"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Return the home directory</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">load_config</tt><big>(</big><em>section</em>, <em>conf</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#load_config"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Load a config section</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">logger</tt><big>(</big><em>name</em>, <em>log_dir</em>, <em>debug=False</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#logger"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Log handler</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">read_file</tt><big>(</big><em>dir</em>, <em>file</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#read_file"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Read and return the data in file</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">spawn</tt><big>(</big><em>func</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#spawn"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Greenthread Spawning Decorator</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">version</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#version"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Prepare the version string</p>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descclassname">pyhole.utils.</tt><tt class="descname">write_file</tt><big>(</big><em>dir</em>, <em>file</em>, <em>data</em><big>)</big><a class="reference internal" href="_modules/pyhole/utils.html#write_file"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Write data to file</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pyhole Modules</a><ul>
+<li><a class="reference internal" href="#module-pyhole.config"><tt class="docutils literal"><span class="pre">pyhole.config</span></tt></a></li>
+<li><a class="reference internal" href="#module-pyhole.irc"><tt class="docutils literal"><span class="pre">pyhole.irc</span></tt></a></li>
+<li><a class="reference internal" href="#module-pyhole.irclib"><tt class="docutils literal"><span class="pre">pyhole.irclib</span></tt></a></li>
+<li><a class="reference internal" href="#module-pyhole.plugin"><tt class="docutils literal"><span class="pre">pyhole.plugin</span></tt></a></li>
+<li><a class="reference internal" href="#module-pyhole.utils"><tt class="docutils literal"><span class="pre">pyhole.utils</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="github.html"
+                        title="previous chapter">Submitting Code</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="plugins.html"
+                        title="next chapter">Pyhole Plugins</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pyhole.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="plugins.html" title="Pyhole Plugins"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="github.html" title="Submitting Code"
+             >previous</a> |</li>
+        <li><a href="index.html">pyhole v0.5.4-875e4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Josh Kearney.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

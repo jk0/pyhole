@@ -14,11 +14,11 @@
 
 """Pyhole Search Plugin"""
 
-import imdb
 import re
 import simplejson
 import urllib
 
+from BeautifulSoup import BeautifulSoup
 from xml.dom import minidom
 
 from pyhole import plugin
@@ -28,10 +28,6 @@ from pyhole import utils
 class Search(plugin.Plugin):
     """Provide access to search engines"""
 
-    def __init__(self, irc):
-        self.irc = irc
-        self.name = self.__class__.__name__
-
     @plugin.hook_add_command("google")
     @utils.spawn
     def google(self, params=None, **kwargs):
@@ -39,24 +35,25 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params})
             url = ("http://ajax.googleapis.com/ajax/"
-                "services/search/web?v=1.0&%s" % query)
-
+                    "services/search/web?v=1.0&%s" % query)
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             json = simplejson.loads(response.read())
             results = json["responseData"]["results"]
             if results:
                 for r in results:
                     self.irc.reply("%s: %s" % (
-                        r["titleNoFormatting"].encode("ascii", "ignore"),
-                        r["unescapedUrl"]))
+                            r["titleNoFormatting"].encode("ascii", "ignore"),
+                            r["unescapedUrl"]))
             else:
                 self.irc.reply("No results found: '%s'" % params)
         else:
             self.irc.reply(self.google.__doc__)
 
     @plugin.hook_add_command("g")
-    def g(self, params=None, **kwargs):
+    def alias_g(self, params=None, **kwargs):
         """Alias of google"""
         self.google(params, **kwargs)
 
@@ -65,22 +62,31 @@ class Search(plugin.Plugin):
     def imdb(self, params=None, **kwargs):
         """Search IMDb (ex: .imdb <query>)"""
         if params:
-            i = imdb.IMDb()
-
-            try:
-                results = i.search_movie(params, results=4)
-            except IOError:
-                self.irc.reply("Unable to fetch IMDb data")
+            query = urllib.urlencode({"q": params})
+            url = "http://www.imdb.com/find?s=all&%s" % query
+            response = self.irc.fetch_url(url, self.name)
+            if not response:
                 return
 
-            if results:
-                for r in results:
-                    self.irc.reply(
-                        "%s (%s): http://www.imdb.com/title/tt%s/" % (
-                        r["title"],
-                        r["year"],
-                        r.movieID))
-            else:
+            soup = BeautifulSoup(response.read())
+            results = soup.findAll("td", {"valign": "top"})
+
+            i = 0
+            for result in results:
+                if len(result) > 3 and len(result.contents[2].attrs) > 0:
+                    id = result.contents[2].attrs[0][1]
+                    title = utils.decode_entities(
+                            result.contents[2].contents[0])
+                    year = result.contents[2].nextSibling.strip()[0:6]
+
+                    if not title.startswith("aka") and len(year):
+                        self.irc.reply("%s %s: http://www.imdb.com%s" % (
+                                title, year, id))
+                        i += 1
+                elif i >= 4:
+                    break
+
+            if i == 0:
                 self.irc.reply("No results found: '%s'" % params)
         else:
             self.irc.reply(self.imdb.__doc__)
@@ -93,15 +99,16 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params, "rpp": 4})
             url = "http://search.twitter.com/search.json?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             json = simplejson.loads(response.read())
             results = json["results"]
             if results:
                 for r in results:
-                    self.irc.reply("@%s: %s" % (
-                        r["from_user"],
-                        utils.decode_entities(
-                            r["text"].encode("ascii", "ignore"))))
+                    self.irc.reply("@%s: %s" % (r["from_user"],
+                            utils.decode_entities(
+                                    r["text"].encode("ascii", "ignore"))))
             else:
                 self.irc.reply("No results found: '%s'" % params)
         else:
@@ -115,21 +122,26 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"term": params})
             url = "http://www.urbandictionary.com/define.php?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
-            html = response.read()
-            if re.search("<i>%s</i>\nisn't defined" % params, html):
-                self.irc.reply("No results found: '%s'" % params)
-            else:
-                r = (re.compile("<div class=\"definition\">(.*)</div>"
-                    "<div class=\"example\">"))
-                m = r.search(html)
-                for i, line in enumerate(m.group(1).split("<br/>")):
+            soup = BeautifulSoup(response.read())
+            results = soup.findAll("div", {"class": "definition"})
+
+            urban = ""
+            if len(results):
+                urban = " ".join(str(x) for x in soup.findAll(
+                        "div", {"class": "definition"})[0].contents)
+
+            if len(urban) > 0:
+                for i, line in enumerate(urban.split("<br/>")):
                     if i <= 4:
-                        line = utils.decode_entities(line)
-                        self.irc.reply(line)
+                        self.irc.reply(utils.decode_entities(line))
                     else:
                         self.irc.reply("[...] %s" % url)
                         break
+            else:
+                self.irc.reply("No results found: '%s'" % params)
         else:
             self.irc.reply(self.urban.__doc__)
 
@@ -138,14 +150,13 @@ class Search(plugin.Plugin):
     def wikipedia(self, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)"""
         if params:
-            query = urllib.urlencode({
-                "action": "query",
-                "generator": "allpages",
-                "gaplimit": 4,
-                "gapfrom": params,
-                "format": "xml"})
+            query = urllib.urlencode({"action": "query",
+                    "generator": "allpages", "gaplimit": 4,
+                    "gapfrom": params, "format": "xml"})
             url = "http://en.wikipedia.org/w/api.php?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             xml = minidom.parseString(response.read())
             for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
@@ -160,13 +171,12 @@ class Search(plugin.Plugin):
     def youtube(self, params=None, **kwargs):
         """Search YouTube (ex: .youtube <query>)"""
         if params:
-            query = urllib.urlencode({
-                "q": params,
-                "v": 2,
-                "max-results": 4,
-                "alt": "jsonc"})
+            query = urllib.urlencode({"q": params, "v": 2, "max-results": 4,
+                    "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
             response = self.irc.fetch_url(url, self.name)
+            if not response:
+                return
 
             json = simplejson.loads(response.read())
             results = json["data"]

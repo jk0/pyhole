@@ -14,7 +14,10 @@
 
 """Intelligent Configuration Library"""
 
+from __future__ import with_statement
+
 import ConfigParser
+import os
 import sys
 
 
@@ -22,27 +25,42 @@ class Config(object):
     """A configuration object"""
 
     def __init__(self, config, section):
-        self.config = ConfigParser.ConfigParser()
+        self.config = os.path.abspath(config)
+        self.config_parser = ConfigParser.ConfigParser()
         self.section = section
 
         try:
-            conf_file = open(config)
-            self.config.readfp(conf_file)
-            conf_file.close()
+            with open(self.config) as conf_file:
+                self.config_parser.readfp(conf_file)
+            conf_file.closed
         except IOError:
-            sys.exit("No such file: '%s'" % config)
+            print "Unable to load configuration file: %s" % self.config
+            print "Try specifying a location:"
+            print "    %s -c path/to/config.conf" % sys.argv[0]
+            sys.exit(1)
 
     def sections(self):
         """Return a list of sections"""
-        return self.config.sections()
+        return self.config_parser.sections()
 
-    def get(self, key, param_type="string"):
+    def get(self, option, **kwargs):
         """Retrieve configuration values"""
-        if param_type == "int":
-            return self.config.getint(self.section, key)
-        elif param_type == "bool":
-            return self.config.getboolean(self.section, key)
-        elif param_type == "list":
-            return self.config.get(self.section, key).split(", ")
-        else:
-            return self.config.get(self.section, key)
+        _type = kwargs.get("type", "str")
+
+        try:
+            if _type == "int":
+                return self.config_parser.getint(self.section, option)
+            elif _type == "bool":
+                return self.config_parser.getboolean(self.section, option)
+            elif _type == "list":
+                return self.config_parser.get(self.section, option).split(", ")
+            else:
+                return self.config_parser.get(self.section, option)
+        except ConfigParser.NoOptionError:
+            if "default" in kwargs:
+                return kwargs["default"]
+
+            print "Unable to locate '%s' in %s" % (option, self.config)
+            print "[%s]" % self.section
+            print "%s: value" % option
+            sys.exit(1)

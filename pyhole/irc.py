@@ -14,90 +14,71 @@
 
 """Event-based IRC Class"""
 
-import inspect
 import random
 import re
 import time
 import urllib
 
-import irclib
-import plugin
+from pyhole import irclib
+from pyhole import plugin
 
 
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, redmine, network, logger, version):
+    def __init__(self, config, network, log, version, conf_file):
         irclib.SimpleIRCClient.__init__(self)
 
-        self.log = logger
+        self.log = log
         self.version = version
+        self.conf_file = conf_file
 
-        self.admins = config.get("admins", "list")
+        self.admins = config.get("admins", type="list")
         self.command_prefix = config.get("command_prefix")
-        self.reconnect_delay = config.get("reconnect_delay", "int")
-        self.rejoin_delay = config.get("rejoin_delay", "int")
-        self.cache = config.get("cache")
-
-        self.redmine_domain = redmine.get("domain")
-        self.redmine_key = redmine.get("key")
+        self.reconnect_delay = config.get("reconnect_delay", type="int")
+        self.rejoin_delay = config.get("rejoin_delay", type="int")
+        self.plugin_dir = config.get("plugin_dir")
 
         self.server = network.get("server")
-        self.password = network.get("password")
-        self.port = network.get("port", "int")
-        self.ssl = network.get("ssl", "bool")
+        self.password = network.get("password", default="")
+        self.port = network.get("port", type="int", default=6667)
+        self.ssl = network.get("ssl", type="bool", default=False)
+        self.ipv6 = network.get("ipv6", type="bool", default=False)
+        self.bind_to = network.get("bind_to", default="")
         self.nick = network.get("nick")
-        self.channels = network.get("channels", "list")
+        self.identify_password = network.get("identify_password", default="")
+        self.channels = network.get("channels", type="list")
 
         self.addressed = False
 
         self.load_plugins()
 
-        self.log.info("Connecting to %s:%d as %s" % (
-            self.server,
-            self.port,
-            self.nick))
-        self.connect(
-            self.server,
-            self.port,
-            self.nick,
-            self.password,
-            ssl=self.ssl)
+        self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
+                self.nick))
+        self.connect(self.server, self.port, self.nick, self.password,
+                ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to)
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
-
         if reload_plugins:
-            plugin.reload_plugins(irc=self)
+            plugin.reload_plugins(self.plugin_dir, irc=self,
+                    conf_file=self.conf_file)
         else:
-            plugin.load_plugins("plugins", irc=self)
-        self.log.info(self.active_plugins())
+            plugin.load_plugins(self.plugin_dir, irc=self,
+                    conf_file=self.conf_file)
 
-    def active_plugins(self):
-        """List active plugins"""
-        return "Loaded Plugins: %s" % ", ".join(plugin.active_plugins())
-
-    def active_commands(self):
-        """List active commands"""
-        return ", ".join(plugin.active_commands())
-
-    def active_keywords(self):
-        """List active keywords"""
-        return ", ".join(plugin.active_keywords())
+        self.log.info("Loaded Plugins: %s" % active_plugins())
 
     def run_hook_command(self, mod_name, f, arg, **kwargs):
         """Make a call to a plugin hook"""
         try:
             f(arg, **kwargs)
             if arg:
-                self.log.debug("Calling: %s.%s(\"%s\")" % (
-                    mod_name,
-                    f.__name__,
-                    arg))
+                self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
+                        f.__name__, arg))
             else:
-                self.log.debug("Calling: %s.%s(None)" % (
-                    mod_name,
-                    f.__name__))
+                self.log.debug("Calling: %s.%s(None)" % (mod_name,
+                        f.__name__))
         except Exception, e:
             self.log.error(e)
 
@@ -106,12 +87,8 @@ class IRC(irclib.SimpleIRCClient):
         for mod_name, f, msg_regex in plugin.hook_get_msg_regexs():
             m = re.search(msg_regex, message, re.I)
             if m:
-                self.run_hook_command(
-                    mod_name,
-                    f,
-                    m,
-                    private=private,
-                    full_message=message)
+                self.run_hook_command(mod_name, f, m, private=private,
+                        full_message=message)
 
     def run_keyword_hooks(self, message, private):
         """Run keyword hooks"""
@@ -119,14 +96,10 @@ class IRC(irclib.SimpleIRCClient):
 
         for mod_name, f, kw in plugin.hook_get_keywords():
             for word in words:
-                m = re.search("%s(.+)" % kw, word, re.I)
+                m = re.search("^%s(.+)" % kw, word, re.I)
                 if m:
-                    self.run_hook_command(
-                        mod_name,
-                        f,
-                        m.group(1),
-                        private=private,
-                        full_message=message)
+                    self.run_hook_command(mod_name, f, m.group(1),
+                            private=private, full_message=message)
 
     def run_command_hooks(self, message, private):
         """Run command hooks"""
@@ -136,13 +109,9 @@ class IRC(irclib.SimpleIRCClient):
             if private:
                 m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message, re.I)
                 if m:
-                    self.run_hook_command(
-                        mod_name,
-                        f,
-                        m.group(1),
-                        private=private,
-                        addressed=self.addressed,
-                        full_message=message)
+                    self.run_hook_command(mod_name, f, m.group(1),
+                            private=private, addressed=self.addressed,
+                            full_message=message)
 
             if message.startswith(self.command_prefix):
                 # Strip off command prefix
@@ -150,12 +119,10 @@ class IRC(irclib.SimpleIRCClient):
             else:
                 # Check for command starting with nick being addressed
                 msg_start_upper = message[:len(self.nick) + 1].upper()
-                if msg_start_upper == self.nick.upper() + ':':
+                if msg_start_upper == self.nick.upper() + ":":
                     # Get rest of string after "nick:" and white spaces
-                    msg_rest = re.sub(
-                        "^\s+",
-                        "",
-                        message[len(self.nick) + 1:])
+                    msg_rest = re.sub("^\s+", "",
+                            message[len(self.nick) + 1:])
                 else:
                     continue
 
@@ -163,13 +130,8 @@ class IRC(irclib.SimpleIRCClient):
 
             m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
             if m:
-                self.run_hook_command(
-                    mod_name,
-                    f,
-                    m.group(1),
-                    private=private,
-                    addressed=self.addressed,
-                    full_message=message)
+                self.run_hook_command(mod_name, f, m.group(1), private=private,
+                        addressed=self.addressed, full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
@@ -181,11 +143,32 @@ class IRC(irclib.SimpleIRCClient):
 
     def reply(self, msg):
         """Send a privmsg"""
-        if self.addressed:
-            nick = self.source.split("!")[0]
-            self.connection.privmsg(self.target, "%s: %s" % (nick, msg))
-        else:
-            self.connection.privmsg(self.target, msg)
+        if not hasattr(msg, "encode"):
+            try:
+                msg = str(msg)
+            except Exception:
+                self.log.error("msg cannot be converted to string")
+                return
+
+        msg = msg.encode("utf-8").split("\n")
+        # 10 is completely arbitrary for now
+        if len(msg) > 10:
+            msg = msg[0:8]
+            msg.append("...")
+
+        for line in msg:
+            if self.addressed:
+                source = self.source.split("!")[0]
+                self.connection.privmsg(self.target, "%s: %s" % (source, line))
+                self.log.info("-%s- <%s> %s: %s" % (self.target, self.nick,
+                        source, line))
+            else:
+                self.connection.privmsg(self.target, line)
+                if irclib.is_channel(self.target):
+                    self.log.info("-%s- <%s> %s" % (self.target, self.nick,
+                            line))
+                else:
+                    self.log.info("<%s> %s" % (self.nick, line))
 
     def privmsg(self, target, msg):
         """Send a privmsg"""
@@ -225,11 +208,16 @@ class IRC(irclib.SimpleIRCClient):
 
     def fetch_url(self, url, name):
         """Fetch a URL"""
+        class PyholeURLopener(urllib.FancyURLopener):
+            version = self.version
+
+        urllib._urlopener = PyholeURLopener()
+
         try:
             return urllib.urlopen(url)
         except IOError:
             self.reply("Unable to fetch %s data" % name)
-            return
+            return None
 
     def on_nicknameinuse(self, connection, event):
         """Ensure the use of unique IRC nick"""
@@ -238,13 +226,17 @@ class IRC(irclib.SimpleIRCClient):
         self.nick = "%s%d" % (self.nick, random_int)
         self.log.info("Setting IRC nick to '%s'" % self.nick)
         connection.nick("%s" % self.nick)
+        # Try to prevent nick flooding
+        time.sleep(1)
 
     def on_welcome(self, connection, event):
         """Join channels upon successful connection"""
+        if self.identify_password:
+            self.privmsg("NickServ", "IDENTIFY %s" % self.identify_password)
+
         for channel in self.channels:
             c = channel.split(" ", 1)
             if irclib.is_channel(c[0]):
-                self.log.info("Joining %s" % c[0])
                 if len(c) > 1:
                     connection.join(c[0], c[1])
                 else:
@@ -255,60 +247,88 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
-        self.log.info("Connecting to %s:%d as %s" % (
-            self.server,
-            self.port,
-            self.nick))
-        self.connect(
-            self.server,
-            self.port,
-            self.nick,
-            self.password,
-            ssl=self.ssl)
+        self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
+                self.nick))
+        self.connect(self.server, self.port, self.nick, self.password,
+                ssl=self.ssl)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked"""
-        self.target = event.target()
+        source = irclib.nm_to_n(event.source())
+        target = event.target()
+        nick, reason = event.arguments()
 
-        if event.arguments()[1] == self.nick:
-            self.log.info("Kicked from %s" % self.target)
-            self.log.info("Rejoining %s in %d seconds" % (
-                self.target,
-                self.rejoin_delay))
+        if nick == self.nick:
+            self.log.info("-%s- kicked by %s: %s" % (target, source, reason))
+            self.log.info("-%s- rejoining in %d seconds" % (target,
+                    self.rejoin_delay))
             time.sleep(self.rejoin_delay)
-            connection.join(self.target)
+            connection.join(target)
+        else:
+            self.log.info("-%s- %s was kicked by %s: %s" % (target, nick,
+                    source, reason))
 
     def on_invite(self, connection, event):
         """Join a channel upon invitation"""
-        self.source = event.source().split("@", 1)[0]
-        self.target = irclib.nm_to_n(event.source())
+        source = event.source().split("@", 1)[0]
 
-        if self.source in self.admins:
+        if source in self.admins:
             self.join_channel(event.arguments()[0])
 
     def on_ctcp(self, connection, event):
         """Respond to CTCP events"""
-        self.source = irclib.nm_to_n(event.source())
+        source = irclib.nm_to_n(event.source())
         ctcp = event.arguments()[0]
 
         if ctcp == "VERSION":
-            self.log.info("Received CTCP VERSION from %s" % self.source)
-            connection.ctcp_reply(self.source, "VERSION %s" % self.version)
+            self.log.info("Received CTCP VERSION from %s" % source)
+            connection.ctcp_reply(source, "VERSION %s" % self.version)
         elif ctcp == "PING":
             if len(event.arguments()) > 1:
-                self.log.info("Received CTCP PING from %s" % self.source)
-                connection.ctcp_reply(
-                    self.source,
-                    "PING %s" % event.arguments()[1])
+                self.log.info("Received CTCP PING from %s" % source)
+                connection.ctcp_reply(source,
+                        "PING %s" % event.arguments()[1])
+
+    def on_join(self, connection, event):
+        """Handle joins"""
+        target = event.target()
+        source = irclib.nm_to_n(event.source())
+        self.log.info("-%s- %s joined" % (target, source))
+
+    def on_part(self, connection, event):
+        """Handle parts"""
+        target = event.target()
+        source = irclib.nm_to_n(event.source())
+        self.log.info("-%s- %s left" % (target, source))
+
+    def on_quit(self, connection, event):
+        """Handle quits"""
+        source = irclib.nm_to_n(event.source())
+        self.log.info("%s quit" % source)
 
     def on_action(self, connection, event):
         """Handle IRC actions"""
-        self.source = event.source().split("@", 1)[0]
-        self.target = event.target()
-        nick = irclib.nm_to_n(event.source())
+        target = event.target()
+        source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info("%s * %s %s" % (self.target, nick, msg))
+        self.log.info(unicode("-%s- * %s %s" % (target, source, msg), "utf-8"))
+
+    def on_privnotice(self, connection, event):
+        """Handle private notices"""
+        source = irclib.nm_to_n(event.source())
+        msg = event.arguments()[0]
+
+        self.log.info(unicode("-%s- %s" % (source, msg), "utf-8"))
+
+    def on_pubnotice(self, connection, event):
+        """Handle public notices"""
+        target = event.target()
+        source = irclib.nm_to_n(event.source())
+        msg = event.arguments()[0]
+
+        self.log.info(unicode("-%s- <%s> %s" % (target, source, msg),
+                "utf-8"))
 
     def on_privmsg(self, connection, event):
         """Handle private messages"""
@@ -317,7 +337,7 @@ class IRC(irclib.SimpleIRCClient):
         msg = event.arguments()[0]
 
         if self.target != self.nick:
-            self.log.info("<%s> %s" % (self.target, msg))
+            self.log.info(unicode("<%s> %s" % (self.target, msg), "utf-8"))
             self.poll_messages(msg, private=True)
 
     def on_pubmsg(self, connection, event):
@@ -327,5 +347,21 @@ class IRC(irclib.SimpleIRCClient):
         nick = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info("%s <%s> %s" % (self.target, nick, msg))
+        self.log.info(unicode("-%s- <%s> %s" % (self.target, nick, msg),
+                "utf-8"))
         self.poll_messages(msg)
+
+
+def active_plugins():
+    """List active plugins"""
+    return ", ".join(sorted(plugin.active_plugins()))
+
+
+def active_commands():
+    """List active commands"""
+    return ", ".join(sorted(plugin.active_commands()))
+
+
+def active_keywords():
+    """List active keywords"""
+    return ", ".join(sorted(plugin.active_keywords()))

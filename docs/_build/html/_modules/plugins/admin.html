@@ -1,0 +1,212 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>plugins.admin &mdash; pyhole v0.5.4-875e4 documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.5.4-875e4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pyhole v0.5.4-875e4 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyhole v0.5.4-875e4 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for plugins.admin</h1><div class="highlight"><pre>
+<span class="c">#   Copyright 2010-2011 Josh Kearney</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Pyhole Administration Plugin&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">irc</span>
+<span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">plugin</span>
+<span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">utils</span>
+
+
+<div class="viewcode-block" id="Admin"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin">[docs]</a><span class="k">class</span> <span class="nc">Admin</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">Plugin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide administration functionality&quot;&quot;&quot;</span>
+
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;help&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Admin.help"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.help">[docs]</a>    <span class="k">def</span> <span class="nf">help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Learn how to use active commands (ex: .help &lt;command&gt;)&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_doc_string</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">doc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s">&quot;No help available for </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">help</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s">&quot;Active Commands: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">irc</span><span class="o">.</span><span class="n">active_commands</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s">&quot;Active Keywords: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">irc</span><span class="o">.</span><span class="n">active_keywords</span><span class="p">())</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;version&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Admin.version"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.version">[docs]</a>    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display the current version&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;reload&quot;</span><span class="p">)</span>
+    <span class="nd">@utils.admin</span>
+<div class="viewcode-block" id="Admin.reload"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reload all plugins&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">load_plugins</span><span class="p">(</span><span class="n">reload_plugins</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s">&quot;Loaded Plugins: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">irc</span><span class="o">.</span><span class="n">active_plugins</span><span class="p">())</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;op&quot;</span><span class="p">)</span>
+    <span class="nd">@utils.admin</span>
+<div class="viewcode-block" id="Admin.op"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.op">[docs]</a>    <span class="k">def</span> <span class="nf">op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Op a user (ex: .op &lt;channel&gt; &lt;nick&gt;)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">op_user</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">op</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;deop&quot;</span><span class="p">)</span>
+    <span class="nd">@utils.admin</span>
+<div class="viewcode-block" id="Admin.deop"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.deop">[docs]</a>    <span class="k">def</span> <span class="nf">deop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;De-op a user (ex: .deop &lt;channel&gt; &lt;nick&gt;)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">deop_user</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deop</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;nick&quot;</span><span class="p">)</span>
+    <span class="nd">@utils.admin</span>
+<div class="viewcode-block" id="Admin.nick"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.nick">[docs]</a>    <span class="k">def</span> <span class="nf">nick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Change IRC nick (ex: .nick &lt;nick&gt;)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">set_nick</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;join&quot;</span><span class="p">)</span>
+    <span class="nd">@utils.admin</span>
+<div class="viewcode-block" id="Admin.join"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.join">[docs]</a>    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Join a channel (ex: .join #channel [&lt;key&gt;])&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">join_channel</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">join</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;part&quot;</span><span class="p">)</span>
+    <span class="nd">@utils.admin</span>
+<div class="viewcode-block" id="Admin.part"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.part">[docs]</a>    <span class="k">def</span> <span class="nf">part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Part a channel (ex: .part &lt;channel&gt;)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">part_channel</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">part</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+</div>
+    <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;say&quot;</span><span class="p">)</span>
+    <span class="nd">@utils.admin</span>
+<div class="viewcode-block" id="Admin.say"><a class="viewcode-back" href="../../plugins.html#plugins.admin.Admin.say">[docs]</a>    <span class="k">def</span> <span class="nf">say</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a PRIVMSG (ex: .say &lt;channel&gt;|&lt;nick&gt; message)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">privmsg</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">say</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_find_doc_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Find the doc string for a plugin, command or keyword hook&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">plugin</span><span class="o">.</span><span class="n">active_plugin_classes</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">params</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">p</span><span class="o">.</span><span class="n">__doc__</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">cmd_hook</span><span class="p">,</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">plugin</span><span class="o">.</span><span class="n">hook_get_commands</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">cmd</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">params</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">cmd_hook</span><span class="o">.</span><span class="n">__doc__</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">kw_hook</span><span class="p">,</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">plugin</span><span class="o">.</span><span class="n">hook_get_keywords</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">kw</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="n">params</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">kw_hook</span><span class="o">.</span><span class="n">__doc__</span>
+
+        <span class="k">return</span> <span class="bp">None</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyhole v0.5.4-875e4 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Josh Kearney.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

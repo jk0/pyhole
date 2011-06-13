@@ -23,24 +23,21 @@ from pyhole import utils
 class News(plugin.Plugin):
     """Provide access to news feeds"""
 
-    def __init__(self, irc):
-        self.irc = irc
-        self.name = self.__class__.__name__
-
     @plugin.hook_add_command("cnn")
     @utils.spawn
     def cnn(self, params=None, **kwargs):
         """Display current CNN news (ex: .cnn)"""
         url = "http://rss.cnn.com/rss/cnn_topstories.rss"
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[2].childNodes[0].childNodes):
             if i >= 21 and i <= 28 and item.childNodes:
                 ref = item.childNodes
-                self.irc.reply("%s: %s" % (
-                    ref[1].firstChild.data,
-                    ref[5].firstChild.data))
+                self.irc.reply("%s: %s" % (ref[1].firstChild.data,
+                        ref[5].firstChild.data))
 
     @plugin.hook_add_command("digg")
     @utils.spawn
@@ -48,29 +45,15 @@ class News(plugin.Plugin):
         """Display current Digg news (ex: .digg)"""
         url = "http://services.digg.com/2.0/story.getTopNews?type=rss"
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[0].childNodes[1].childNodes):
             if i >= 15 and i <= 21 and item.childNodes:
                 ref = item.childNodes
-                self.irc.reply("%s: %s" % (
-                    ref[1].firstChild.data.strip(),
-                    ref[3].firstChild.data.strip()))
-
-    @plugin.hook_add_command("hackernews")
-    @utils.spawn
-    def hackernews(self, params=None, **kwargs):
-        """Display current Hacker News links (ex: .hackernews)"""
-        url = "http://news.ycombinator.com/rss"
-        response = self.irc.fetch_url(url, self.name)
-
-        xml = minidom.parseString(response.read())
-        for i, item in enumerate(xml.firstChild.childNodes[0].childNodes):
-            if i >= 3 and i <= 6:
-                ref = item.childNodes
-                self.irc.reply("%s: %s" % (
-                    ref[0].firstChild.data.strip(),
-                    ref[1].firstChild.data))
+                self.irc.reply("%s: %s" % (ref[1].firstChild.data.strip(),
+                        ref[3].firstChild.data.strip()))
 
     @plugin.hook_add_command("reddit")
     @utils.spawn
@@ -78,11 +61,13 @@ class News(plugin.Plugin):
         """Display current reddit news (ex: .reddit)"""
         url = "http://www.reddit.com/.rss"
         response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
         xml = minidom.parseString(response.read())
         for i, item in enumerate(xml.childNodes[0].childNodes[0].childNodes):
             if i >= 4 and i <= 7:
                 ref = item.childNodes
                 self.irc.reply("%s: %s" % (
-                    ref[0].firstChild.data.encode("ascii", "ignore"),
-                    ref[1].firstChild.data.encode("ascii", "ignore")))
+                        ref[0].firstChild.data.encode("ascii", "ignore"),
+                        ref[1].firstChild.data.encode("ascii", "ignore")))

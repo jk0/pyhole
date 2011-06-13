@@ -12,11 +12,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from plugins import admin
-from plugins import entertainment
-from plugins import launchpad
-from plugins import news
-from plugins import redmine
-from plugins import search
-from plugins import urls
-from plugins import weather
+"""Pyhole Plugins"""

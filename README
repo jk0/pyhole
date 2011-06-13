@@ -9,17 +9,21 @@ Core Requirements
 
 Plugin Requirements
 
-    - IMDbPY
+    - BeautifulSoup
     - launchpadlib
     - pywapi
     - simplejson
 
 
+Test Requirements
+
+    - nose
+
 Installation
 
     git clone git://github.com/jk0/pyhole.git
     cd pyhole
-    cp pyhole.cfg.dist pyhole.cfg
-    vi pyhole.cfg
+    cp pyhole.conf.example pyhole.conf
+    vi pyhole.conf
 
-    ./pyhole.py
+    ./bin/pyhole

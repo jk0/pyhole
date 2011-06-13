@@ -14,7 +14,7 @@
 
 """Pyhole URL Plugin"""
 
-import re
+from BeautifulSoup import BeautifulSoup
 
 from pyhole import plugin
 from pyhole import utils
@@ -23,7 +23,7 @@ from pyhole import utils
 class Url(plugin.Plugin):
     """Provide access to URL data"""
 
-    def __init__(self, irc):
+    def __init__(self, irc, conf_file):
         self.irc = irc
         self.name = self.__class__.__name__
         self.url = None
@@ -38,7 +38,7 @@ class Url(plugin.Plugin):
             if self.url:
                 self._find_title(self.url)
 
-    @plugin.hook_add_msg_regex("http:\/\/|www\.")
+    @plugin.hook_add_msg_regex("https?:\/\/|www\.")
     def _watch_for_url(self, params=None, **kwargs):
         """Watch and keep track of the latest URL"""
         try:
@@ -51,15 +51,14 @@ class Url(plugin.Plugin):
         if not url.startswith("http://"):
             url = "http://" + url
 
-        response = self.irc.fetch_url(url, self.name).read()
-        response = re.sub("\n", "", response)
-        response = re.sub("  +", "", response)
+        response = self.irc.fetch_url(url, self.name)
+        if not response:
+            return
 
-        r = re.compile("<title>(.*)</title>")
-        m = r.search(response)
+        soup = BeautifulSoup(response.read())
 
-        if m:
-            title = utils.decode_entities(m.group(1))
+        if soup.head:
+            title = utils.decode_entities(soup.head.title.string)
             self.irc.reply(title)
         else:
             self.irc.reply("No title found for %s" % url)
