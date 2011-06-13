@@ -4,4 +4,6 @@
 *.log
 *.xml
 *.conf
+.DS_Store
+.coverage
 logs/
