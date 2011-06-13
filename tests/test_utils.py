@@ -14,8 +14,6 @@
 
 """Pyhole Utils Unit Tests"""
 
-from __future__ import with_statement
-
 import os
 import sys
 import unittest
@@ -122,15 +120,7 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(isinstance(test_config, object))
 
     def test_version(self):
-        git_path = os.path.normpath(os.path.join(os.path.abspath(
-                sys.argv[0]), os.pardir, os.pardir, ".git/refs/heads/master"))
-
-        with open(git_path, "r") as git:
-            git_commit = git.read()
-        git.closed
-
-        test_ver = "pyhole v0 (%s) - http://pyhole.org" % git_commit[0:5]
-        self.assertEqual(utils.version("0"), test_ver)
+        self.assertEqual(len(utils.version()), 41)
 
     def test_get_home_directory(self):
         self.assertTrue(utils.get_home_directory().endswith("/.pyhole/"))
