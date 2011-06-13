@@ -34,7 +34,7 @@ Getting Involved
    github
 
 The Code
-----
+--------
 
 .. toctree::
    :maxdepth: 2
@@ -44,7 +44,7 @@ The Code
    tests
 
 Other
-------------------
+-----
 
 * :ref:`genindex`
 * :ref:`modindex`
