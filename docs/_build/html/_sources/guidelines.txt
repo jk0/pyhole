@@ -37,7 +37,8 @@ Imports
 
 * Import only modules
 * Import one module per line
-* Imports should be in alphabetical order
+* Imports are grouped by *import* and *from*
+* Imports should be in alphabetical order in their groups
 
 ::
 
@@ -54,7 +55,7 @@ Docstrings
 
 ::
 
-    """This is a one line docstring"""
+    """This is a single-line docstring"""
 
     """This is a multi-line docstring
 
