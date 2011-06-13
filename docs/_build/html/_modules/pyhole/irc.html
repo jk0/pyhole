@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyhole.irc &mdash; pyhole v0.5.4-2f4ef documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.5.4-2f4ef',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pyhole v0.5.4-2f4ef documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyhole v0.5.4-2f4ef documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for pyhole.irc</h1><div class="highlight"><pre>
+<span class="c">#   Copyright 2010-2011 Josh Kearney</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Event-based IRC Class&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">urllib</span>
+
+<span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">irclib</span>
+<span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">plugin</span>
+
+
+<div class="viewcode-block" id="IRC"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC">[docs]</a><span class="k">class</span> <span class="nc">IRC</span><span class="p">(</span><span class="n">irclib</span><span class="o">.</span><span class="n">SimpleIRCClient</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An IRC connection&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">):</span>
+        <span class="n">irclib</span><span class="o">.</span><span class="n">SimpleIRCClient</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conf_file</span> <span class="o">=</span> <span class="n">conf_file</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">admins</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;admins&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;list&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command_prefix</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;command_prefix&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reconnect_delay</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;reconnect_delay&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;int&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rejoin_delay</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;rejoin_delay&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;int&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plugin_dir</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;plugin_dir&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;server&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;password&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;port&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;int&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">6667</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ssl</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;ssl&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;bool&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;ipv6&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;bool&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bind_to</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;bind_to&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nick</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;nick&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identify_password</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;identify_password&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;channels&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s">&quot;list&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">addressed</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_plugins</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Connecting to </span><span class="si">%s</span><span class="s">:</span><span class="si">%d</span><span class="s"> as </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                <span class="n">ssl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ipv6</span><span class="p">,</span> <span class="n">localaddress</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bind_to</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IRC.load_plugins"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.load_plugins">[docs]</a>    <span class="k">def</span> <span class="nf">load_plugins</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reload_plugins</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load plugins and their commands respectively&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">reload_plugins</span><span class="p">:</span>
+            <span class="n">plugin</span><span class="o">.</span><span class="n">reload_plugins</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugin_dir</span><span class="p">,</span> <span class="n">irc</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">conf_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf_file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plugin</span><span class="o">.</span><span class="n">load_plugins</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plugin_dir</span><span class="p">,</span> <span class="n">irc</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">conf_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conf_file</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Loaded Plugins: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">active_plugins</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRC.run_hook_command"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.run_hook_command">[docs]</a>    <span class="k">def</span> <span class="nf">run_hook_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Make a call to a plugin hook&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">arg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Calling: </span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">(</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mod_name</span><span class="p">,</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">arg</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Calling: </span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">(None)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mod_name</span><span class="p">,</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.run_msg_regexp_hooks"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.run_msg_regexp_hooks">[docs]</a>    <span class="k">def</span> <span class="nf">run_msg_regexp_hooks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">private</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run regexp hooks&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">msg_regex</span> <span class="ow">in</span> <span class="n">plugin</span><span class="o">.</span><span class="n">hook_get_msg_regexs</span><span class="p">():</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">msg_regex</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_hook_command</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">private</span><span class="o">=</span><span class="n">private</span><span class="p">,</span>
+                        <span class="n">full_message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.run_keyword_hooks"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.run_keyword_hooks">[docs]</a>    <span class="k">def</span> <span class="nf">run_keyword_hooks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">private</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run keyword hooks&quot;&quot;&quot;</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">plugin</span><span class="o">.</span><span class="n">hook_get_keywords</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;^</span><span class="si">%s</span><span class="s">(.+)&quot;</span> <span class="o">%</span> <span class="n">kw</span><span class="p">,</span> <span class="n">word</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">run_hook_command</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                            <span class="n">private</span><span class="o">=</span><span class="n">private</span><span class="p">,</span> <span class="n">full_message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.run_command_hooks"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.run_command_hooks">[docs]</a>    <span class="k">def</span> <span class="nf">run_command_hooks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">private</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Run command hooks&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">plugin</span><span class="o">.</span><span class="n">hook_get_commands</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">addressed</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="k">if</span> <span class="n">private</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;^</span><span class="si">%s</span><span class="s">$|^</span><span class="si">%s</span><span class="s">\s(.*)$&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cmd</span><span class="p">),</span> <span class="n">message</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">run_hook_command</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                            <span class="n">private</span><span class="o">=</span><span class="n">private</span><span class="p">,</span> <span class="n">addressed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addressed</span><span class="p">,</span>
+                            <span class="n">full_message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">message</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command_prefix</span><span class="p">):</span>
+                <span class="c"># Strip off command prefix</span>
+                <span class="n">msg_rest</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">command_prefix</span><span class="p">):]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># Check for command starting with nick being addressed</span>
+                <span class="n">msg_start_upper</span> <span class="o">=</span> <span class="n">message</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">msg_start_upper</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;:&quot;</span><span class="p">:</span>
+                    <span class="c"># Get rest of string after &quot;nick:&quot; and white spaces</span>
+                    <span class="n">msg_rest</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;^\s+&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">,</span>
+                            <span class="n">message</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">addressed</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&quot;^</span><span class="si">%s</span><span class="s">$|^</span><span class="si">%s</span><span class="s">\s(.*)$&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cmd</span><span class="p">),</span> <span class="n">msg_rest</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_hook_command</span><span class="p">(</span><span class="n">mod_name</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">private</span><span class="o">=</span><span class="n">private</span><span class="p">,</span>
+                        <span class="n">addressed</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">addressed</span><span class="p">,</span> <span class="n">full_message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.poll_messages"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.poll_messages">[docs]</a>    <span class="k">def</span> <span class="nf">poll_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">private</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Watch for known commands&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addressed</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_command_hooks</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">private</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_keyword_hooks</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">private</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_msg_regexp_hooks</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">private</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.reply"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.reply">[docs]</a>    <span class="k">def</span> <span class="nf">reply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a privmsg&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="s">&quot;encode&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&quot;msg cannot be converted to string&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="c"># 10 is completely arbitrary for now</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;...&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">addressed</span><span class="p">:</span>
+                <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;!&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">privmsg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- &lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">,</span>
+                        <span class="n">source</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">privmsg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">irclib</span><span class="o">.</span><span class="n">is_channel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- &lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">,</span>
+                            <span class="n">line</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;&lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">,</span> <span class="n">line</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="IRC.privmsg"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.privmsg">[docs]</a>    <span class="k">def</span> <span class="nf">privmsg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a privmsg&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">privmsg</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.op_user"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.op_user">[docs]</a>    <span class="k">def</span> <span class="nf">op_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Op a user&quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&quot;+o </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="IRC.deop_user"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.deop_user">[docs]</a>    <span class="k">def</span> <span class="nf">deop_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;De-op a user&quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&quot;-o </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="IRC.set_nick"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.set_nick">[docs]</a>    <span class="k">def</span> <span class="nf">set_nick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set IRC nick&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nick</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">nick</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.join_channel"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.join_channel">[docs]</a>    <span class="k">def</span> <span class="nf">join_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Join a channel&quot;&quot;&quot;</span>
+        <span class="n">channel</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s">&quot;Joining </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">channel</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">irclib</span><span class="o">.</span><span class="n">is_channel</span><span class="p">(</span><span class="n">channel</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">channel</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">channel</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">channel</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">channel</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="IRC.part_channel"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.part_channel">[docs]</a>    <span class="k">def</span> <span class="nf">part_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Part a channel&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s">&quot;Parting </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">part</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.fetch_url"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.fetch_url">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetch a URL&quot;&quot;&quot;</span>
+        <span class="k">class</span> <span class="nc">PyholeURLopener</span><span class="p">(</span><span class="n">urllib</span><span class="o">.</span><span class="n">FancyURLopener</span><span class="p">):</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+
+        <span class="n">urllib</span><span class="o">.</span><span class="n">_urlopener</span> <span class="o">=</span> <span class="n">PyholeURLopener</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s">&quot;Unable to fetch </span><span class="si">%s</span><span class="s"> data&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="IRC.on_nicknameinuse"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_nicknameinuse">[docs]</a>    <span class="k">def</span> <span class="nf">on_nicknameinuse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure the use of unique IRC nick&quot;&quot;&quot;</span>
+        <span class="n">random_int</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;IRC nick &#39;</span><span class="si">%s</span><span class="s">&#39; is currently in use&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nick</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">,</span> <span class="n">random_int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Setting IRC nick to &#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">)</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">nick</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">)</span>
+        <span class="c"># Try to prevent nick flooding</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.on_welcome"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_welcome">[docs]</a>    <span class="k">def</span> <span class="nf">on_welcome</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Join channels upon successful connection&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">identify_password</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">privmsg</span><span class="p">(</span><span class="s">&quot;NickServ&quot;</span><span class="p">,</span> <span class="s">&quot;IDENTIFY </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">identify_password</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="n">channel</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">irclib</span><span class="o">.</span><span class="n">is_channel</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">connection</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">connection</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="IRC.on_disconnect"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_disconnect">[docs]</a>    <span class="k">def</span> <span class="nf">on_disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Attempt to reconnect after disconnection&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Disconnected from </span><span class="si">%s</span><span class="s">:</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Reconnecting in </span><span class="si">%d</span><span class="s"> seconds&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconnect_delay</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reconnect_delay</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Connecting to </span><span class="si">%s</span><span class="s">:</span><span class="si">%d</span><span class="s"> as </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">,</span>
+                <span class="n">ssl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ssl</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.on_kick"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_kick">[docs]</a>    <span class="k">def</span> <span class="nf">on_kick</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Automatically rejoin channel if kicked&quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+        <span class="n">nick</span><span class="p">,</span> <span class="n">reason</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">nick</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- kicked by </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- rejoining in </span><span class="si">%d</span><span class="s"> seconds&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">rejoin_delay</span><span class="p">))</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rejoin_delay</span><span class="p">)</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- </span><span class="si">%s</span><span class="s"> was kicked by </span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">nick</span><span class="p">,</span>
+                    <span class="n">source</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="IRC.on_invite"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_invite">[docs]</a>    <span class="k">def</span> <span class="nf">on_invite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Join a channel upon invitation&quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">admins</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">join_channel</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="IRC.on_ctcp"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_ctcp">[docs]</a>    <span class="k">def</span> <span class="nf">on_ctcp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Respond to CTCP events&quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="n">ctcp</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">ctcp</span> <span class="o">==</span> <span class="s">&quot;VERSION&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Received CTCP VERSION from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">ctcp_reply</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s">&quot;VERSION </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ctcp</span> <span class="o">==</span> <span class="s">&quot;PING&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;Received CTCP PING from </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+                <span class="n">connection</span><span class="o">.</span><span class="n">ctcp_reply</span><span class="p">(</span><span class="n">source</span><span class="p">,</span>
+                        <span class="s">&quot;PING </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="IRC.on_join"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_join">[docs]</a>    <span class="k">def</span> <span class="nf">on_join</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle joins&quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- </span><span class="si">%s</span><span class="s"> joined&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="IRC.on_part"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_part">[docs]</a>    <span class="k">def</span> <span class="nf">on_part</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle parts&quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- </span><span class="si">%s</span><span class="s"> left&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="IRC.on_quit"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_quit">[docs]</a>    <span class="k">def</span> <span class="nf">on_quit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle quits&quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s"> quit&quot;</span> <span class="o">%</span> <span class="n">source</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.on_action"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_action">[docs]</a>    <span class="k">def</span> <span class="nf">on_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle IRC actions&quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- * </span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">msg</span><span class="p">),</span> <span class="s">&quot;utf-8&quot;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="IRC.on_privnotice"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_privnotice">[docs]</a>    <span class="k">def</span> <span class="nf">on_privnotice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle private notices&quot;&quot;&quot;</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">msg</span><span class="p">),</span> <span class="s">&quot;utf-8&quot;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="IRC.on_pubnotice"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_pubnotice">[docs]</a>    <span class="k">def</span> <span class="nf">on_pubnotice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle public notices&quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- &lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">msg</span><span class="p">),</span>
+                <span class="s">&quot;utf-8&quot;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="IRC.on_privmsg"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_privmsg">[docs]</a>    <span class="k">def</span> <span class="nf">on_privmsg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle private messages&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nick</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;&lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">msg</span><span class="p">),</span> <span class="s">&quot;utf-8&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">poll_messages</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">private</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRC.on_pubmsg"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.IRC.on_pubmsg">[docs]</a>    <span class="k">def</span> <span class="nf">on_pubmsg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle public messages&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;@&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+        <span class="n">nick</span> <span class="o">=</span> <span class="n">irclib</span><span class="o">.</span><span class="n">nm_to_n</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">source</span><span class="p">())</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">arguments</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;-</span><span class="si">%s</span><span class="s">- &lt;</span><span class="si">%s</span><span class="s">&gt; </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">nick</span><span class="p">,</span> <span class="n">msg</span><span class="p">),</span>
+                <span class="s">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">poll_messages</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="active_plugins"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.active_plugins">[docs]</a><span class="k">def</span> <span class="nf">active_plugins</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;List active plugins&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">active_plugins</span><span class="p">()))</span>
+
+</div>
+<div class="viewcode-block" id="active_commands"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.active_commands">[docs]</a><span class="k">def</span> <span class="nf">active_commands</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;List active commands&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">active_commands</span><span class="p">()))</span>
+
+</div>
+<div class="viewcode-block" id="active_keywords"><a class="viewcode-back" href="../../pyhole.html#pyhole.irc.active_keywords">[docs]</a><span class="k">def</span> <span class="nf">active_keywords</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;List active keywords&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">active_keywords</span><span class="p">()))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyhole v0.5.4-2f4ef documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Josh Kearney.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

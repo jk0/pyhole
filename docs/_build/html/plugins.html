@@ -1,0 +1,446 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Pyhole Plugins &mdash; pyhole v0.5.4-2f4ef documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.5.4-2f4ef',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyhole v0.5.4-2f4ef documentation" href="index.html" />
+    <link rel="next" title="Pyhole Tests" href="tests.html" />
+    <link rel="prev" title="Pyhole Modules" href="pyhole.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tests.html" title="Pyhole Tests"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyhole.html" title="Pyhole Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyhole v0.5.4-2f4ef documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyhole-plugins">
+<h1>Pyhole Plugins<a class="headerlink" href="#pyhole-plugins" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-plugins.admin">
+<span id="plugins-admin"></span><h2><a class="reference internal" href="#module-plugins.admin" title="plugins.admin"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.admin</span></tt></a><a class="headerlink" href="#module-plugins.admin" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Administration Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.admin.</tt><tt class="descname">Admin</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide administration functionality</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">deop</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.deop"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>De-op a user (ex: .deop &lt;channel&gt; &lt;nick&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">help</tt><big>(</big><em>params=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.help"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Learn how to use active commands (ex: .help &lt;command&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">join</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.join"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Join a channel (ex: .join #channel [&lt;key&gt;])</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">nick</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.nick"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Change IRC nick (ex: .nick &lt;nick&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">op</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.op"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Op a user (ex: .op &lt;channel&gt; &lt;nick&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">part</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.part"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Part a channel (ex: .part &lt;channel&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">reload</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.reload"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Reload all plugins</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">say</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.say"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Send a PRIVMSG (ex: .say &lt;channel&gt;|&lt;nick&gt; message)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Admin.</tt><tt class="descname">version</tt><big>(</big><em>params=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/admin.html#Admin.version"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display the current version</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.dice">
+<span id="plugins-dice"></span><h2><a class="reference internal" href="#module-plugins.dice" title="plugins.dice"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.dice</span></tt></a><a class="headerlink" href="#module-plugins.dice" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole dice plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.dice.</tt><tt class="descname">Dice</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/dice.html#Dice"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to dice games</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Dice.</tt><tt class="descname">roll</tt><big>(</big><em>params=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/dice.html#Dice.roll"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Roll dice (ex: .roll 2d6)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.entertainment">
+<span id="plugins-entertainment"></span><h2><a class="reference internal" href="#module-plugins.entertainment" title="plugins.entertainment"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.entertainment</span></tt></a><a class="headerlink" href="#module-plugins.entertainment" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Entertainment Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.entertainment.</tt><tt class="descname">Entertainment</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/entertainment.html#Entertainment"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to entertaining sites</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Entertainment.</tt><tt class="descname">grouphug</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/entertainment.html#Entertainment.grouphug"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display a random Group Hug (ex: .grouphug)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Entertainment.</tt><tt class="descname">lastnight</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/entertainment.html#Entertainment.lastnight"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display a random Text From Last Night (ex: .lastnight)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.kernel">
+<span id="plugins-kernel"></span><h2><a class="reference internal" href="#module-plugins.kernel" title="plugins.kernel"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.kernel</span></tt></a><a class="headerlink" href="#module-plugins.kernel" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Kernel.org Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.kernel.</tt><tt class="descname">Kernel</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/kernel.html#Kernel"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to kernel.org data</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Kernel.</tt><tt class="descname">kernel</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/kernel.html#Kernel.kernel"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Retrieve the current kernel version (ex: .kernel)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Kernel.</tt><tt class="descname">keyword_k</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/kernel.html#Kernel.keyword_k"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Retrieve kernel.org Bugzilla bug information (ex: K12345)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.launchpad">
+<span id="plugins-launchpad"></span><h2><a class="reference internal" href="#module-plugins.launchpad" title="plugins.launchpad"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.launchpad</span></tt></a><a class="headerlink" href="#module-plugins.launchpad" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Launchpad Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.launchpad.</tt><tt class="descname">Launchpad</tt><big>(</big><em>irc</em>, <em>conf_file</em><big>)</big><a class="reference internal" href="_modules/plugins/launchpad.html#Launchpad"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to the Launchpad API</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Launchpad.</tt><tt class="descname">keyword_lp</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/launchpad.html#Launchpad.keyword_lp"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Retrieve Launchpad bug information (ex: LP12345)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Launchpad.</tt><tt class="descname">lbugs</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/launchpad.html#Launchpad.lbugs"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Launchpad bugs for a team (ex: .lbugs &lt;project&gt; &lt;team&gt;|&lt;user&gt;)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.news">
+<span id="plugins-news"></span><h2><a class="reference internal" href="#module-plugins.news" title="plugins.news"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.news</span></tt></a><a class="headerlink" href="#module-plugins.news" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole News Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.news.</tt><tt class="descname">News</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/news.html#News"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to news feeds</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">News.</tt><tt class="descname">cnn</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/news.html#News.cnn"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display current CNN news (ex: .cnn)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">News.</tt><tt class="descname">digg</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/news.html#News.digg"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display current Digg news (ex: .digg)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">News.</tt><tt class="descname">reddit</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/news.html#News.reddit"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display current reddit news (ex: .reddit)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.redmine">
+<span id="plugins-redmine"></span><h2><a class="reference internal" href="#module-plugins.redmine" title="plugins.redmine"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.redmine</span></tt></a><a class="headerlink" href="#module-plugins.redmine" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Redmine Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.redmine.</tt><tt class="descname">Redmine</tt><big>(</big><em>irc</em>, <em>conf_file</em><big>)</big><a class="reference internal" href="_modules/plugins/redmine.html#Redmine"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to the Redmine API</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Redmine.</tt><tt class="descname">keyword_rm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/redmine.html#Redmine.keyword_rm"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Retrieve Redmine bug information (ex: RM12345)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Redmine.</tt><tt class="descname">rbugs</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/redmine.html#Redmine.rbugs"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Redmine bugs for a user (ex: .rbugs &lt;login&gt;)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.search">
+<span id="plugins-search"></span><h2><a class="reference internal" href="#module-plugins.search" title="plugins.search"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.search</span></tt></a><a class="headerlink" href="#module-plugins.search" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Search Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.search.</tt><tt class="descname">Search</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to search engines</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Search.</tt><tt class="descname">alias_g</tt><big>(</big><em>params=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search.alias_g"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Alias of google</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Search.</tt><tt class="descname">google</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search.google"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Search Google (ex: .g &lt;query&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Search.</tt><tt class="descname">imdb</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search.imdb"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Search IMDb (ex: .imdb &lt;query&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Search.</tt><tt class="descname">twitter</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search.twitter"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Search Twitter (ex: .twitter &lt;query&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Search.</tt><tt class="descname">urban</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search.urban"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Search Urban Dictionary (ex: .urban &lt;query&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Search.</tt><tt class="descname">wikipedia</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search.wikipedia"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Search Wikipedia (ex: .wikipedia &lt;query&gt;)</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Search.</tt><tt class="descname">youtube</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/search.html#Search.youtube"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Search YouTube (ex: .youtube &lt;query&gt;)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.taskwarrior">
+<span id="plugins-taskwarrior"></span><h2><a class="reference internal" href="#module-plugins.taskwarrior" title="plugins.taskwarrior"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.taskwarrior</span></tt></a><a class="headerlink" href="#module-plugins.taskwarrior" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Taskwarrior Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.taskwarrior.</tt><tt class="descname">Taskwarrior</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/taskwarrior.html#Taskwarrior"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to Taskwarrior</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Taskwarrior.</tt><tt class="descname">task</tt><big>(</big><em>params=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/taskwarrior.html#Taskwarrior.task"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>List and add tasks (ex: .task &lt;list|add|done&gt;)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.urls">
+<span id="plugins-urls"></span><h2><a class="reference internal" href="#module-plugins.urls" title="plugins.urls"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.urls</span></tt></a><a class="headerlink" href="#module-plugins.urls" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole URL Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.urls.</tt><tt class="descname">Url</tt><big>(</big><em>irc</em>, <em>conf_file</em><big>)</big><a class="reference internal" href="_modules/plugins/urls.html#Url"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to URL data</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Url.</tt><tt class="descname">title</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/urls.html#Url.title"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display the title of the a URL (ex: .title &lt;url&gt;)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-plugins.weather">
+<span id="plugins-weather"></span><h2><a class="reference internal" href="#module-plugins.weather" title="plugins.weather"><tt class="xref py py-mod docutils literal"><span class="pre">plugins.weather</span></tt></a><a class="headerlink" href="#module-plugins.weather" title="Permalink to this headline">¶</a></h2>
+<p>Pyhole Weather Plugin</p>
+<dl class="class">
+<dt>
+<em class="property">class </em><tt class="descclassname">plugins.weather.</tt><tt class="descname">Weather</tt><big>(</big><em>irc</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/weather.html#Weather"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">pyhole.plugin.Plugin</span></tt></p>
+<p>Provide access to current weather data</p>
+<dl class="method">
+<dt>
+<tt class="descclassname">Weather.</tt><tt class="descname">alias_w</tt><big>(</big><em>params=None</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/weather.html#Weather.alias_w"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Alias of weather</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descclassname">Weather.</tt><tt class="descname">weather</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/plugins/weather.html#Weather.weather"><span class="viewcode-link">[source]</span></a></dt>
+<dd><p>Display current weather report (ex: .w [set] [&lt;location&gt;])</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Pyhole Plugins</a><ul>
+<li><a class="reference internal" href="#module-plugins.admin"><tt class="docutils literal"><span class="pre">plugins.admin</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.dice"><tt class="docutils literal"><span class="pre">plugins.dice</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.entertainment"><tt class="docutils literal"><span class="pre">plugins.entertainment</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.kernel"><tt class="docutils literal"><span class="pre">plugins.kernel</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.launchpad"><tt class="docutils literal"><span class="pre">plugins.launchpad</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.news"><tt class="docutils literal"><span class="pre">plugins.news</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.redmine"><tt class="docutils literal"><span class="pre">plugins.redmine</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.search"><tt class="docutils literal"><span class="pre">plugins.search</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.taskwarrior"><tt class="docutils literal"><span class="pre">plugins.taskwarrior</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.urls"><tt class="docutils literal"><span class="pre">plugins.urls</span></tt></a></li>
+<li><a class="reference internal" href="#module-plugins.weather"><tt class="docutils literal"><span class="pre">plugins.weather</span></tt></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyhole.html"
+                        title="previous chapter">Pyhole Modules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="tests.html"
+                        title="next chapter">Pyhole Tests</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/plugins.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tests.html" title="Pyhole Tests"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyhole.html" title="Pyhole Modules"
+             >previous</a> |</li>
+        <li><a href="index.html">pyhole v0.5.4-2f4ef documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Josh Kearney.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>

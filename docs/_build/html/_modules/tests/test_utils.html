@@ -1,0 +1,240 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tests.test_utils &mdash; pyhole v0.5.4-2f4ef documentation</title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.5.4-2f4ef',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="pyhole v0.5.4-2f4ef documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyhole v0.5.4-2f4ef documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tests.test_utils</h1><div class="highlight"><pre>
+<span class="c">#   Copyright 2011 Josh Kearney</span>
+<span class="c">#</span>
+<span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c">#   you may not use this file except in compliance with the License.</span>
+<span class="c">#   You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#       http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c">#   Unless required by applicable law or agreed to in writing, software</span>
+<span class="c">#   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+<span class="c">#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c">#   See the License for the specific language governing permissions and</span>
+<span class="c">#   limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Pyhole Utils Unit Tests&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">with_statement</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">utils</span>
+
+
+<div class="viewcode-block" id="TestUtils"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils">[docs]</a><span class="k">class</span> <span class="nc">TestUtils</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestUtils.setUp"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="s">&quot;tests&quot;</span><span class="p">,</span> <span class="s">&quot;pyhole_test_file&quot;</span><span class="p">,</span> <span class="s">&quot;foo&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_file</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_home_directory</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;tests/pyhole_test_file&quot;</span>
+</div>
+<div class="viewcode-block" id="TestUtils.tearDown"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.tearDown">[docs]</a>    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_file</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_file</span><span class="p">[:</span><span class="o">-</span><span class="mi">16</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_logger"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_logger">[docs]</a>    <span class="k">def</span> <span class="nf">test_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_log_dir</span> <span class="o">=</span> <span class="s">&quot;/tmp/pyhole_log_test&quot;</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span><span class="s">&quot;TEST&quot;</span><span class="p">,</span> <span class="n">test_log_dir</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s">&quot;TEST&quot;</span><span class="p">,</span> <span class="n">log</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">level</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">test_log_dir</span> <span class="o">+</span> <span class="s">&quot;/test.log&quot;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">test_log_dir</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&lt;foo&gt;bar&lt;/foo&gt;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;bar&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_2"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_2">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;foo&amp;nbsp;bar&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;foo bar&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_3"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_3">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;amp;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;&amp;&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_4"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_4">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_5"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_5">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#8212;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;-&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_6"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_6">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_6</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#8217;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;&#39;&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_7"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_7">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_7</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#8220;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_8"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_8">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_8</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#8221;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_9"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_9">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_9</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#8230;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;...&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_10"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_10">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_10</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&lt;[lol^&gt;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_11"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_11">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_11</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&lt;]*?&gt;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_12"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_12">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_12</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#39;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;&#39;&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_13"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_13">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_13</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#x22;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_14"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_14">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_14</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#x27;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;&#39;&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_15"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_15">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_15</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#x26;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;&amp;&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_16"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_16">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_16</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;ndash;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;-&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_decode_entities_17"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_decode_entities_17">[docs]</a>    <span class="k">def</span> <span class="nf">test_decode_entities_17</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_str</span> <span class="o">=</span> <span class="s">&quot;&amp;#64;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">decode_entities</span><span class="p">(</span><span class="n">test_str</span><span class="p">),</span> <span class="s">&quot;@&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_ensure_int"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_ensure_int">[docs]</a>    <span class="k">def</span> <span class="nf">test_ensure_int</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">ensure_int</span><span class="p">(</span><span class="s">&quot;3&quot;</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_ensure_int_2"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_ensure_int_2">[docs]</a>    <span class="k">def</span> <span class="nf">test_ensure_int_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">ensure_int</span><span class="p">(</span><span class="s">&quot;\W&quot;</span><span class="p">),</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_ensure_int_3"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_ensure_int_3">[docs]</a>    <span class="k">def</span> <span class="nf">test_ensure_int_3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">ensure_int</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">),</span> <span class="bp">None</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_load_config"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_load_config">[docs]</a>    <span class="k">def</span> <span class="nf">test_load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">test_config</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="s">&quot;Pyhole&quot;</span><span class="p">,</span> <span class="s">&quot;../pyhole.conf.example&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">test_config</span><span class="p">,</span> <span class="nb">object</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_version"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_version">[docs]</a>    <span class="k">def</span> <span class="nf">test_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="s">&quot;.git/refs/heads/master&quot;</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">git_path</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">git</span><span class="p">:</span>
+            <span class="n">git_commit</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">git</span><span class="o">.</span><span class="n">closed</span>
+
+        <span class="n">test_ver</span> <span class="o">=</span> <span class="s">&quot;pyhole v0 (</span><span class="si">%s</span><span class="s">) - http://pyhole.org&quot;</span> <span class="o">%</span> <span class="n">git_commit</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s">&quot;0&quot;</span><span class="p">),</span> <span class="n">test_ver</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_get_home_directory"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_get_home_directory">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_home_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">get_home_directory</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;/.pyhole/&quot;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_get_directory"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_get_directory">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new_dir</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_home_directory</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;test_dir&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">new_dir</span><span class="p">))</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">get_directory</span><span class="p">(</span><span class="s">&quot;test_dir&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">new_dir</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_write_file"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_write_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_write_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_file</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TestUtils.test_read_file"><a class="viewcode-back" href="../../tests.html#tests.test_utils.TestUtils.test_read_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">&quot;tests&quot;</span><span class="p">,</span> <span class="s">&quot;pyhole_test_file&quot;</span><span class="p">),</span> <span class="s">&quot;foo&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">pyhole v0.5.4-2f4ef documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Josh Kearney.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.7.
+    </div>
+  </body>
+</html>
