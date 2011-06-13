@@ -35,7 +35,7 @@ from pyhole import irc
 from pyhole import utils
 
 
-__VERSION__ = utils.version("0.5.4")
+__VERSION__ = utils.version()
 
 
 class IRCConnection(multiprocessing.Process):
