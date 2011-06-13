@@ -15,3 +15,25 @@
 
 Submitting Code
 ===============
+
+Follow the procedure below when submitting code.
+
+Standard GitHub Workflow
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Start off my forking [#]_ `pyhole <https://github.com/jk0/pyhole>`_ to your account on GitHub.
+From here you can make your changes::
+
+    git clone git://github.com/<GitHub ID>/pyhole.git
+    cd pyhole
+
+    ...make changes...
+
+    ./tools/run_tests.sh
+    git commit -a -m "Detailed commit message."
+    git push
+
+When done, open a Pull Request [#]_ on GitHub.
+
+.. [#] http://help.github.com/fork-a-repo/
+.. [#] http://help.github.com/send-pull-requests/
