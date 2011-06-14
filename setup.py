@@ -1,35 +1,46 @@
-import os
-import sys
+#   Copyright 2011 Josh Kearney
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 from setuptools import setup, find_packages
+
 from pyhole import utils
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-requirements = ['eventlet', 'pywapi', 'simplejson']
-if sys.version_info < (2,6):
-    requirements.append('simplejson')
-
-version = utils.version(short=True)
 
 setup(
-    name = "pyhole",
-    version = version,
-    description = "Modular IRC Bot for Python",
-    long_description = read('README'),
-    url = 'https://github.com/jk0/pyhole',
-    license = 'Apache',
-    author = 'Josh Kearney',
-    author_email = 'josh@jk0.org',
-    packages = find_packages(exclude=['tests']),
-    classifiers = [
-        'Development Status :: 5 - Production/Stable',
-        'Environment :: Service',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Information Technology',
-        'License :: OSI Approved :: Apache Software License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python',
+    name="irc-pyhole",
+    version=utils.version(short=True),
+    author="Josh Kearney",
+    author_email="josh@jk0.org",
+    description="A modular IRC bot for Python developers.",
+    license="Apache License, Version 2.0",
+    url="http://docs.pyhole.org",
+    packages=find_packages(exclude=["tests"]),
+    install_requires=[
+        "eventlet",
+        "beautifulsoup",
+        "launchpadlib",
+        "nose",
+        "pywapi",
+        "simplejson"
     ],
-    install_requires = requirements,
+    scripts=["bin/pyhole"],
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python",
+    ]
 )
