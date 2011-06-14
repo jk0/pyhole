@@ -30,7 +30,6 @@ setup(
         "eventlet",
         "beautifulsoup",
         "launchpadlib",
-        "nose",
         "pywapi",
         "simplejson"
     ],
