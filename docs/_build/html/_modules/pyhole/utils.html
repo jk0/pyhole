@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyhole.utils &mdash; pyhole v0.5.4-875e4 documentation</title>
+    <title>pyhole.utils &mdash; pyhole v0.5.4-31df7 documentation</title>
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.5.4-875e4',
+        VERSION:     '0.5.4-31df7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyhole v0.5.4-875e4 documentation" href="../../index.html" />
+    <link rel="top" title="pyhole v0.5.4-31df7 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.4-875e4 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyhole v0.5.4-31df7 documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -158,17 +158,29 @@
     <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">Config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="version"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.version">[docs]</a><span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="n">number</span><span class="p">):</span>
+<div class="viewcode-block" id="version"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.version">[docs]</a><span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Prepare the version string&quot;&quot;&quot;</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="s">&quot;0.5.4&quot;</span>
+    <span class="n">git_file</span> <span class="o">=</span> <span class="s">&quot;.git/refs/heads/master&quot;</span>
     <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="s">&quot;.git/refs/heads/master&quot;</span><span class="p">))</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">git_file</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="s">&quot;short&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">number</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">git_path</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s">&quot;pyhole v</span><span class="si">%s</span><span class="s"> - http://pyhole.org&quot;</span> <span class="o">%</span> <span class="n">number</span>
+        <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">git_file</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">git_path</span><span class="p">):</span>
+            <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/../&quot;</span> <span class="o">+</span> <span class="n">git_file</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">git_path</span><span class="p">):</span>
+                <span class="k">return</span> <span class="s">&quot;pyhole v</span><span class="si">%s</span><span class="s"> - http://pyhole.org&quot;</span> <span class="o">%</span> <span class="n">number</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">git_path</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">git</span><span class="p">:</span>
         <span class="n">git_commit</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
     <span class="n">git</span><span class="o">.</span><span class="n">closed</span>
+
+    <span class="k">if</span> <span class="s">&quot;long&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">git_commit</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="s">&quot;pyhole v</span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">) - http://pyhole.org&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">git_commit</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 
@@ -246,7 +258,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.4-875e4 documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyhole v0.5.4-31df7 documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
