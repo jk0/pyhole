@@ -33,7 +33,7 @@ Pyhole Tests
     :show-inheritance:
 
 :mod:`tests.test_version`
------------------------
+-------------------------
 .. automodule:: tests.test_version
     :noindex:
     :members:
