@@ -33,9 +33,10 @@ if os.path.exists(os.path.join(PYHOLE_PATH, "pyhole", "__init__.py")):
 
 from pyhole import irc
 from pyhole import utils
+from pyhole import version
 
 
-__VERSION__ = utils.version()
+__VERSION__ = version.version_string()
 
 
 class IRCConnection(multiprocessing.Process):

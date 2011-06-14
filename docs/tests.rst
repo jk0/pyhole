@@ -31,3 +31,11 @@ Pyhole Tests
     :members:
     :undoc-members:
     :show-inheritance:
+
+:mod:`tests.test_version`
+-----------------------
+.. automodule:: tests.test_version
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:

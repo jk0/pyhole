@@ -114,9 +114,6 @@ class TestUtils(unittest.TestCase):
     def test_ensure_int_3(self):
         self.assertEqual(utils.ensure_int("a"), None)
 
-    def test_version(self):
-        self.assertEqual(len(utils.version()), 41)
-
     def test_get_home_directory(self):
         self.assertTrue(utils.get_home_directory().endswith("/.pyhole/"))
 

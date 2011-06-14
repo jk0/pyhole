@@ -14,12 +14,12 @@
 
 import setuptools
 
-from pyhole import utils
+from pyhole import version
 
 
 setuptools.setup(
     name="irc-pyhole",
-    version=utils.version(short=True),
+    version=version.version(),
     author="Josh Kearney",
     author_email="josh@jk0.org",
     description="A modular IRC bot for Python developers.",

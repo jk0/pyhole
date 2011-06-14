@@ -111,33 +111,6 @@ def load_config(section, conf):
     return config.Config(conf, section)
 
 
-def version(**kwargs):
-    """Prepare the version string"""
-    number = "0.5.5"
-    git_file = ".git/refs/heads/master"
-    git_path = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
-            os.pardir, os.pardir, git_file))
-
-    if "short" in kwargs:
-        return number
-
-    if not os.path.exists(git_path):
-        git_path = os.getcwd() + "/" + git_file
-        if not os.path.exists(git_path):
-            git_path = os.getcwd() + "/../" + git_file
-            if not os.path.exists(git_path):
-                return "pyhole v%s - http://pyhole.org" % number
-
-    with open(git_path, "r") as git:
-        git_commit = git.read()
-    git.closed
-
-    if "long" in kwargs:
-        return "%s-%s" % (number, git_commit[0:5])
-
-    return "pyhole v%s (%s) - http://pyhole.org" % (number, git_commit[0:5])
-
-
 def get_home_directory():
     """Return the home directory"""
     home_dir = os.getenv("HOME") + "/.pyhole/"
