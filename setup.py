@@ -12,12 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from setuptools import setup, find_packages
+import setuptools
 
 from pyhole import utils
 
 
-setup(
+setuptools.setup(
     name="irc-pyhole",
     version=utils.version(short=True),
     author="Josh Kearney",
@@ -25,7 +25,7 @@ setup(
     description="A modular IRC bot for Python developers.",
     license="Apache License, Version 2.0",
     url="http://docs.pyhole.org",
-    packages=find_packages(exclude=["tests"]),
+    packages=["pyhole", "pyhole.plugins"],
     install_requires=[
         "eventlet",
         "beautifulsoup",

@@ -7,36 +7,36 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>plugins.search &mdash; pyhole v0.5.5-c9835 documentation</title>
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <title>pyhole.plugins.search &mdash; pyhole v0.5.5-c9835 documentation</title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
+        URL_ROOT:    '../../../',
         VERSION:     '0.5.5-c9835',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyhole v0.5.5-c9835 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyhole v0.5.5-c9835 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -45,7 +45,7 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for plugins.search</h1><div class="highlight"><pre>
+  <h1>Source code for pyhole.plugins.search</h1><div class="highlight"><pre>
 <span class="c">#   Copyright 2010-2011 Josh Kearney</span>
 <span class="c">#</span>
 <span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -73,12 +73,12 @@
 <span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">utils</span>
 
 
-<div class="viewcode-block" id="Search"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search">[docs]</a><span class="k">class</span> <span class="nc">Search</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">Plugin</span><span class="p">):</span>
+<div class="viewcode-block" id="Search"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search">[docs]</a><span class="k">class</span> <span class="nc">Search</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">Plugin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Provide access to search engines&quot;&quot;&quot;</span>
 
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;google&quot;</span><span class="p">)</span>
     <span class="nd">@utils.spawn</span>
-<div class="viewcode-block" id="Search.google"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search.google">[docs]</a>    <span class="k">def</span> <span class="nf">google</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Search.google"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search.google">[docs]</a>    <span class="k">def</span> <span class="nf">google</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search Google (ex: .g &lt;query&gt;)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&quot;q&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">})</span>
@@ -101,13 +101,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">irc</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">google</span><span class="o">.</span><span class="n">__doc__</span><span class="p">)</span>
 </div>
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;g&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="Search.alias_g"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search.alias_g">[docs]</a>    <span class="k">def</span> <span class="nf">alias_g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Search.alias_g"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search.alias_g">[docs]</a>    <span class="k">def</span> <span class="nf">alias_g</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Alias of google&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">google</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </div>
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;imdb&quot;</span><span class="p">)</span>
     <span class="nd">@utils.spawn</span>
-<div class="viewcode-block" id="Search.imdb"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search.imdb">[docs]</a>    <span class="k">def</span> <span class="nf">imdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Search.imdb"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search.imdb">[docs]</a>    <span class="k">def</span> <span class="nf">imdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search IMDb (ex: .imdb &lt;query&gt;)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&quot;q&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">})</span>
@@ -141,7 +141,7 @@
 </div>
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;twitter&quot;</span><span class="p">)</span>
     <span class="nd">@utils.spawn</span>
-<div class="viewcode-block" id="Search.twitter"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search.twitter">[docs]</a>    <span class="k">def</span> <span class="nf">twitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Search.twitter"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search.twitter">[docs]</a>    <span class="k">def</span> <span class="nf">twitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search Twitter (ex: .twitter &lt;query&gt;)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&quot;q&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">,</span> <span class="s">&quot;rpp&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
@@ -164,7 +164,7 @@
 </div>
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;urban&quot;</span><span class="p">)</span>
     <span class="nd">@utils.spawn</span>
-<div class="viewcode-block" id="Search.urban"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search.urban">[docs]</a>    <span class="k">def</span> <span class="nf">urban</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Search.urban"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search.urban">[docs]</a>    <span class="k">def</span> <span class="nf">urban</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search Urban Dictionary (ex: .urban &lt;query&gt;)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&quot;term&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">})</span>
@@ -195,7 +195,7 @@
 </div>
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;wikipedia&quot;</span><span class="p">)</span>
     <span class="nd">@utils.spawn</span>
-<div class="viewcode-block" id="Search.wikipedia"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search.wikipedia">[docs]</a>    <span class="k">def</span> <span class="nf">wikipedia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Search.wikipedia"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search.wikipedia">[docs]</a>    <span class="k">def</span> <span class="nf">wikipedia</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search Wikipedia (ex: .wikipedia &lt;query&gt;)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&quot;action&quot;</span><span class="p">:</span> <span class="s">&quot;query&quot;</span><span class="p">,</span>
@@ -216,7 +216,7 @@
 </div>
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;youtube&quot;</span><span class="p">)</span>
     <span class="nd">@utils.spawn</span>
-<div class="viewcode-block" id="Search.youtube"><a class="viewcode-back" href="../../plugins.html#plugins.search.Search.youtube">[docs]</a>    <span class="k">def</span> <span class="nf">youtube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Search.youtube"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.search.Search.youtube">[docs]</a>    <span class="k">def</span> <span class="nf">youtube</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Search YouTube (ex: .youtube &lt;query&gt;)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="n">query</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span><span class="s">&quot;q&quot;</span><span class="p">:</span> <span class="n">params</span><span class="p">,</span> <span class="s">&quot;v&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;max-results&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
@@ -245,7 +245,7 @@
         <div class="sphinxsidebarwrapper">
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
+    <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
@@ -264,13 +264,13 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

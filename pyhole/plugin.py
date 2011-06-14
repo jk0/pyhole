@@ -147,18 +147,16 @@ def _init_plugins(*args, **kwargs):
                             (attr.__module__, attr, hook_arg))
 
 
-def load_plugins(plugindir, *args, **kwargs):
+def load_plugins(*args, **kwargs):
     """
     Module function that loads plugins from a particular directory
     """
     config = utils.load_config("Pyhole", kwargs.get("conf_file"))
-
-    plugins = os.path.abspath(plugindir)
     plugin_names = config.get("plugins", type="list")
 
     for p in plugin_names:
         try:
-            __import__(os.path.basename(plugindir), globals(), locals(), [p])
+            __import__("pyhole.plugins", globals(), locals(), [p])
         except Exception, e:
             # Catch all because this could be many things
             kwargs.get("irc").log.error(e)
@@ -167,7 +165,7 @@ def load_plugins(plugindir, *args, **kwargs):
     _init_plugins(*args, **kwargs)
 
 
-def reload_plugins(plugins, *args, **kwargs):
+def reload_plugins(*args, **kwargs):
     """
     Module function that'll reload all of the plugins
     """
@@ -180,7 +178,7 @@ def reload_plugins(plugins, *args, **kwargs):
 
     # Now reload all of the plugins
     plugins_to_reload = []
-    plugindir = os.path.basename(plugins)
+    plugindir = "pyhole.plugins"
 
     # Reload existing plugins
     for mod, val in sys.modules.items():
@@ -201,7 +199,7 @@ def reload_plugins(plugins, *args, **kwargs):
             pass
 
     # Load new plugins
-    load_plugins(plugindir, *args, **kwargs)
+    load_plugins(*args, **kwargs)
 
 
 def active_plugins():

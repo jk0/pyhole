@@ -191,7 +191,6 @@ command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
 debug: False
-plugin_dir: /home/pyhole/plugins
 plugins: admin, dice, entertainment, news, search, urls, weather
 
 [Redmine]

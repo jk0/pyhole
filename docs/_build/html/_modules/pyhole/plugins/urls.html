@@ -7,36 +7,36 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>plugins.urls &mdash; pyhole v0.5.5-c9835 documentation</title>
-    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <title>pyhole.plugins.urls &mdash; pyhole v0.5.5-c9835 documentation</title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
+        URL_ROOT:    '../../../',
         VERSION:     '0.5.5-c9835',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
       };
     </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyhole v0.5.5-c9835 documentation" href="../../index.html" />
-    <link rel="up" title="Module code" href="../index.html" /> 
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="pyhole v0.5.5-c9835 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body>
     <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
-          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -45,7 +45,7 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for plugins.urls</h1><div class="highlight"><pre>
+  <h1>Source code for pyhole.plugins.urls</h1><div class="highlight"><pre>
 <span class="c">#   Copyright 2011 Josh Kearney</span>
 <span class="c">#</span>
 <span class="c">#   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
@@ -68,7 +68,7 @@
 <span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">utils</span>
 
 
-<div class="viewcode-block" id="Url"><a class="viewcode-back" href="../../plugins.html#plugins.urls.Url">[docs]</a><span class="k">class</span> <span class="nc">Url</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">Plugin</span><span class="p">):</span>
+<div class="viewcode-block" id="Url"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.urls.Url">[docs]</a><span class="k">class</span> <span class="nc">Url</span><span class="p">(</span><span class="n">plugin</span><span class="o">.</span><span class="n">Plugin</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Provide access to URL data&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">irc</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">):</span>
@@ -78,7 +78,7 @@
 
     <span class="nd">@plugin.hook_add_command</span><span class="p">(</span><span class="s">&quot;title&quot;</span><span class="p">)</span>
     <span class="nd">@utils.spawn</span>
-<div class="viewcode-block" id="Url.title"><a class="viewcode-back" href="../../plugins.html#plugins.urls.Url.title">[docs]</a>    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Url.title"><a class="viewcode-back" href="../../../plugins.html#pyhole.plugins.urls.Url.title">[docs]</a>    <span class="k">def</span> <span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Display the title of the a URL (ex: .title &lt;url&gt;)&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_find_title</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
@@ -119,7 +119,7 @@
         <div class="sphinxsidebarwrapper">
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
+    <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" size="18" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
@@ -138,13 +138,13 @@
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
-          <a href="../../genindex.html" title="General Index"
+          <a href="../../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="../../py-modindex.html" title="Python Module Index"
+          <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
-          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+        <li><a href="../../../index.html">pyhole v0.5.5-c9835 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
