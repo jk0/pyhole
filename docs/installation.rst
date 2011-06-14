@@ -24,7 +24,7 @@ From Source
     git clone git://github.com/jk0/pyhole.git
     cd pyhole
     ./bin/pyhole
-    vi pyhole.conf
+    vi ~/.pyhole/pyhole.conf
     ./bin/pyhole
 
 Python Package

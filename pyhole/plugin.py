@@ -20,7 +20,7 @@ import functools
 import os
 import sys
 
-from pyhole import utils
+import utils
 
 
 def _reset_variables():

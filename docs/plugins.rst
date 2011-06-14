@@ -16,89 +16,89 @@
 Pyhole Plugins
 ==============
 
-:mod:`plugins.admin`
---------------------
-.. automodule:: plugins.admin
+:mod:`pyhole.plugins.admin`
+---------------------------
+.. automodule:: pyhole.plugins.admin
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`plugins.dice`
--------------------
-.. automodule:: plugins.dice
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`plugins.entertainment`
-----------------------------
-.. automodule:: plugins.entertainment
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`plugins.kernel`
----------------------
-.. automodule:: plugins.kernel
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`plugins.launchpad`
-------------------------
-.. automodule:: plugins.launchpad
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`plugins.news`
--------------------
-.. automodule:: plugins.news
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`plugins.redmine`
-----------------------
-.. automodule:: plugins.redmine
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`plugins.search`
----------------------
-.. automodule:: plugins.search
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`plugins.taskwarrior`
+:mod:`pyhole.plugins.dice`
 --------------------------
-.. automodule:: plugins.taskwarrior
+.. automodule:: pyhole.plugins.dice
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`plugins.urls`
--------------------
-.. automodule:: plugins.urls
+:mod:`pyhole.plugins.entertainment`
+-----------------------------------
+.. automodule:: pyhole.plugins.entertainment
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`plugins.weather`
-----------------------
-.. automodule:: plugins.weather
+:mod:`pyhole.plugins.kernel`
+----------------------------
+.. automodule:: pyhole.plugins.kernel
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.launchpad`
+-------------------------------
+.. automodule:: pyhole.plugins.launchpad
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.news`
+--------------------------
+.. automodule:: pyhole.plugins.news
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.redmine`
+-----------------------------
+.. automodule:: pyhole.plugins.redmine
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.search`
+----------------------------
+.. automodule:: pyhole.plugins.search
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.taskwarrior`
+---------------------------------
+.. automodule:: pyhole.plugins.taskwarrior
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.urls`
+--------------------------
+.. automodule:: pyhole.plugins.urls
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.weather`
+-----------------------------
+.. automodule:: pyhole.plugins.weather
     :noindex:
     :members:
     :undoc-members:

@@ -19,8 +19,8 @@ import re
 import time
 import urllib
 
-from pyhole import irclib
-from pyhole import plugin
+import irclib
+import plugin
 
 
 class IRC(irclib.SimpleIRCClient):

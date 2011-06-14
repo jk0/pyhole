@@ -31,12 +31,11 @@ class TestUtils(unittest.TestCase):
         os.rmdir(self.new_file[:-16])
 
     def test_logger(self):
-        test_log_dir = "/tmp/pyhole_log_test"
-        log = utils.logger("TEST", test_log_dir, True)
+        test_log_dir = utils.get_home_directory() + "logs/"
+        log = utils.logger("TEST", True)
         self.assertEqual("TEST", log.name)
         self.assertEqual(log.level, 0)
-        os.unlink(test_log_dir + "/test.log")
-        os.rmdir(test_log_dir)
+        os.unlink(test_log_dir + "test.log")
 
     def test_decode_entities(self):
         test_str = "<foo>bar</foo>"
@@ -114,10 +113,6 @@ class TestUtils(unittest.TestCase):
 
     def test_ensure_int_3(self):
         self.assertEqual(utils.ensure_int("a"), None)
-
-    def test_load_config(self):
-        test_config = utils.load_config("Pyhole", "../pyhole.conf.example")
-        self.assertTrue(isinstance(test_config, object))
 
     def test_version(self):
         self.assertEqual(len(utils.version()), 41)

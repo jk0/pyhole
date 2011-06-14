@@ -23,14 +23,15 @@ import os
 import re
 import sys
 
-from pyhole import config
+import config
 
 
 eventlet.monkey_patch()
 
 
-def logger(name, log_dir, debug=False):
+def logger(name, debug=False):
     """Log handler"""
+    log_dir = get_home_directory() + "logs"
     level = logging.DEBUG if debug else logging.INFO
     format = "%(asctime)s [%(name)s] %(message)s"
     datefmt = "%H:%M:%S"
@@ -112,7 +113,7 @@ def load_config(section, conf):
 
 def version(**kwargs):
     """Prepare the version string"""
-    number = "0.5.4"
+    number = "0.5.5"
     git_file = ".git/refs/heads/master"
     git_path = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
             os.pardir, os.pardir, git_file))
@@ -139,16 +140,17 @@ def version(**kwargs):
 
 def get_home_directory():
     """Return the home directory"""
-    return os.getenv("HOME") + "/.pyhole/"
+    home_dir = os.getenv("HOME") + "/.pyhole/"
+    if not os.path.exists(home_dir):
+        os.makedirs(home_dir)
+
+    return home_dir
 
 
 def get_directory(new_dir):
     """Return a directory"""
     home_dir = get_home_directory()
     new_dir = home_dir + new_dir
-
-    if not os.path.exists(home_dir):
-        os.makedirs(home_dir)
 
     if not os.path.exists(new_dir):
         os.makedirs(new_dir)
@@ -177,3 +179,50 @@ def read_file(dir, file):
         return data
     except IOError:
         return None
+
+
+def generate_config():
+    """Generate an example config"""
+    example = """# Global Configuration
+
+[Pyhole]
+admins: nick!ident, nick2!ident
+command_prefix: .
+reconnect_delay: 60
+rejoin_delay: 5
+debug: False
+plugin_dir: /home/pyhole/plugins
+plugins: admin, dice, entertainment, news, search, urls, weather
+
+[Redmine]
+domain: redmine.example.com
+key: abcd1234
+
+# IRC Network Configuration
+
+[FreeNode]
+server: verne.freenode.net
+password:
+port: 7000
+ssl: True
+ipv6: True
+bind_to: fe80::1
+nick: mynick
+identify_password: mypass
+channels: #mychannel key, #mychannel2
+
+[EFnet]
+server: irc.efnet.net
+password:
+port: 6667
+ssl: False
+ipv6: False
+bind_to:
+nick: mynick
+identify_password:
+channels: #mychannel key, #mychannel2
+"""
+
+    with open(get_home_directory() + "pyhole.conf", "w") as f:
+        f.write(example)
+    f.closed

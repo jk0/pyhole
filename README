@@ -23,7 +23,6 @@ Installation
 
     git clone git://github.com/jk0/pyhole.git
     cd pyhole
-    cp pyhole.conf.example pyhole.conf
-    vi pyhole.conf
-
+    ./bin/pyhole
+    vi ~/.pyhole/pyhole.conf
     ./bin/pyhole
