@@ -31,13 +31,10 @@ eventlet.monkey_patch()
 
 def logger(name, debug=False):
     """Log handler"""
-    log_dir = get_home_directory() + "logs"
+    log_dir = get_directory("logs")
     level = logging.DEBUG if debug else logging.INFO
     format = "%(asctime)s [%(name)s] %(message)s"
     datefmt = "%H:%M:%S"
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
 
     logging.basicConfig(level=level, format=format, datefmt=datefmt)
 

@@ -130,6 +130,7 @@ def _init_plugins(*args, **kwargs):
 
 def load_user_plugin(plugin, *args, **kwargs):
     """Load a user plugin"""
+    sys.path.append(utils.get_home_directory() + "plugins")
     user_plugins = os.listdir(utils.get_directory("plugins"))
 
     for user_plugin in user_plugins:
@@ -146,8 +147,6 @@ def load_user_plugin(plugin, *args, **kwargs):
 
 def load_plugins(*args, **kwargs):
     """Module function that loads plugins from a particular directory"""
-    sys.path.append(utils.get_home_directory() + "plugins")
-
     config = utils.load_config("Pyhole", kwargs.get("conf_file"))
     plugin_names = config.get("plugins", type="list")
 
