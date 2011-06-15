@@ -19,7 +19,7 @@ from pyhole import version
 
 setuptools.setup(
     name="irc-pyhole",
-    version=version.version(),
+    version=version.version_hash(),
     author="Josh Kearney",
     author_email="josh@jk0.org",
     description="A modular IRC bot for Python developers.",
