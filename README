@@ -12,7 +12,6 @@ Plugin Requirements
     - BeautifulSoup
     - launchpadlib
     - pywapi
-    - simplejson
 
 
 Test Requirements

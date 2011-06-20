@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pyhole.utils &mdash; pyhole v0.5.5-7a22d documentation</title>
+    <title>pyhole.utils &mdash; pyhole v0.5.5-c55ee documentation</title>
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.5.5-7a22d',
+        VERSION:     '0.5.5-c55ee',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
-    <link rel="top" title="pyhole v0.5.5-7a22d documentation" href="../../index.html" />
+    <link rel="top" title="pyhole v0.5.5-c55ee documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body>
@@ -35,7 +35,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.5-7a22d documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyhole v0.5.5-c55ee documentation</a> &raquo;</li>
           <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
       </ul>
     </div>  
@@ -71,20 +71,18 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 
-<span class="kn">from</span> <span class="nn">pyhole</span> <span class="kn">import</span> <span class="n">config</span>
+<span class="kn">import</span> <span class="nn">config</span>
 
 
 <span class="n">eventlet</span><span class="o">.</span><span class="n">monkey_patch</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="logger"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.logger">[docs]</a><span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">log_dir</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="logger"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.logger">[docs]</a><span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Log handler&quot;&quot;&quot;</span>
+    <span class="n">log_dir</span> <span class="o">=</span> <span class="n">get_directory</span><span class="p">(</span><span class="s">&quot;logs&quot;</span><span class="p">)</span>
     <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span> <span class="k">if</span> <span class="n">debug</span> <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
     <span class="n">format</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%(asctime)s</span><span class="s"> [</span><span class="si">%(name)s</span><span class="s">] </span><span class="si">%(message)s</span><span class="s">&quot;</span>
     <span class="n">datefmt</span> <span class="o">=</span> <span class="s">&quot;%H:%M:%S&quot;</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_dir</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">log_dir</span><span class="p">)</span>
 
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">level</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="n">format</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="n">datefmt</span><span class="p">)</span>
 
@@ -158,45 +156,19 @@
     <span class="k">return</span> <span class="n">config</span><span class="o">.</span><span class="n">Config</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
 
 </div>
-<div class="viewcode-block" id="version"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.version">[docs]</a><span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Prepare the version string&quot;&quot;&quot;</span>
-    <span class="n">number</span> <span class="o">=</span> <span class="s">&quot;0.5.4&quot;</span>
-    <span class="n">git_file</span> <span class="o">=</span> <span class="s">&quot;.git/refs/heads/master&quot;</span>
-    <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">,</span> <span class="n">git_file</span><span class="p">))</span>
-
-    <span class="k">if</span> <span class="s">&quot;short&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">number</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">git_path</span><span class="p">):</span>
-        <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">git_file</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">git_path</span><span class="p">):</span>
-            <span class="n">git_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/../&quot;</span> <span class="o">+</span> <span class="n">git_file</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">git_path</span><span class="p">):</span>
-                <span class="k">return</span> <span class="s">&quot;pyhole v</span><span class="si">%s</span><span class="s"> - http://pyhole.org&quot;</span> <span class="o">%</span> <span class="n">number</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">git_path</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">git</span><span class="p">:</span>
-        <span class="n">git_commit</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="n">git</span><span class="o">.</span><span class="n">closed</span>
-
-    <span class="k">if</span> <span class="s">&quot;long&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">git_commit</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
-
-    <span class="k">return</span> <span class="s">&quot;pyhole v</span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">) - http://pyhole.org&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">number</span><span class="p">,</span> <span class="n">git_commit</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
-
-</div>
 <div class="viewcode-block" id="get_home_directory"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.get_home_directory">[docs]</a><span class="k">def</span> <span class="nf">get_home_directory</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Return the home directory&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&quot;HOME&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;/.pyhole/&quot;</span>
+    <span class="n">home_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s">&quot;HOME&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;/.pyhole/&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">home_dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">home_dir</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">home_dir</span>
 
 </div>
 <div class="viewcode-block" id="get_directory"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.get_directory">[docs]</a><span class="k">def</span> <span class="nf">get_directory</span><span class="p">(</span><span class="n">new_dir</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return a directory&quot;&quot;&quot;</span>
     <span class="n">home_dir</span> <span class="o">=</span> <span class="n">get_home_directory</span><span class="p">()</span>
     <span class="n">new_dir</span> <span class="o">=</span> <span class="n">home_dir</span> <span class="o">+</span> <span class="n">new_dir</span>
-
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">home_dir</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">home_dir</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">new_dir</span><span class="p">):</span>
         <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">new_dir</span><span class="p">)</span>
@@ -224,7 +196,53 @@
 
         <span class="k">return</span> <span class="n">data</span>
     <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">None</span></div>
+        <span class="k">return</span> <span class="bp">None</span>
+
+</div>
+<div class="viewcode-block" id="generate_config"><a class="viewcode-back" href="../../pyhole.html#pyhole.utils.generate_config">[docs]</a><span class="k">def</span> <span class="nf">generate_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generate an example config&quot;&quot;&quot;</span>
+    <span class="n">example</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;# Global Configuration</span>
+
+<span class="s">[Pyhole]</span>
+<span class="s">admins: nick!ident, nick2!ident</span>
+<span class="s">command_prefix: .</span>
+<span class="s">reconnect_delay: 60</span>
+<span class="s">rejoin_delay: 5</span>
+<span class="s">debug: False</span>
+<span class="s">plugins: admin, dice, entertainment, news, search, urls, weather</span>
+
+<span class="s">[Redmine]</span>
+<span class="s">domain: redmine.example.com</span>
+<span class="s">key: abcd1234</span>
+
+<span class="s"># IRC Network Configuration</span>
+
+<span class="s">[FreeNode]</span>
+<span class="s">server: verne.freenode.net</span>
+<span class="s">password:</span>
+<span class="s">port: 7000</span>
+<span class="s">ssl: True</span>
+<span class="s">ipv6: True</span>
+<span class="s">bind_to: fe80::1</span>
+<span class="s">nick: mynick</span>
+<span class="s">identify_password: mypass</span>
+<span class="s">channels: #mychannel key, #mychannel2</span>
+
+<span class="s">[EFnet]</span>
+<span class="s">server: irc.efnet.net</span>
+<span class="s">password:</span>
+<span class="s">port: 6667</span>
+<span class="s">ssl: False</span>
+<span class="s">ipv6: False</span>
+<span class="s">bind_to:</span>
+<span class="s">nick: mynick</span>
+<span class="s">identify_password:</span>
+<span class="s">channels: #mychannel key, #mychannel2</span>
+<span class="s">&quot;&quot;&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">get_home_directory</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;pyhole.conf&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">example</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">closed</span></div>
 </pre></div>
 
           </div>
@@ -258,7 +276,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../../index.html">pyhole v0.5.5-7a22d documentation</a> &raquo;</li>
+        <li><a href="../../index.html">pyhole v0.5.5-c55ee documentation</a> &raquo;</li>
           <li><a href="../index.html" >Module code</a> &raquo;</li> 
       </ul>
     </div>

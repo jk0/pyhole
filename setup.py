@@ -30,8 +30,7 @@ setuptools.setup(
         "eventlet",
         "beautifulsoup",
         "launchpadlib",
-        "pywapi",
-        "simplejson"
+        "pywapi"
     ],
     scripts=["bin/pyhole"],
     classifiers=[
