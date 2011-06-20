@@ -6,4 +6,4 @@
 *.conf
 .DS_Store
 .coverage
-logs/
+docs/_build/*
