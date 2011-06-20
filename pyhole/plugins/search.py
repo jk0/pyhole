@@ -14,8 +14,11 @@
 
 """Pyhole Search Plugin"""
 
+try:
+    import json
+except ImportError:
+    import simplejson as json
 import re
-import simplejson
 import urllib
 
 from BeautifulSoup import BeautifulSoup
@@ -40,8 +43,8 @@ class Search(plugin.Plugin):
             if not response:
                 return
 
-            json = simplejson.loads(response.read())
-            results = json["responseData"]["results"]
+            json_obj = json.loads(response.read())
+            results = json_obj["responseData"]["results"]
             if results:
                 for r in results:
                     self.irc.reply("%s: %s" % (
@@ -102,8 +105,8 @@ class Search(plugin.Plugin):
             if not response:
                 return
 
-            json = simplejson.loads(response.read())
-            results = json["results"]
+            json_obj = json.loads(response.read())
+            results = json_obj["results"]
             if results:
                 for r in results:
                     self.irc.reply("@%s: %s" % (r["from_user"],
@@ -178,8 +181,8 @@ class Search(plugin.Plugin):
             if not response:
                 return
 
-            json = simplejson.loads(response.read())
-            results = json["data"]
+            json_obj = json.loads(response.read())
+            results = json_obj["data"]
             if len(results) > 4:
                 for r in results["items"]:
                     v = r["player"]["default"].split("&", 1)[0]

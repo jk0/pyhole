@@ -14,7 +14,10 @@
 
 """Pyhole Redmine Plugin"""
 
-import simplejson
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 from pyhole import plugin
 from pyhole import utils
@@ -90,7 +93,7 @@ class Redmine(plugin.Plugin):
         if not response:
             return
 
-        return simplejson.loads(response.read())["issues"]
+        return json.loads(response.read())["issues"]
 
     def _find_user(self, login):
         """Find a specific Redmine user"""
@@ -113,7 +116,7 @@ class Redmine(plugin.Plugin):
         if not response:
             return
 
-        return simplejson.loads(response.read())["users"]
+        return json.loads(response.read())["users"]
 
     def _find_issue(self, issue_id):
         """Find and display a Redmine issue"""
@@ -123,7 +126,7 @@ class Redmine(plugin.Plugin):
             return
 
         try:
-            issue = simplejson.loads(response.read())["issue"]
+            issue = json.loads(response.read())["issue"]
         except Exception:
             return
 
