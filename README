@@ -4,12 +4,12 @@ pyhole - A modular IRC bot for Python developers.
 Core Requirements
 
     - Python 2.5+
+    - BeautifulSoup
     - Eventlet
 
 
 Plugin Requirements
 
-    - BeautifulSoup
     - launchpadlib
     - pywapi
 
