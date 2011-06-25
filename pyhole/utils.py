@@ -23,6 +23,8 @@ import os
 import re
 import sys
 
+from BeautifulSoup import BeautifulStoneSoup
+
 import config
 
 
@@ -72,26 +74,12 @@ def spawn(func):
 
 
 def decode_entities(html):
-    """Strip HTML entities from a string"""
-    entities = [
-        ("<[^>]*?>", ""),
-        ("&nbsp;", " "),
-        ("&amp;", "&"),
-        ("&quot;", "\""),
-        ("&#8212;", "-"),
-        ("&#8217;", "'"),
-        ("&#39;", "'"),
-        ("&#8220;", "\""),
-        ("&#8221;", "\""),
-        ("&#8230;", "..."),
-        ("&#x22;", "\""),
-        ("&#x27;", "'"),
-        ("&#x26;", "&"),
-        ("&ndash;", "-"),
-        ("&#64;", "@")]
+    """Strip HTML entities from a string and make it printable"""
+    html = "".join(str(x).strip() for x in BeautifulStoneSoup(html,
+            convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
+            text=True))
 
-    html = reduce(lambda a, b: re.sub(b[0], b[1], a), entities, html)
-    return filter(lambda x: ord(x) > 9 and ord(x) < 127, html).strip()
+    return filter(lambda x: ord(x) > 9 and ord(x) < 127, html)
 
 
 def ensure_int(param):
