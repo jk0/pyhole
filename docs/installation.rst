@@ -23,6 +23,7 @@ From Source
 
     git clone git://github.com/jk0/pyhole.git
     cd pyhole
+    sudo pip install -r tools/pip-requires
     ./bin/pyhole
     vi ~/.pyhole/pyhole.conf
     ./bin/pyhole
