@@ -28,7 +28,7 @@ setuptools.setup(
     packages=["pyhole", "pyhole.plugins"],
     install_requires=[
         "eventlet",
-        "beautifulsoup",
+        "beautifulsoup==3.2.0",
         "launchpadlib",
         "pywapi"
     ],
