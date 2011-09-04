@@ -158,7 +158,7 @@ def load_plugins(plugindir, *args, **kwargs):
         try:
             __import__(os.path.basename(plugindir), globals(), locals(), [p])
         except ImportError:
-            # log something here?
+            print ("Could not import %s plugin, skipping..." % p)
             pass
 
     _init_plugins(*args, **kwargs)
