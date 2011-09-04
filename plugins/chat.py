@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Launchpad Plugin"""
+"""Pyhole Cleverbot Plugin"""
 
 import cleverbot
 
