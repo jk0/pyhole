@@ -19,8 +19,8 @@ import re
 import time
 import urllib
 
-from pyhole import irclib
-from pyhole import plugin
+import irclib
+import plugin
 
 
 class IRC(irclib.SimpleIRCClient):
@@ -37,14 +37,13 @@ class IRC(irclib.SimpleIRCClient):
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", type="int")
         self.rejoin_delay = config.get("rejoin_delay", type="int")
-        self.cache_dir = config.get("cache_dir")
-        self.plugin_dir = config.get("plugin_dir")
 
         self.server = network.get("server")
         self.password = network.get("password", default="")
         self.port = network.get("port", type="int", default=6667)
         self.ssl = network.get("ssl", type="bool", default=False)
         self.ipv6 = network.get("ipv6", type="bool", default=False)
+        self.bind_to = network.get("bind_to", default="")
         self.nick = network.get("nick")
         self.identify_password = network.get("identify_password", default="")
         self.channels = network.get("channels", type="list")
@@ -56,16 +55,14 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                ssl=self.ssl, ipv6=self.ipv6)
+                ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to)
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
         if reload_plugins:
-            plugin.reload_plugins(self.plugin_dir, irc=self,
-                    conf_file=self.conf_file)
+            plugin.reload_plugins(irc=self, conf_file=self.conf_file)
         else:
-            plugin.load_plugins(self.plugin_dir, irc=self,
-                    conf_file=self.conf_file)
+            plugin.load_plugins(irc=self, conf_file=self.conf_file)
 
         self.log.info("Loaded Plugins: %s" % active_plugins())
 
@@ -312,7 +309,7 @@ class IRC(irclib.SimpleIRCClient):
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
 
-        self.log.info(unicode("%s * %s %s" % (target, source, msg), "utf-8"))
+        self.log.info(unicode("-%s- * %s %s" % (target, source, msg), "utf-8"))
 
     def on_privnotice(self, connection, event):
         """Handle private notices"""

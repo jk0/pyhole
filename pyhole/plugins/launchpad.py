@@ -25,8 +25,9 @@ class Launchpad(plugin.Plugin):
 
     def __init__(self, irc, conf_file):
         self.irc = irc
+        self.name = self.__class__.__name__
         self.launchpad = LP.login_anonymously("pyhole", "production",
-                self.irc.cache_dir)
+                utils.get_directory(self.name))
 
     @plugin.hook_add_command("lbugs")
     @utils.spawn
@@ -62,7 +63,6 @@ class Launchpad(plugin.Plugin):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
             params = utils.ensure_int(params)
-
             if not params:
                 return
 

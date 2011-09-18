@@ -4,15 +4,14 @@ pyhole - A modular IRC bot for Python developers.
 Core Requirements
 
     - Python 2.5+
+    - BeautifulSoup
     - Eventlet
 
 
 Plugin Requirements
 
-    - BeautifulSoup
     - launchpadlib
     - pywapi
-    - simplejson
 
 
 Test Requirements
@@ -23,7 +22,7 @@ Installation
 
     git clone git://github.com/jk0/pyhole.git
     cd pyhole
-    cp pyhole.conf.example pyhole.conf
-    vi pyhole.conf
-
+    sudo pip install -r tools/pip-requires
+    ./bin/pyhole
+    vi ~/.pyhole/pyhole.conf
     ./bin/pyhole

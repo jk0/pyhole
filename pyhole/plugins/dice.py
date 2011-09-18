@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole dice plugin"""
+"""Pyhole Dice Plugin"""
 
 import random
 

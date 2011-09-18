@@ -1,5 +1,3 @@
-# vim: tabstop=4 shiftwidth=4 softtabstop=4
-#
 #   Copyright 2011 Chris Behrens
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,54 +18,50 @@ import functools
 import os
 import sys
 
+import utils
+
 
 def _reset_variables():
-    """
-    Local function to init some variables that are common between
+    """Local function to init some variables that are common between
     load and reload
     """
-
     global _plugin_instances
     global _plugin_hooks
+
     _plugin_instances = []
     _plugin_hooks = {}
+
     for x in _hook_names:
         _plugin_hooks[x] = []
 
 
-# Decorator for adding a hook
 def hook_add(hookname, arg):
-    """
-    Generic decorator to add hooks.  Generally, this is not called
+    """Generic decorator to add hooks.  Generally, this is not called
     directly by plugins.  Decorators that plugins use are automatically
     generated below with the setattrs you'll see
     """
-
     def wrap(f):
         setattr(f, "_is_%s_hook" % hookname, True)
         f._hook_arg = arg
         return f
+
     return wrap
 
 
 def hook_get(hookname):
-    """
-    Function to return the list of hooks of a particular type.  Genearlly
+    """Function to return the list of hooks of a particular type.  Genearlly
     this is not called directly.  Callers tend to use the dynamically
     generated calls 'hook_get_*' that are created below with the setattrs
     """
-
     return _plugin_hooks[hookname]
 
 
 def active_get(hookname):
-    """
-    Function to return the list of hook arguments.  Genearlly
+    """Function to return the list of hook arguments.  Genearlly
     this is not called directly.  Callers tend to use the dynamically
     generated calls 'active_get_*' that are created below with the
     setattrs
     """
-
     return [x[2] for x in _plugin_hooks[hookname]]
 
 _hook_names = ["keyword", "command", "msg_regex"]
@@ -82,19 +76,16 @@ for x in _hook_names:
 
 
 class PluginMetaClass(type):
-    """
-    The metaclass that makes all of the plugin magic work.  All subclassing
+    """The metaclass that makes all of the plugin magic work.  All subclassing
     gets caught here, which we can use to have plugins automagically
     register themselves
     """
 
     def __init__(cls, name, bases, attrs):
-        """
-        Catch subclassing.  If the class doesn't yet have _plugin_classes,
+        """Catch subclassing.  If the class doesn't yet have _plugin_classes,
         it means it's the Plugin class itself, otherwise it's a class
         that's been subclassed from Plugin (ie, a real plugin class)
         """
-
         if not hasattr(cls, "_plugin_classes"):
             cls._plugin_classes = []
         else:
@@ -103,28 +94,20 @@ class PluginMetaClass(type):
 
 
 class Plugin(object):
-    """
-    The class that all plugin classes should inherit from
-    """
+    """The class that all plugin classes should inherit from"""
 
-    # Set the metaclass
     __metaclass__ = PluginMetaClass
 
     def __init__(self, irc, *args, **kwargs):
-        """
-        Default constructor for Plugin.  Stores the IRC instance, etc
-        """
-
+        """Default constructor for Plugin.  Stores the IRC instance, etc"""
         self.irc = irc
         self.name = self.__class__.__name__
 
 
 def _init_plugins(*args, **kwargs):
-    """
-    Create instances of the plugin classes and create a cache
+    """Create instances of the plugin classes and create a cache
     of their hook functions
     """
-
     for cls in Plugin._plugin_classes:
         # Create instance of 'p'
         instance = cls(*args, **kwargs)
@@ -141,33 +124,48 @@ def _init_plugins(*args, **kwargs):
                 if getattr(attr, "_is_%s_hook" % hook_key, False):
                     hook_arg = getattr(attr, "_hook_arg", None)
                     # Append (module, method, arg) tuple
-                    _plugin_hooks[hook_key].append(
-                            (attr.__module__, attr, hook_arg))
+                    _plugin_hooks[hook_key].append((attr.__module__, attr,
+                            hook_arg))
 
 
-def load_plugins(plugindir, *args, **kwargs):
-    """
-    Module function that loads plugins from a particular directory
-    """
+def load_user_plugin(plugin, *args, **kwargs):
+    """Load a user plugin"""
+    sys.path.append(utils.get_home_directory() + "plugins")
+    user_plugins = os.listdir(utils.get_directory("plugins"))
 
-    plugins = os.path.abspath(plugindir)
-    plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
-            and not x.startswith("_"))
+    for user_plugin in user_plugins:
+        if user_plugin.endswith(".py"):
+            user_plugin = user_plugin[:-3]
+            if plugin == user_plugin:
+                try:
+                    __import__(plugin, globals(), locals(), [plugin])
+                except Exception, e:
+                    # Catch all because this could be many things
+                    kwargs.get("irc").log.error(e)
+                    pass
+
+
+def load_plugins(*args, **kwargs):
+    """Module function that loads plugins from a particular directory"""
+    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
+    plugin_names = config.get("plugins", type="list")
 
     for p in plugin_names:
+        load_user_plugin(p, *args, **kwargs)
+
         try:
-            __import__(os.path.basename(plugindir), globals(), locals(), [p])
-        except ImportError:
-            print ("Could not import %s plugin, skipping..." % p)
+            __import__("pyhole.plugins", globals(), locals(), [p])
+        except Exception, e:
+            # Catch all because this could be many things
+            kwargs.get("irc").log.error(e)
             pass
 
     _init_plugins(*args, **kwargs)
 
 
-def reload_plugins(plugins, *args, **kwargs):
-    """
-    Module function that'll reload all of the plugins
-    """
+def reload_plugins(*args, **kwargs):
+    """Module function that'll reload all of the plugins"""
+    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
 
     # When the modules are reloaded, the meta class will append
     # all of the classes again, so we need to make sure this is empty
@@ -176,7 +174,7 @@ def reload_plugins(plugins, *args, **kwargs):
 
     # Now reload all of the plugins
     plugins_to_reload = []
-    plugindir = os.path.basename(plugins)
+    plugindir = "pyhole.plugins"
 
     # Reload existing plugins
     for mod, val in sys.modules.items():
@@ -184,43 +182,27 @@ def reload_plugins(plugins, *args, **kwargs):
             mod_file = val.__file__
             if not os.path.isfile(mod_file):
                 continue
-            if mod_file.endswith('.pyc') or mod_file.endswith('.pyo'):
-                source_file_guess = mod_file[:-1]
-                if not os.path.isfile(source_file_guess):
-                    os.unlink(mod_file)
-            plugins_to_reload.append(mod)
+            for p in config.get("plugins", type="list"):
+                if plugindir + "." + p == mod:
+                    plugins_to_reload.append(mod)
 
     for p in plugins_to_reload:
         try:
             reload(sys.modules[p])
-        except Exception, err:
-            # log something here?
+        except Exception, e:
+            # Catch all because this could be many things
+            kwargs.get("irc").log.error(e)
             pass
 
     # Load new plugins
-    plugin_names = (x[:-3] for x in os.listdir(plugins) if x.endswith(".py")
-            and not x.startswith("_") and x not in plugins_to_reload)
-    for p in plugin_names:
-        try:
-            __import__(os.path.basename(plugindir), globals(), locals(), [p])
-        except ImportError:
-            # log something here?
-            pass
-
-    _init_plugins(*args, **kwargs)
+    load_plugins(*args, **kwargs)
 
 
 def active_plugins():
-    """
-    Get the loaded plugin names
-    """
-
+    """Get the loaded plugin names"""
     return [x.__name__ for x in Plugin._plugin_classes]
 
 
 def active_plugin_classes():
-    """
-    Get the loaded plugin classes
-    """
-
+    """Get the loaded plugin classes"""
     return Plugin._plugin_classes

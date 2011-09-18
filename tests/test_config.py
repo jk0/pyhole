@@ -17,14 +17,13 @@
 import unittest
 
 from pyhole import config
+from pyhole import utils
 
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        self.config = config.Config("../pyhole.conf.example", "Pyhole")
-
-    def test_missing_config(self):
-        self.assertRaises(SystemExit, config.Config, "pyhole.conf", "Pyhole")
+        home_dir = utils.get_home_directory()
+        self.config = config.Config(home_dir + "pyhole.conf", "Pyhole")
 
     def test_missing_parameter(self):
         self.assertRaises(SystemExit, self.config.get, "foo")

@@ -23,20 +23,20 @@ import os
 import re
 import sys
 
-from pyhole import config
+from BeautifulSoup import BeautifulStoneSoup
+
+import config
 
 
 eventlet.monkey_patch()
 
 
-def logger(name, log_dir, debug=False):
+def logger(name, debug=False):
     """Log handler"""
+    log_dir = get_directory("logs")
     level = logging.DEBUG if debug else logging.INFO
     format = "%(asctime)s [%(name)s] %(message)s"
     datefmt = "%H:%M:%S"
-
-    if not os.path.exists(log_dir):
-        os.makedirs(log_dir)
 
     logging.basicConfig(level=level, format=format, datefmt=datefmt)
 
@@ -74,26 +74,12 @@ def spawn(func):
 
 
 def decode_entities(html):
-    """Strip HTML entities from a string"""
-    entities = [
-        ("<[^>]*?>", ""),
-        ("&nbsp;", " "),
-        ("&amp;", "&"),
-        ("&quot;", "\""),
-        ("&#8212;", "-"),
-        ("&#8217;", "'"),
-        ("&#39;", "'"),
-        ("&#8220;", "\""),
-        ("&#8221;", "\""),
-        ("&#8230;", "..."),
-        ("&#x22;", "\""),
-        ("&#x27;", "'"),
-        ("&#x26;", "&"),
-        ("&ndash;", "-"),
-        ("&#64;", "@")]
+    """Strip HTML entities from a string and make it printable"""
+    html = "".join(str(x).strip() for x in BeautifulStoneSoup(html,
+            convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
+            text=True))
 
-    html = reduce(lambda a, b: re.sub(b[0], b[1], a), entities, html)
-    return filter(lambda x: ord(x) > 9 and ord(x) < 127, html).strip()
+    return filter(lambda x: ord(x) > 9 and ord(x) < 127, html)
 
 
 def ensure_int(param):
@@ -110,16 +96,90 @@ def load_config(section, conf):
     return config.Config(conf, section)
 
 
-def version(number):
-    """Prepare the version string"""
-    git_path = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
-            os.pardir, os.pardir, ".git/refs/heads/master"))
+def get_home_directory():
+    """Return the home directory"""
+    home_dir = os.getenv("HOME") + "/.pyhole/"
+    if not os.path.exists(home_dir):
+        os.makedirs(home_dir)
 
-    if not os.path.exists(git_path):
-        return "pyhole v%s - http://pyhole.org" % number
+    return home_dir
 
-    with open(git_path, "r") as git:
-        git_commit = git.read()
-    git.closed
 
-    return "pyhole v%s (%s) - http://pyhole.org" % (number, git_commit[0:5])
+def get_directory(new_dir):
+    """Return a directory"""
+    home_dir = get_home_directory()
+    new_dir = home_dir + new_dir
+
+    if not os.path.exists(new_dir):
+        os.makedirs(new_dir)
+
+    return new_dir + "/"
+
+
+def write_file(dir, file, data):
+    """Write data to file"""
+    dir = get_directory(dir)
+
+    with open(dir + file, "w") as f:
+        f.write(str(data).strip())
+    f.closed
+
+
+def read_file(dir, file):
+    """Read and return the data in file"""
+    dir = get_directory(dir)
+
+    try:
+        with open(dir + file, "r") as f:
+            data = f.read()
+        f.closed
+
+        return data
+    except IOError:
+        return None
+
+
+def generate_config():
+    """Generate an example config"""
+    example = """# Global Configuration
+
+[Pyhole]
+admins: nick!ident, nick2!ident
+command_prefix: .
+reconnect_delay: 60
+rejoin_delay: 5
+debug: False
+plugins: admin, dice, entertainment, news, search, urls, weather
+
+[Redmine]
+domain: redmine.example.com
+key: abcd1234
+
+# IRC Network Configuration
+
+[FreeNode]
+server: verne.freenode.net
+password:
+port: 7000
+ssl: True
+ipv6: True
+bind_to: fe80::1
+nick: mynick
+identify_password: mypass
+channels: #mychannel key, #mychannel2
+
+[EFnet]
+server: irc.efnet.net
+password:
+port: 6667
+ssl: False
+ipv6: False
+bind_to:
+nick: mynick
+identify_password:
+channels: #mychannel key, #mychannel2
+"""
+
+    with open(get_home_directory() + "pyhole.conf", "w") as f:
+        f.write(example)
+    f.closed

@@ -20,6 +20,8 @@ import ConfigParser
 import os
 import sys
 
+import utils
+
 
 class Config(object):
     """A configuration object"""
@@ -35,8 +37,9 @@ class Config(object):
             conf_file.closed
         except IOError:
             print "Unable to load configuration file: %s" % self.config
-            print "Try specifying a location:"
-            print "    %s -c path/to/config.conf" % sys.argv[0]
+            print "Generating..."
+            utils.generate_config()
+            print "Done"
             sys.exit(1)
 
     def sections(self):

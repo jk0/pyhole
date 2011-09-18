@@ -4,4 +4,7 @@
 *.log
 *.xml
 *.conf
-logs/
+.DS_Store
+.coverage
+docs/_build/*
+build/

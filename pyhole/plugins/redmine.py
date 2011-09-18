@@ -14,7 +14,10 @@
 
 """Pyhole Redmine Plugin"""
 
-import simplejson
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 from pyhole import plugin
 from pyhole import utils
@@ -67,7 +70,8 @@ class Redmine(plugin.Plugin):
         """Retrieve Redmine bug information (ex: RM12345)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
-            self._find_issue(params)
+            if params:
+                self._find_issue(params)
 
     @plugin.hook_add_msg_regex("https?:\/\/redmine\..*/issues")
     def _watch_for_rm_bug_url(self, params=None, **kwargs):
@@ -89,7 +93,7 @@ class Redmine(plugin.Plugin):
         if not response:
             return
 
-        return simplejson.loads(response.read())["issues"]
+        return json.loads(response.read())["issues"]
 
     def _find_user(self, login):
         """Find a specific Redmine user"""
@@ -112,7 +116,7 @@ class Redmine(plugin.Plugin):
         if not response:
             return
 
-        return simplejson.loads(response.read())["users"]
+        return json.loads(response.read())["users"]
 
     def _find_issue(self, issue_id):
         """Find and display a Redmine issue"""
@@ -122,7 +126,7 @@ class Redmine(plugin.Plugin):
             return
 
         try:
-            issue = simplejson.loads(response.read())["issue"]
+            issue = json.loads(response.read())["issue"]
         except Exception:
             return
 

@@ -33,9 +33,10 @@ if os.path.exists(os.path.join(PYHOLE_PATH, "pyhole", "__init__.py")):
 
 from pyhole import irc
 from pyhole import utils
+from pyhole import version
 
 
-__VERSION__ = utils.version("0.5.4")
+__VERSION__ = version.version_string()
 
 
 class IRCConnection(multiprocessing.Process):
@@ -48,7 +49,7 @@ class IRCConnection(multiprocessing.Process):
     def run(self):
         """IRC network connection"""
         network_info = utils.load_config(self.irc_network, self.conf_file)
-        log = utils.logger(self.irc_network, LOG_DIR, DEBUG)
+        log = utils.logger(self.irc_network, DEBUG)
         reconnect_delay = CONFIG.get("reconnect_delay", type="int")
 
         while True:
@@ -82,7 +83,7 @@ def build_options():
     parser = optparse.OptionParser(version=__VERSION__)
 
     parser.add_option("-c", "--config", dest="config",
-            default="pyhole.conf",
+            default=utils.get_home_directory() + "pyhole.conf",
             help="specify the path to a configuration file")
     parser.add_option("-b", "--background", action="store_true",
             dest="background", help="run in the background")
@@ -94,7 +95,7 @@ def build_options():
 
 def main():
     """Main loop"""
-    log = utils.logger("Pyhole", LOG_DIR, DEBUG)
+    log = utils.logger("Pyhole", DEBUG)
     networks = network_list(CONFIG.sections())
 
     log.info("Starting %s" % __VERSION__)
@@ -116,12 +117,11 @@ if __name__ == "__main__":
 
     CONFIG = utils.load_config("Pyhole", CONF_FILE)
     DEBUG = OPTIONS.debug or CONFIG.get("debug", type="bool")
-    LOG_DIR = CONFIG.get("log_dir")
 
     if OPTIONS.background and not OPTIONS.debug:
         try:
-            pid = os.fork()
-            if pid == 0:
+            PID = os.fork()
+            if PID == 0:
                 os.setsid()
                 with open(os.devnull, "r+b") as null:
                     for desc in (0, 1, 2):
