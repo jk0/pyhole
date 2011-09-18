@@ -12,7 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Cleverbot Plugin"""
+"""Pyhole Cleverbot Plugin
+
+needs the pycleverbot library from
+
+browse latest: 
+http://code.google.com/p/pycleverbot/downloads/list
+
+get specific version:
+wget http://code.google.com/p/pycleverbot/downloads/detail?name=cleverbot.py&can=2&q=
+"""
 
 import cleverbot
 
@@ -25,7 +34,7 @@ class CleverChat(plugin.Plugin):
     @plugin.hook_add_command("chat")
     @utils.spawn
     def chat(self, params=None, **kwargs):
-        """Chat with the bot (ex: .chat 'How you doin' pyhole?"""
+        """Chat with the Cleverbot (ex: .chat 'How you doin'?"""
         cb = cleverbot.Session()
         if params:
             try:
