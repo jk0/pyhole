@@ -12,35 +12,31 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Cleverbot Plugin
-
-needs the pycleverbot library from
-
-browse latest: 
-http://code.google.com/p/pycleverbot/downloads/list
-
-get specific version:
-wget http://code.google.com/p/pycleverbot/downloads/detail?name=cleverbot.py&can=2&q=
-"""
+"""Pyhole Cleverbot Plugin"""
 
 import cleverbot
 
 from pyhole import plugin
 from pyhole import utils
 
+
 class CleverChat(plugin.Plugin):
     """Provide access to the Cleverbot API"""
 
-    @plugin.hook_add_command("chat")
+    @plugin.hook_add_command("cleverbot")
     @utils.spawn
-    def chat(self, params=None, **kwargs):
+    def cleverbot(self, params=None, **kwargs):
         """Chat with the Cleverbot (ex: .chat 'How you doin'?"""
         cb = cleverbot.Session()
         if params:
             try:
                 self.irc.reply(cb.Ask(params))
             except KeyError:
-                self.irc.reply("Can't chat now, I'm washing my hair")
+                self.irc.reply("Can't chat now. I'm washing my hair.")
         else:
             self.irc.reply(self.chat.__doc__)
 
+    @plugin.hook_add_command("cb")
+    def alias_cb(self, params=None, **kwargs):
+        """Alias of cleverbot"""
+        self.cleverbot(params, **kwargs)
