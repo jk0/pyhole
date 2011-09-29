@@ -180,6 +180,13 @@ identify_password:
 channels: #mychannel key, #mychannel2
 """
 
-    with open(get_home_directory() + "pyhole.conf", "w") as f:
+    conf_file = get_home_directory() + "pyhole.conf"
+
+    if os.path.exists(conf_file):
+        return
+
+    print "Generating..."
+    with open(conf_file, "w") as f:
         f.write(example)
     f.closed
+    print "Done"

@@ -37,9 +37,7 @@ class Config(object):
             conf_file.closed
         except IOError:
             print "Unable to load configuration file: %s" % self.config
-            print "Generating..."
             utils.generate_config()
-            print "Done"
             sys.exit(1)
 
     def sections(self):

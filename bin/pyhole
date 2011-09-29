@@ -82,12 +82,12 @@ def build_options():
     """Generate command line options"""
     parser = optparse.OptionParser(version=__VERSION__)
 
-    parser.add_option("-c", "--config", dest="config",
+    parser.add_option("-c", "--config",
             default=utils.get_home_directory() + "pyhole.conf",
             help="specify the path to a configuration file")
     parser.add_option("-b", "--background", action="store_true",
-            dest="background", help="run in the background")
-    parser.add_option("-d", "--debug", action="store_true", dest="debug",
+            help="run in the background")
+    parser.add_option("-d", "--debug", action="store_true",
             help="show debugging output")
 
     return parser.parse_args()
