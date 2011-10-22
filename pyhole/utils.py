@@ -18,12 +18,14 @@ from __future__ import with_statement
 
 import eventlet
 import os
+import optparse
 import re
 import sys
 
 from BeautifulSoup import BeautifulStoneSoup
 
 import config
+import version
 
 
 eventlet.monkey_patch()
@@ -70,9 +72,23 @@ def ensure_int(param):
         return None
 
 
-def load_config(section, conf):
-    """Load a config section"""
-    return config.Config(conf, section)
+def build_options():
+    """Generate command line options"""
+    default_conf_file = get_home_directory() + "pyhole.conf"
+
+    parser = optparse.OptionParser(version=version.version_string())
+    parser.add_option("-c", "--config", default=default_conf_file,
+            help="specify the path to a configuration file")
+    parser.add_option("-d", "--debug", action="store_true",
+            help="show debugging output")
+
+    return parser.parse_args()
+
+
+def get_option(option):
+    """Retrive an option from the command line."""
+    options, args = build_options()
+    return vars(options).get(option)
 
 
 def get_home_directory():
@@ -93,6 +109,16 @@ def get_directory(new_dir):
         os.makedirs(new_dir)
 
     return new_dir + "/"
+
+
+def get_conf_file():
+    """Return the path to the conf file"""
+    return get_option("config") or get_home_directory() + "pyhole.conf"
+
+
+def get_config(section="Pyhole"):
+    """Return the default config object"""
+    return config.Config(get_conf_file(), section)
 
 
 def write_file(dir, file, data):
@@ -127,6 +153,7 @@ admins: nick!ident, nick2!ident
 command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
+debug: False
 plugins: admin, dice, entertainment, news, search, urls, weather
 
 [Redmine]
@@ -158,8 +185,7 @@ identify_password:
 channels: #mychannel key, #mychannel2
 """
 
-    conf_file = get_home_directory() + "pyhole.conf"
-
+    conf_file = get_conf_file()
     if os.path.exists(conf_file):
         return
 

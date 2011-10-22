@@ -147,7 +147,7 @@ def load_user_plugin(plugin, *args, **kwargs):
 
 def load_plugins(*args, **kwargs):
     """Module function that loads plugins from a particular directory"""
-    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
+    config = utils.get_config()
     plugin_names = config.get("plugins", type="list")
 
     for p in plugin_names:
@@ -165,7 +165,7 @@ def load_plugins(*args, **kwargs):
 
 def reload_plugins(*args, **kwargs):
     """Module function that'll reload all of the plugins"""
-    config = utils.load_config("Pyhole", kwargs.get("conf_file"))
+    config = utils.get_config()
 
     # When the modules are reloaded, the meta class will append
     # all of the classes again, so we need to make sure this is empty

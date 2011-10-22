@@ -20,10 +20,14 @@ import logging.handlers
 import utils
 
 
-def getLogger(name):
+def getLogger(name="Pyhole"):
     """Log handler"""
+    debug_option = utils.get_option("debug")
+    debug_config = utils.get_config().get("debug", type="bool")
+    debug = debug_option or debug_config
+
     log_dir = utils.get_directory("logs")
-    level = logging.DEBUG
+    level = logging.DEBUG if debug else logging.INFO
     format = "%(asctime)s [%(name)s] %(message)s"
     datefmt = "%H:%M:%S"
 

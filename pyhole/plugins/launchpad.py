@@ -23,7 +23,7 @@ from pyhole import utils
 class Launchpad(plugin.Plugin):
     """Provide access to the Launchpad API"""
 
-    def __init__(self, irc, conf_file):
+    def __init__(self, irc):
         self.irc = irc
         self.name = self.__class__.__name__
         self.launchpad = LP.login_anonymously("pyhole", "production",

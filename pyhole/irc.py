@@ -22,34 +22,38 @@ import urllib
 import irclib
 import log
 import plugin
+import utils
+import version
 
 
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, network, version, conf_file):
+    def __init__(self, network):
         irclib.SimpleIRCClient.__init__(self)
 
+        config = utils.get_config()
+        network_config = utils.get_config(network)
+
         self.log = log.getLogger(str(network))
-        self.version = version
-        self.conf_file = conf_file
+        self.version = version.version_string()
+        self.addressed = False
 
         self.admins = config.get("admins", type="list")
         self.command_prefix = config.get("command_prefix")
         self.reconnect_delay = config.get("reconnect_delay", type="int")
         self.rejoin_delay = config.get("rejoin_delay", type="int")
 
-        self.server = network.get("server")
-        self.password = network.get("password", default="")
-        self.port = network.get("port", type="int", default=6667)
-        self.ssl = network.get("ssl", type="bool", default=False)
-        self.ipv6 = network.get("ipv6", type="bool", default=False)
-        self.bind_to = network.get("bind_to", default="")
-        self.nick = network.get("nick")
-        self.identify_password = network.get("identify_password", default="")
-        self.channels = network.get("channels", type="list")
-
-        self.addressed = False
+        self.server = network_config.get("server")
+        self.password = network_config.get("password", default="")
+        self.port = network_config.get("port", type="int", default=6667)
+        self.ssl = network_config.get("ssl", type="bool", default=False)
+        self.ipv6 = network_config.get("ipv6", type="bool", default=False)
+        self.bind_to = network_config.get("bind_to", default="")
+        self.nick = network_config.get("nick")
+        self.identify_password = network_config.get("identify_password",
+                default="")
+        self.channels = network_config.get("channels", type="list")
 
         self.load_plugins()
 
@@ -61,9 +65,9 @@ class IRC(irclib.SimpleIRCClient):
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively"""
         if reload_plugins:
-            plugin.reload_plugins(irc=self, conf_file=self.conf_file)
+            plugin.reload_plugins(irc=self)
         else:
-            plugin.load_plugins(irc=self, conf_file=self.conf_file)
+            plugin.load_plugins(irc=self)
 
         self.log.info("Loaded Plugins: %s" % active_plugins())
 

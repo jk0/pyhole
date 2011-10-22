@@ -43,6 +43,14 @@ class TestUtils(unittest.TestCase):
     def test_ensure_int_3(self):
         self.assertEqual(utils.ensure_int("a"), None)
 
+    def test_build_options(self):
+        options, args = utils.build_options()
+        self.assertTrue(isinstance(options, object))
+
+    def test_get_option(self):
+        conf_file = utils.get_option("config")
+        self.assertTrue(conf_file.endswith("pyhole.conf"))
+
     def test_get_home_directory(self):
         self.assertTrue(utils.get_home_directory().endswith("/.pyhole/"))
 
@@ -52,6 +60,16 @@ class TestUtils(unittest.TestCase):
         utils.get_directory("test_dir")
         self.assertTrue(os.path.exists(new_dir))
         os.rmdir(new_dir)
+
+    def test_get_conf_file(self):
+        actual_conf_file = utils.get_home_directory() + "pyhole.conf"
+        generated_conf_file = utils.get_conf_file()
+        self.assertEqual(actual_conf_file, generated_conf_file)
+
+    def test_get_config(self):
+        config = utils.get_config()
+        debug = config.get("debug", type="bool")
+        self.assertTrue(debug in [True, False])
 
     def test_write_file(self):
         self.assertTrue(os.path.exists(self.new_file))
