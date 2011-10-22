@@ -30,13 +30,6 @@ class TestUtils(unittest.TestCase):
         os.unlink(self.new_file)
         os.rmdir(self.new_file[:-16])
 
-    def test_logger(self):
-        test_log_dir = utils.get_home_directory() + "logs/"
-        log = utils.logger("TEST", True)
-        self.assertEqual("TEST", log.name)
-        self.assertEqual(log.level, 0)
-        os.unlink(test_log_dir + "test.log")
-
     def test_decode_entities(self):
         test_str = "<foo>&#64;&amp;bar&amp;&#64;</foo>"
         self.assertEqual(utils.decode_entities(test_str), "@&bar&@")

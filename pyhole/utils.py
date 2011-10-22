@@ -17,8 +17,6 @@
 from __future__ import with_statement
 
 import eventlet
-import logging
-import logging.handlers
 import os
 import re
 import sys
@@ -29,25 +27,6 @@ import config
 
 
 eventlet.monkey_patch()
-
-
-def logger(name, debug=False):
-    """Log handler"""
-    log_dir = get_directory("logs")
-    level = logging.DEBUG if debug else logging.INFO
-    format = "%(asctime)s [%(name)s] %(message)s"
-    datefmt = "%H:%M:%S"
-
-    logging.basicConfig(level=level, format=format, datefmt=datefmt)
-
-    log = logging.handlers.TimedRotatingFileHandler("%s/%s.log" % (log_dir,
-            name.lower()), "midnight")
-    log.setLevel(level)
-    formatter = logging.Formatter(format, datefmt)
-    log.setFormatter(formatter)
-    logging.getLogger(name).addHandler(log)
-
-    return logging.getLogger(name)
 
 
 def admin(func):
@@ -148,7 +127,6 @@ admins: nick!ident, nick2!ident
 command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
-debug: False
 plugins: admin, dice, entertainment, news, search, urls, weather
 
 [Redmine]

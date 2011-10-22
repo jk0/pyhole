@@ -40,6 +40,10 @@ class Config(object):
             utils.generate_config()
             sys.exit(1)
 
+    def __str__(self):
+        """Make the config object readable for logging."""
+        return self.section
+
     def sections(self):
         """Return a list of sections"""
         return self.config_parser.sections()

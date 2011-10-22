@@ -46,7 +46,6 @@ class Launchpad(plugin.Plugin):
                     # Find everyone on the team
                     for i, person in enumerate(members.members):
                         if i <= 4:
-                            self.irc.log.debug("LP: %s" % person.display_name)
                             self._find_bugs(person, proj, False)
                         else:
                             self.irc.reply("[...] truncated last %d users" % (

@@ -39,7 +39,6 @@ class Redmine(plugin.Plugin):
                     self.redmine_key, self.redmine_domain)
         except Exception:
             self.disabled = True
-            self.irc.log.error("Unable to load %s configuration." % self.name)
 
     @plugin.hook_add_command("rbugs")
     @utils.spawn

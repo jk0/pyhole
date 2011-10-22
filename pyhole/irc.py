@@ -20,16 +20,17 @@ import time
 import urllib
 
 import irclib
+import log
 import plugin
 
 
 class IRC(irclib.SimpleIRCClient):
     """An IRC connection"""
 
-    def __init__(self, config, network, log, version, conf_file):
+    def __init__(self, config, network, version, conf_file):
         irclib.SimpleIRCClient.__init__(self)
 
-        self.log = log
+        self.log = log.getLogger(str(network))
         self.version = version
         self.conf_file = conf_file
 
