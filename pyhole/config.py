@@ -34,7 +34,6 @@ class Config(object):
         try:
             with open(self.config) as conf_file:
                 self.config_parser.readfp(conf_file)
-            conf_file.closed
         except IOError:
             print "Unable to load configuration file: %s" % self.config
             utils.generate_config()
@@ -58,7 +57,9 @@ class Config(object):
             elif _type == "bool":
                 return self.config_parser.getboolean(self.section, option)
             elif _type == "list":
-                return self.config_parser.get(self.section, option).split(", ")
+                value = self.config_parser.get(self.section, option)
+                if hasattr(value, "split"):
+                    return value.split(", ")
             else:
                 return self.config_parser.get(self.section, option)
         except ConfigParser.NoOptionError:

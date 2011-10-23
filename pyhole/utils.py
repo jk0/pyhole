@@ -130,7 +130,6 @@ def write_file(dir, file, data):
 
     with open(dir + file, "w") as f:
         f.write(str(data).strip())
-    f.closed
 
 
 def read_file(dir, file):
@@ -140,7 +139,6 @@ def read_file(dir, file):
     try:
         with open(dir + file, "r") as f:
             data = f.read()
-        f.closed
 
         return data
     except IOError:
@@ -195,5 +193,4 @@ channels: #mychannel key, #mychannel2
     print "Generating..."
     with open(conf_file, "w") as f:
         f.write(example)
-    f.closed
     print "Done"

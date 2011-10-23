@@ -38,7 +38,6 @@ def current_git_hash():
 
     with open(git_path, "r") as git:
         git_hash = git.read()
-    git.closed
 
     return git_hash[0:5]
 
