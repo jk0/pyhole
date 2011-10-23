@@ -74,10 +74,8 @@ def ensure_int(param):
 
 def build_options():
     """Generate command line options"""
-    default_conf_file = get_home_directory() + "pyhole.conf"
-
     parser = optparse.OptionParser(version=version.version_string())
-    parser.add_option("-c", "--config", default=default_conf_file,
+    parser.add_option("-c", "--config", default=get_conf_file_path(),
             help="specify the path to a configuration file")
     parser.add_option("-d", "--debug", action="store_true",
             help="show debugging output")
@@ -111,9 +109,14 @@ def get_directory(new_dir):
     return new_dir + "/"
 
 
+def get_conf_file_path():
+    """Return the path to the conf file"""
+    return get_home_directory() + "pyhole.conf"
+
+
 def get_conf_file():
     """Return the path to the conf file"""
-    return get_option("config") or get_home_directory() + "pyhole.conf"
+    return get_option("config") or get_conf_file_path()
 
 
 def get_config(section="Pyhole"):

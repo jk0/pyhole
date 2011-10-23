@@ -61,8 +61,13 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(os.path.exists(new_dir))
         os.rmdir(new_dir)
 
+    def test_get_conf_file_path(self):
+        conf_file_path = utils.get_conf_file_path()
+        actual_conf_file_path = utils.get_home_directory() + "pyhole.conf"
+        self.assertEqual(conf_file_path, actual_conf_file_path)
+
     def test_get_conf_file(self):
-        actual_conf_file = utils.get_home_directory() + "pyhole.conf"
+        actual_conf_file = utils.get_conf_file_path()
         generated_conf_file = utils.get_conf_file()
         self.assertEqual(actual_conf_file, generated_conf_file)
 
