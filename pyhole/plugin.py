@@ -18,7 +18,11 @@ import functools
 import os
 import sys
 
+import log
 import utils
+
+
+LOG = log.get_logger()
 
 
 def _reset_variables():
@@ -140,9 +144,7 @@ def load_user_plugin(plugin, *args, **kwargs):
                 try:
                     __import__(plugin, globals(), locals(), [plugin])
                 except Exception, e:
-                    # Catch all because this could be many things
-                    kwargs.get("irc").log.error(e)
-                    pass
+                    LOG.error(e)
 
 
 def load_plugins(*args, **kwargs):
@@ -150,15 +152,13 @@ def load_plugins(*args, **kwargs):
     config = utils.get_config()
     plugin_names = config.get("plugins", type="list")
 
-    for p in plugin_names:
-        load_user_plugin(p, *args, **kwargs)
+    for plugin_name in plugin_names:
+        load_user_plugin(plugin_name, *args, **kwargs)
 
         try:
-            __import__("pyhole.plugins", globals(), locals(), [p])
+            __import__("pyhole.plugins", globals(), locals(), [plugin_name])
         except Exception, e:
-            # Catch all because this could be many things
-            kwargs.get("irc").log.error(e)
-            pass
+            LOG.error(e)
 
     _init_plugins(*args, **kwargs)
 
@@ -186,13 +186,11 @@ def reload_plugins(*args, **kwargs):
                 if plugindir + "." + p == mod:
                     plugins_to_reload.append(mod)
 
-    for p in plugins_to_reload:
+    for plugin in plugins_to_reload:
         try:
-            reload(sys.modules[p])
+            reload(sys.modules[plugin])
         except Exception, e:
-            # Catch all because this could be many things
-            kwargs.get("irc").log.error(e)
-            pass
+            LOG.error(e)
 
     # Load new plugins
     load_plugins(*args, **kwargs)

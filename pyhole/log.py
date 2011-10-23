@@ -20,23 +20,24 @@ import logging.handlers
 import utils
 
 
-def getLogger(name="Pyhole"):
+def get_logger(name="Pyhole"):
     """Log handler"""
     debug_option = utils.get_option("debug")
     debug_config = utils.get_config().get("debug", type="bool")
     debug = debug_option or debug_config
 
     log_dir = utils.get_directory("logs")
-    level = logging.DEBUG if debug else logging.INFO
-    format = "%(asctime)s [%(name)s] %(message)s"
-    datefmt = "%H:%M:%S"
+    log_level = logging.DEBUG if debug else logging.INFO
+    log_format = "%(asctime)s [%(name)s] %(message)s"
+    log_datefmt = "%H:%M:%S"
 
-    logging.basicConfig(level=level, format=format, datefmt=datefmt)
+    logging.basicConfig(level=log_level, format=log_format,
+            datefmt=log_datefmt)
 
     log = logging.handlers.TimedRotatingFileHandler("%s/%s.log" % (log_dir,
             name.lower()), "midnight")
-    log.setLevel(level)
-    formatter = logging.Formatter(format, datefmt)
+    log.setLevel(log_level)
+    formatter = logging.Formatter(log_format, log_datefmt)
     log.setFormatter(formatter)
     logging.getLogger(name).addHandler(log)
 

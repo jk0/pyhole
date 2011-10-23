@@ -42,7 +42,7 @@ class Dice(plugin.Plugin):
                 result = self.roll.__doc__
             else:
                 result = 0
-                for i in xrange(count):
+                for _ in xrange(count):
                     result += random.randint(1, sides)
         else:
             result = self.roll.__doc__

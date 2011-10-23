@@ -35,7 +35,7 @@ class IRC(irclib.SimpleIRCClient):
         config = utils.get_config()
         network_config = utils.get_config(network)
 
-        self.log = log.getLogger(str(network))
+        self.log = log.get_logger(str(network))
         self.version = version.version_string()
         self.source = None
         self.target = None

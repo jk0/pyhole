@@ -24,7 +24,7 @@ from pyhole import utils
 class TestLog(unittest.TestCase):
     def test_logger(self):
         test_log_dir = utils.get_home_directory() + "logs/"
-        test_log = log.getLogger("TEST")
+        test_log = log.get_logger("TEST")
         self.assertEqual("TEST", test_log.name)
         self.assertEqual(test_log.level, 0)
         os.unlink(test_log_dir + "test.log")

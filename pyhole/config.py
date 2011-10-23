@@ -57,9 +57,7 @@ class Config(object):
             elif _type == "bool":
                 return self.config_parser.getboolean(self.section, option)
             elif _type == "list":
-                value = self.config_parser.get(self.section, option)
-                if hasattr(value, "split"):
-                    return value.split(", ")
+                return self.config_parser.get(self.section, option).split(", ")
             else:
                 return self.config_parser.get(self.section, option)
         except ConfigParser.NoOptionError:

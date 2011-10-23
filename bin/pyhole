@@ -36,7 +36,7 @@ from pyhole import version
 
 __VERSION__ = version.version_string()
 
-LOG = log.getLogger()
+LOG = log.get_logger()
 CONFIG = utils.get_config()
 
 
@@ -82,8 +82,8 @@ def main():
     LOG.info("Starting %s" % __VERSION__)
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
     for network in networks:
-        p = IRCConnection(network)
-        p.start()
+        proc = IRCConnection(network)
+        proc.start()
 
     try:
         while True:
