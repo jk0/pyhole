@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Intelligent Configuration Library"""
+"""Pyhole Configuration Library"""
 
 from __future__ import with_statement
 
@@ -24,7 +24,7 @@ import utils
 
 
 class Config(object):
-    """A configuration object"""
+    """A configuration object."""
 
     def __init__(self, config, section):
         self.config = os.path.abspath(config)
@@ -45,11 +45,11 @@ class Config(object):
         return self.section
 
     def sections(self):
-        """Return a list of sections"""
+        """Return a list of sections."""
         return self.config_parser.sections()
 
     def get(self, option, **kwargs):
-        """Retrieve configuration values"""
+        """Retrieve configuration values."""
         _type = kwargs.get("type", "str")
 
         try:

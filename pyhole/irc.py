@@ -37,6 +37,8 @@ class IRC(irclib.SimpleIRCClient):
 
         self.log = log.getLogger(str(network))
         self.version = version.version_string()
+        self.source = None
+        self.target = None
         self.addressed = False
 
         self.admins = config.get("admins", type="list")
@@ -71,47 +73,47 @@ class IRC(irclib.SimpleIRCClient):
 
         self.log.info("Loaded Plugins: %s" % active_plugins())
 
-    def run_hook_command(self, mod_name, f, arg, **kwargs):
+    def run_hook_command(self, mod_name, func, arg, **kwargs):
         """Make a call to a plugin hook"""
         try:
-            f(arg, **kwargs)
+            func(arg, **kwargs)
             if arg:
                 self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
-                        f.__name__, arg))
+                        func.__name__, arg))
             else:
                 self.log.debug("Calling: %s.%s(None)" % (mod_name,
-                        f.__name__))
+                        func.__name__))
         except Exception, e:
             self.log.error(e)
 
     def run_msg_regexp_hooks(self, message, private):
         """Run regexp hooks"""
-        for mod_name, f, msg_regex in plugin.hook_get_msg_regexs():
-            m = re.search(msg_regex, message, re.I)
-            if m:
-                self.run_hook_command(mod_name, f, m, private=private,
+        for mod_name, func, msg_regex in plugin.hook_get_msg_regexs():
+            match = re.search(msg_regex, message, re.I)
+            if match:
+                self.run_hook_command(mod_name, func, match, private=private,
                         full_message=message)
 
     def run_keyword_hooks(self, message, private):
         """Run keyword hooks"""
         words = message.split(" ")
-
-        for mod_name, f, kw in plugin.hook_get_keywords():
+        for mod_name, func, kwarg in plugin.hook_get_keywords():
             for word in words:
-                m = re.search("^%s(.+)" % kw, word, re.I)
-                if m:
-                    self.run_hook_command(mod_name, f, m.group(1),
+                match = re.search("^%s(.+)" % kwarg, word, re.I)
+                if match:
+                    self.run_hook_command(mod_name, func, match.group(1),
                             private=private, full_message=message)
 
     def run_command_hooks(self, message, private):
         """Run command hooks"""
-        for mod_name, f, cmd in plugin.hook_get_commands():
+        for mod_name, func, cmd in plugin.hook_get_commands():
             self.addressed = False
 
             if private:
-                m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message, re.I)
-                if m:
-                    self.run_hook_command(mod_name, f, m.group(1),
+                match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message,
+                        re.I)
+                if match:
+                    self.run_hook_command(mod_name, func, match.group(1),
                             private=private, addressed=self.addressed,
                             full_message=message)
 
@@ -130,10 +132,11 @@ class IRC(irclib.SimpleIRCClient):
 
                 self.addressed = True
 
-            m = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
-            if m:
-                self.run_hook_command(mod_name, f, m.group(1), private=private,
-                        addressed=self.addressed, full_message=message)
+            match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
+            if match:
+                self.run_hook_command(mod_name, func, match.group(1),
+                        private=private, addressed=self.addressed,
+                        full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands"""
@@ -211,6 +214,7 @@ class IRC(irclib.SimpleIRCClient):
     def fetch_url(self, url, name):
         """Fetch a URL"""
         class PyholeURLopener(urllib.FancyURLopener):
+            """Set a custom user agent."""
             version = self.version
 
         urllib._urlopener = PyholeURLopener()
@@ -221,7 +225,7 @@ class IRC(irclib.SimpleIRCClient):
             self.reply("Unable to fetch %s data" % name)
             return None
 
-    def on_nicknameinuse(self, connection, event):
+    def on_nicknameinuse(self, connection, _event):
         """Ensure the use of unique IRC nick"""
         random_int = random.randint(1, 100)
         self.log.info("IRC nick '%s' is currently in use" % self.nick)
@@ -231,20 +235,20 @@ class IRC(irclib.SimpleIRCClient):
         # Try to prevent nick flooding
         time.sleep(1)
 
-    def on_welcome(self, connection, event):
+    def on_welcome(self, connection, _event):
         """Join channels upon successful connection"""
         if self.identify_password:
             self.privmsg("NickServ", "IDENTIFY %s" % self.identify_password)
 
         for channel in self.channels:
-            c = channel.split(" ", 1)
-            if irclib.is_channel(c[0]):
-                if len(c) > 1:
-                    connection.join(c[0], c[1])
+            channel = channel.split(" ", 1)
+            if irclib.is_channel(channel[0]):
+                if len(channel) > 1:
+                    connection.join(channel[0], channel[1])
                 else:
-                    connection.join(c[0])
+                    connection.join(channel[0])
 
-    def on_disconnect(self, connection, event):
+    def on_disconnect(self, _connection, _event):
         """Attempt to reconnect after disconnection"""
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
@@ -270,14 +274,13 @@ class IRC(irclib.SimpleIRCClient):
             self.log.info("-%s- %s was kicked by %s: %s" % (target, nick,
                     source, reason))
 
-    def on_invite(self, connection, event):
+    def on_invite(self, _connection, event):
         """Join a channel upon invitation"""
         source = event.source().split("@", 1)[0]
-
         if source in self.admins:
             self.join_channel(event.arguments()[0])
 
-    def on_ctcp(self, connection, event):
+    def on_ctcp(self, _connection, event):
         """Respond to CTCP events"""
         source = irclib.nm_to_n(event.source())
         ctcp = event.arguments()[0]
@@ -291,48 +294,45 @@ class IRC(irclib.SimpleIRCClient):
                 connection.ctcp_reply(source,
                         "PING %s" % event.arguments()[1])
 
-    def on_join(self, connection, event):
+    def on_join(self, _connection, event):
         """Handle joins"""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s joined" % (target, source))
 
-    def on_part(self, connection, event):
+    def on_part(self, _connection, event):
         """Handle parts"""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s left" % (target, source))
 
-    def on_quit(self, connection, event):
+    def on_quit(self, _connection, event):
         """Handle quits"""
         source = irclib.nm_to_n(event.source())
         self.log.info("%s quit" % source)
 
-    def on_action(self, connection, event):
+    def on_action(self, _connection, event):
         """Handle IRC actions"""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
-
         self.log.info(unicode("-%s- * %s %s" % (target, source, msg), "utf-8"))
 
-    def on_privnotice(self, connection, event):
+    def on_privnotice(self, _connection, event):
         """Handle private notices"""
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
-
         self.log.info(unicode("-%s- %s" % (source, msg), "utf-8"))
 
-    def on_pubnotice(self, connection, event):
+    def on_pubnotice(self, _connection, event):
         """Handle public notices"""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
-
         self.log.info(unicode("-%s- <%s> %s" % (target, source, msg),
                 "utf-8"))
 
-    def on_privmsg(self, connection, event):
+    def on_privmsg(self, _connection, event):
         """Handle private messages"""
         self.source = event.source().split("@", 1)[0]
         self.target = irclib.nm_to_n(event.source())
@@ -342,7 +342,7 @@ class IRC(irclib.SimpleIRCClient):
             self.log.info(unicode("<%s> %s" % (self.target, msg), "utf-8"))
             self.poll_messages(msg, private=True)
 
-    def on_pubmsg(self, connection, event):
+    def on_pubmsg(self, _connection, event):
         """Handle public messages"""
         self.source = event.source().split("@", 1)[0]
         self.target = event.target()
