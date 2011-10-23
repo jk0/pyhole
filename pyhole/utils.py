@@ -20,7 +20,6 @@ import eventlet
 import os
 import optparse
 import re
-import sys
 
 from BeautifulSoup import BeautifulStoneSoup
 
@@ -33,25 +32,25 @@ eventlet.monkey_patch()
 
 def admin(func):
     """Administration Decorator"""
-    def f(self, *args, **kwargs):
+    def wrap(self, *args, **kwargs):
         if self.irc.source in self.irc.admins:
             func(self, *args, **kwargs)
         else:
             self.irc.reply("Sorry, you are not authorized to do that.")
-    f.__doc__ = func.__doc__
-    f.__name__ = func.__name__
-    f.__module__ = func.__module__
-    return f
+    wrap.__doc__ = func.__doc__
+    wrap.__name__ = func.__name__
+    wrap.__module__ = func.__module__
+    return wrap
 
 
 def spawn(func):
     """Greenthread Spawning Decorator"""
-    def f(self, *args, **kwargs):
+    def wrap(self, *args, **kwargs):
         eventlet.spawn_n(func, self, *args, **kwargs)
-    f.__doc__ = func.__doc__
-    f.__name__ = func.__name__
-    f.__module__ = func.__module__
-    return f
+    wrap.__doc__ = func.__doc__
+    wrap.__name__ = func.__name__
+    wrap.__module__ = func.__module__
+    return wrap
 
 
 def decode_entities(html):
@@ -85,7 +84,7 @@ def build_options():
 
 def get_option(option):
     """Retrive an option from the command line."""
-    options, args = build_options()
+    options, _args = build_options()
     return vars(options).get(option)
 
 
@@ -124,22 +123,19 @@ def get_config(section="Pyhole"):
     return config.Config(get_conf_file(), section)
 
 
-def write_file(dir, file, data):
+def write_file(directory, file_name, data):
     """Write data to file"""
-    dir = get_directory(dir)
+    directory = get_directory(directory)
+    with open(directory + file_name, "w") as open_file:
+        open_file.write(str(data).strip())
 
-    with open(dir + file, "w") as f:
-        f.write(str(data).strip())
 
-
-def read_file(dir, file):
+def read_file(directory, file_name):
     """Read and return the data in file"""
-    dir = get_directory(dir)
-
+    directory = get_directory(directory)
     try:
-        with open(dir + file, "r") as f:
-            data = f.read()
-
+        with open(directory + file_name, "r") as open_file:
+            data = open_file.read()
         return data
     except IOError:
         return None
