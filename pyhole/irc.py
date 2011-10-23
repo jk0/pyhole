@@ -280,7 +280,7 @@ class IRC(irclib.SimpleIRCClient):
         if source in self.admins:
             self.join_channel(event.arguments()[0])
 
-    def on_ctcp(self, _connection, event):
+    def on_ctcp(self, connection, event):
         """Respond to CTCP events"""
         source = irclib.nm_to_n(event.source())
         ctcp = event.arguments()[0]
