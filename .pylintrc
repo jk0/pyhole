@@ -1,10 +1,8 @@
 [Messages Control]
+# C0111: Don't require docstrings on every method
 # W0511: TODOs in code comments are fine.
 # W0142: *args and **kwargs are fine.
-disable = W0511,W0142
+# W0622: Redefining id is fine.
+disable=C0111,W0511,W0142,W0622
+method-rgx=([a-z_][a-z0-9_]{2,30}|setUp|tearDown)$
 no-docstring-rgx=((__.*__)|([tT]est.*)|setUp|tearDown)$
-
-[Design]
-max-public-methods=100
-min-public-methods=0
-max-args=6
