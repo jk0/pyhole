@@ -143,8 +143,8 @@ def load_user_plugin(plugin, *args, **kwargs):
             if plugin == user_plugin:
                 try:
                     __import__(plugin, globals(), locals(), [plugin])
-                except Exception, e:
-                    LOG.error(e)
+                except Exception, exc:
+                    LOG.error(exc)
 
 
 def load_plugins(*args, **kwargs):
@@ -157,8 +157,8 @@ def load_plugins(*args, **kwargs):
 
         try:
             __import__("pyhole.plugins", globals(), locals(), [plugin_name])
-        except Exception, e:
-            LOG.error(e)
+        except Exception, exc:
+            LOG.error(exc)
 
     _init_plugins(*args, **kwargs)
 
@@ -189,8 +189,8 @@ def reload_plugins(*args, **kwargs):
     for plugin in plugins_to_reload:
         try:
             reload(sys.modules[plugin])
-        except Exception, e:
-            LOG.error(e)
+        except Exception, exc:
+            LOG.error(exc)
 
     # Load new plugins
     load_plugins(*args, **kwargs)

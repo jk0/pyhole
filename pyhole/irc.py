@@ -83,8 +83,8 @@ class IRC(irclib.SimpleIRCClient):
             else:
                 self.log.debug("Calling: %s.%s(None)" % (mod_name,
                         func.__name__))
-        except Exception, e:
-            self.log.error(e)
+        except Exception, exc:
+            self.log.error(exc)
 
     def run_msg_regexp_hooks(self, message, private):
         """Run regexp hooks"""

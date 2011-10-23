@@ -53,8 +53,8 @@ class IRCConnection(multiprocessing.Process):
         while True:
             try:
                 connection = irc.IRC(self.irc_network)
-            except Exception, e:
-                LOG.error(e)
+            except Exception, exc:
+                LOG.error(exc)
                 LOG.error("Retrying in %d seconds" % reconnect_delay)
                 time.sleep(reconnect_delay)
                 continue
@@ -63,8 +63,8 @@ class IRCConnection(multiprocessing.Process):
                 connection.start()
             except KeyboardInterrupt:
                 sys.exit(0)
-            except Exception, e:
-                LOG.error(e)
+            except Exception, exc:
+                LOG.error(exc)
                 LOG.error("Retrying in %d seconds" % reconnect_delay)
                 time.sleep(reconnect_delay)
                 continue
