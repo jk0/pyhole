@@ -187,6 +187,6 @@ channels: #mychannel key, #mychannel2
         return
 
     print "Generating..."
-    with open(conf_file, "w") as f:
-        f.write(example)
+    with open(conf_file, "w") as open_file:
+        open_file.write(example)
     print "Done"
