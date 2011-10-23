@@ -6,3 +6,8 @@
 disable=C0111,W0511,W0142,W0622
 method-rgx=([a-z_][a-z0-9_]{2,30}|setUp|tearDown)$
 no-docstring-rgx=((__.*__)|([tT]est.*)|setUp|tearDown)$
+
+[Design]
+max-public-methods=100
+min-public-methods=0
+max-args=10
