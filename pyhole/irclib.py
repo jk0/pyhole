@@ -215,6 +215,10 @@ class IRC:
             self.process_data(i)
         else:
             time.sleep(timeout)
+
+        for conn in self.connections:
+            conn._check_last_event()
+
         self.process_timeout()
 
     def process_forever(self, timeout=0.2):
@@ -431,6 +435,8 @@ class ServerConnection(Connection):
         self.localaddress = localaddress
         self.localport = localport
         self.localhost = socket.gethostname()
+        self.last_event = time.time()
+
         if ipv6:
             self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
         else:
@@ -497,6 +503,8 @@ class ServerConnection(Connection):
 
     def process_data(self):
         """[Internal]"""
+        if not self.is_connected():
+            return
 
         try:
             if self.ssl:
@@ -516,6 +524,9 @@ class ServerConnection(Connection):
 
         # Save the last, unfinished line.
         self.previous_buffer = lines.pop()
+
+        # Record the time of this event
+        self.last_event = time.time()
 
         for line in lines:
             if DEBUG:
@@ -619,6 +630,11 @@ class ServerConnection(Connection):
         if event.eventtype() in self.handlers:
             for fn in self.handlers[event.eventtype()]:
                 fn(self, event)
+
+    def _check_last_event(self, timeout=300):
+        """Disconnect if last event was too long ago"""
+        if self.is_connected() and self.last_event + timeout < time.time():
+            self.disconnect("Ping timeout")
 
     def is_connected(self):
         """Return connection status.
@@ -810,7 +826,7 @@ class ServerConnection(Connection):
                 print "TO SERVER:", string
         except socket.error, x:
             # Ouch!
-            self.disconnect("Connection reset by peer.")
+            self.disconnect("Connection reset by peer")
 
     def squit(self, server, comment=""):
         """Send an SQUIT command."""
@@ -1032,7 +1048,7 @@ class DCCConnection(Connection):
                 print "TO PEER: %s\n" % string
         except socket.error, x:
             # Ouch!
-            self.disconnect("Connection reset by peer.")
+            self.disconnect("Connection reset by peer")
 
 
 class SimpleIRCClient:
