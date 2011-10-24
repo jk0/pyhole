@@ -24,9 +24,9 @@ From Source
     git clone git://github.com/jk0/pyhole.git
     cd pyhole
     sudo pip install -r tools/pip-requires
-    ./bin/pyhole
+    ./tools/run_pyhole.sh
     vi ~/.pyhole/pyhole.conf
-    ./bin/pyhole
+    ./tools/run_pyhole.sh
 
 Python Package
 ^^^^^^^^^^^^^^

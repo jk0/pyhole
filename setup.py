@@ -32,7 +32,6 @@ setuptools.setup(
         "launchpadlib",
         "pywapi"
     ],
-    scripts=["bin/pyhole"],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -40,5 +39,8 @@ setuptools.setup(
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
-    ]
+    ],
+    entry_points={
+        "console_scripts": ["pyhole = pyhole.irc:main"]
+    }
 )

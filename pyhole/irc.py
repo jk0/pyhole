@@ -14,8 +14,10 @@
 
 """Event-based IRC Class"""
 
+import multiprocessing
 import random
 import re
+import sys
 import time
 import urllib
 
@@ -26,13 +28,15 @@ import utils
 import version
 
 
+LOG = log.get_logger()
+CONFIG = utils.get_config()
+
+
 class IRC(irclib.SimpleIRCClient):
-    """An IRC connection"""
+    """An IRClib connection."""
 
     def __init__(self, network):
         irclib.SimpleIRCClient.__init__(self)
-
-        config = utils.get_config()
         network_config = utils.get_config(network)
 
         self.log = log.get_logger(str(network))
@@ -41,10 +45,10 @@ class IRC(irclib.SimpleIRCClient):
         self.target = None
         self.addressed = False
 
-        self.admins = config.get("admins", type="list")
-        self.command_prefix = config.get("command_prefix")
-        self.reconnect_delay = config.get("reconnect_delay", type="int")
-        self.rejoin_delay = config.get("rejoin_delay", type="int")
+        self.admins = CONFIG.get("admins", type="list")
+        self.command_prefix = CONFIG.get("command_prefix")
+        self.reconnect_delay = CONFIG.get("reconnect_delay", type="int")
+        self.rejoin_delay = CONFIG.get("rejoin_delay", type="int")
 
         self.server = network_config.get("server")
         self.password = network_config.get("password", default="")
@@ -65,7 +69,7 @@ class IRC(irclib.SimpleIRCClient):
                 ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to)
 
     def load_plugins(self, reload_plugins=False):
-        """Load plugins and their commands respectively"""
+        """Load plugins and their commands respectively."""
         if reload_plugins:
             plugin.reload_plugins(irc=self)
         else:
@@ -74,7 +78,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Loaded Plugins: %s" % active_plugins())
 
     def run_hook_command(self, mod_name, func, arg, **kwargs):
-        """Make a call to a plugin hook"""
+        """Make a call to a plugin hook."""
         try:
             func(arg, **kwargs)
             if arg:
@@ -87,7 +91,7 @@ class IRC(irclib.SimpleIRCClient):
             self.log.error(exc)
 
     def run_msg_regexp_hooks(self, message, private):
-        """Run regexp hooks"""
+        """Run regexp hooks."""
         for mod_name, func, msg_regex in plugin.hook_get_msg_regexs():
             match = re.search(msg_regex, message, re.I)
             if match:
@@ -95,7 +99,7 @@ class IRC(irclib.SimpleIRCClient):
                         full_message=message)
 
     def run_keyword_hooks(self, message, private):
-        """Run keyword hooks"""
+        """Run keyword hooks."""
         words = message.split(" ")
         for mod_name, func, kwarg in plugin.hook_get_keywords():
             for word in words:
@@ -105,7 +109,7 @@ class IRC(irclib.SimpleIRCClient):
                             private=private, full_message=message)
 
     def run_command_hooks(self, message, private):
-        """Run command hooks"""
+        """Run command hooks."""
         for mod_name, func, cmd in plugin.hook_get_commands():
             self.addressed = False
 
@@ -139,7 +143,7 @@ class IRC(irclib.SimpleIRCClient):
                         full_message=message)
 
     def poll_messages(self, message, private=False):
-        """Watch for known commands"""
+        """Watch for known commands."""
         self.addressed = False
 
         self.run_command_hooks(message, private)
@@ -147,7 +151,7 @@ class IRC(irclib.SimpleIRCClient):
         self.run_msg_regexp_hooks(message, private)
 
     def reply(self, msg):
-        """Send a privmsg"""
+        """Send a privmsg."""
         if not hasattr(msg, "encode"):
             try:
                 msg = str(msg)
@@ -176,26 +180,26 @@ class IRC(irclib.SimpleIRCClient):
                     self.log.info("<%s> %s" % (self.nick, line))
 
     def privmsg(self, target, msg):
-        """Send a privmsg"""
+        """Send a privmsg."""
         self.connection.privmsg(target, msg)
 
     def op_user(self, params):
-        """Op a user"""
+        """Op a user."""
         params = params.split(" ", 1)
         self.connection.mode(params[0], "+o %s" % params[1])
 
     def deop_user(self, params):
-        """De-op a user"""
+        """De-op a user."""
         params = params.split(" ", 1)
         self.connection.mode(params[0], "-o %s" % params[1])
 
     def set_nick(self, params):
-        """Set IRC nick"""
+        """Set IRC nick."""
         self.nick = params
         self.connection.nick(params)
 
     def join_channel(self, params):
-        """Join a channel"""
+        """Join a channel."""
         channel = params.split(" ", 1)
         self.reply("Joining %s" % channel[0])
         if irclib.is_channel(channel[0]):
@@ -206,13 +210,13 @@ class IRC(irclib.SimpleIRCClient):
                 self.connection.join(channel[0])
 
     def part_channel(self, params):
-        """Part a channel"""
+        """Part a channel."""
         self.channels.remove(params)
         self.reply("Parting %s" % params)
         self.connection.part(params)
 
     def fetch_url(self, url, name):
-        """Fetch a URL"""
+        """Fetch a URL."""
         class PyholeURLopener(urllib.FancyURLopener):
             """Set a custom user agent."""
             version = self.version
@@ -226,7 +230,7 @@ class IRC(irclib.SimpleIRCClient):
             return None
 
     def on_nicknameinuse(self, connection, _event):
-        """Ensure the use of unique IRC nick"""
+        """Ensure the use of unique IRC nick."""
         random_int = random.randint(1, 100)
         self.log.info("IRC nick '%s' is currently in use" % self.nick)
         self.nick = "%s%d" % (self.nick, random_int)
@@ -236,7 +240,7 @@ class IRC(irclib.SimpleIRCClient):
         time.sleep(1)
 
     def on_welcome(self, connection, _event):
-        """Join channels upon successful connection"""
+        """Join channels upon successful connection."""
         if self.identify_password:
             self.privmsg("NickServ", "IDENTIFY %s" % self.identify_password)
 
@@ -249,7 +253,7 @@ class IRC(irclib.SimpleIRCClient):
                     connection.join(channel[0])
 
     def on_disconnect(self, _connection, _event):
-        """Attempt to reconnect after disconnection"""
+        """Attempt to reconnect after disconnection."""
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
@@ -259,7 +263,7 @@ class IRC(irclib.SimpleIRCClient):
                 ssl=self.ssl)
 
     def on_kick(self, connection, event):
-        """Automatically rejoin channel if kicked"""
+        """Automatically rejoin channel if kicked."""
         source = irclib.nm_to_n(event.source())
         target = event.target()
         nick, reason = event.arguments()
@@ -275,13 +279,13 @@ class IRC(irclib.SimpleIRCClient):
                     source, reason))
 
     def on_invite(self, _connection, event):
-        """Join a channel upon invitation"""
+        """Join a channel upon invitation."""
         source = event.source().split("@", 1)[0]
         if source in self.admins:
             self.join_channel(event.arguments()[0])
 
     def on_ctcp(self, connection, event):
-        """Respond to CTCP events"""
+        """Respond to CTCP events."""
         source = irclib.nm_to_n(event.source())
         ctcp = event.arguments()[0]
 
@@ -295,37 +299,37 @@ class IRC(irclib.SimpleIRCClient):
                         "PING %s" % event.arguments()[1])
 
     def on_join(self, _connection, event):
-        """Handle joins"""
+        """Handle joins."""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s joined" % (target, source))
 
     def on_part(self, _connection, event):
-        """Handle parts"""
+        """Handle parts."""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s left" % (target, source))
 
     def on_quit(self, _connection, event):
-        """Handle quits"""
+        """Handle quits."""
         source = irclib.nm_to_n(event.source())
         self.log.info("%s quit" % source)
 
     def on_action(self, _connection, event):
-        """Handle IRC actions"""
+        """Handle IRC actions."""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
         self.log.info(unicode("-%s- * %s %s" % (target, source, msg), "utf-8"))
 
     def on_privnotice(self, _connection, event):
-        """Handle private notices"""
+        """Handle private notices."""
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
         self.log.info(unicode("-%s- %s" % (source, msg), "utf-8"))
 
     def on_pubnotice(self, _connection, event):
-        """Handle public notices"""
+        """Handle public notices."""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
@@ -333,7 +337,7 @@ class IRC(irclib.SimpleIRCClient):
                 "utf-8"))
 
     def on_privmsg(self, _connection, event):
-        """Handle private messages"""
+        """Handle private messages."""
         self.source = event.source().split("@", 1)[0]
         self.target = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
@@ -343,7 +347,7 @@ class IRC(irclib.SimpleIRCClient):
             self.poll_messages(msg, private=True)
 
     def on_pubmsg(self, _connection, event):
-        """Handle public messages"""
+        """Handle public messages."""
         self.source = event.source().split("@", 1)[0]
         self.target = event.target()
         nick = irclib.nm_to_n(event.source())
@@ -354,16 +358,68 @@ class IRC(irclib.SimpleIRCClient):
         self.poll_messages(msg)
 
 
+class IRCProcess(multiprocessing.Process):
+    """An IRC network connection process."""
+    def __init__(self, irc_network):
+        super(IRCProcess, self).__init__()
+        self.irc_network = irc_network
+        self.reconnect_delay = CONFIG.get("reconnect_delay", type="int")
+
+    def run(self):
+        """An IRC network connection."""
+        while True:
+            try:
+                connection = IRC(self.irc_network)
+            except Exception, exc:
+                LOG.error(exc)
+                LOG.error("Retrying in %d seconds" % self.reconnect_delay)
+                time.sleep(self.reconnect_delay)
+                continue
+
+            try:
+                connection.start()
+            except KeyboardInterrupt:
+                sys.exit(0)
+            except Exception, exc:
+                LOG.error(exc)
+                LOG.error("Retrying in %d seconds" % self.reconnect_delay)
+                time.sleep(self.reconnect_delay)
+                continue
+
+
 def active_plugins():
-    """List active plugins"""
+    """List active plugins."""
     return ", ".join(sorted(plugin.active_plugins()))
 
 
 def active_commands():
-    """List active commands"""
+    """List active commands."""
     return ", ".join(sorted(plugin.active_commands()))
 
 
 def active_keywords():
-    """List active keywords"""
+    """List active keywords."""
     return ", ".join(sorted(plugin.active_keywords()))
+
+
+def network_list():
+    """Return the list of IRC networks."""
+    sections = CONFIG.sections()
+    return [net for net in sections if net not in ["Pyhole", "Redmine"]]
+
+
+def main():
+    """Main IRC loop."""
+    networks = network_list()
+
+    LOG.info("Starting %s" % version.version_string())
+    LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
+    for network in networks:
+        proc = IRCProcess(network)
+        proc.start()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        LOG.info("Caught KeyboardInterrupt, shutting down")
