@@ -16,8 +16,8 @@
 
 from __future__ import with_statement
 
-import argparse
 import eventlet
+import optparse
 import os
 import re
 
@@ -73,10 +73,10 @@ def ensure_int(param):
 
 def build_options():
     """Generate command line options"""
-    parser = argparse.ArgumentParser(version=version.version_string())
-    parser.add_argument("-c", "--config", default=get_conf_file_path(),
+    parser = optparse.OptionParser(version=version.version_string())
+    parser.add_option("-c", "--config", default=get_conf_file_path(),
             help="specify the path to a configuration file")
-    parser.add_argument("-d", "--debug", action="store_true",
+    parser.add_option("-d", "--debug", action="store_true",
             help="show debugging output")
 
     return parser.parse_args()
@@ -84,7 +84,7 @@ def build_options():
 
 def get_option(option):
     """Retrive an option from the command line."""
-    options = build_options()
+    options, _args = build_options()
     return vars(options).get(option)
 
 

@@ -43,7 +43,7 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(utils.ensure_int("a"), None)
 
     def test_build_options(self):
-        options = utils.build_options()
+        options, _args = utils.build_options()
         self.assertTrue(isinstance(options, object))
 
     def test_get_option(self):
