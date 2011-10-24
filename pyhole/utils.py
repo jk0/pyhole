@@ -73,6 +73,11 @@ def ensure_int(param):
 
 def build_options():
     """Generate command line options"""
+    # NOTE(jk0): This hack prevents OptionParser from messing with command line
+    # arguments when running sphinx, nose, etc.
+    if not __name__ == "__main__":
+        return (object, object)
+
     parser = optparse.OptionParser(version=version.version_string())
     parser.add_option("-c", "--config", default=get_conf_file_path(),
             help="specify the path to a configuration file")
