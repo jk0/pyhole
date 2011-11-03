@@ -24,7 +24,7 @@ setuptools.setup(
     author_email="josh@jk0.org",
     description="A modular IRC bot for Python developers.",
     license="Apache License, Version 2.0",
-    url="http://docs.pyhole.org",
+    url="http://pyhole.org",
     packages=["pyhole", "pyhole.plugins"],
     install_requires=[
         "eventlet",
