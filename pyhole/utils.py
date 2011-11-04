@@ -55,7 +55,9 @@ def spawn(func):
 
 def decode_entities(html):
     """Strip HTML entities from a string and make it printable"""
-    html = "".join(str(x).strip() for x in BeautifulStoneSoup(html,
+    html = re.sub("\n", "", html)
+    html = re.sub(" +", " ", html)
+    html = " ".join(str(x).strip() for x in BeautifulStoneSoup(html,
             convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
             text=True))
 
