@@ -43,6 +43,9 @@ class Url(plugin.Plugin):
         """Watch and keep track of the latest URL"""
         try:
             self.url = kwargs["full_message"].split(" ", 1)[0]
+
+            if self.url[7:].startswith("open.spotify.com"):
+                self._find_title(self.url)
         except TypeError:
             return
 
