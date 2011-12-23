@@ -154,6 +154,7 @@ reconnect_delay: 60
 rejoin_delay: 5
 debug: False
 plugins: admin, dice, entertainment, news, search, urls, weather
+networks: FreeNode, EFnet
 
 [Redmine]
 domain: redmine.example.com
