@@ -404,7 +404,7 @@ def active_keywords():
 
 def main():
     """Main IRC loop."""
-    networks = CONFIG.get('networks', type='list')
+    networks = CONFIG.get("networks", type="list")
 
     LOG.info("Starting %s" % version.version_string())
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
