@@ -402,15 +402,9 @@ def active_keywords():
     return ", ".join(sorted(plugin.active_keywords()))
 
 
-def network_list():
-    """Return the list of IRC networks."""
-    sections = CONFIG.sections()
-    return [net for net in sections if net not in ["Pyhole", "Redmine"]]
-
-
 def main():
     """Main IRC loop."""
-    networks = network_list()
+    networks = CONFIG.get('networks', type='list')
 
     LOG.info("Starting %s" % version.version_string())
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
