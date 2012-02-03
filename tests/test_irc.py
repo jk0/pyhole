@@ -27,7 +27,3 @@ class TestIrc(unittest.TestCase):
     def test_active_keywords(self):
         active_keywords = irc.active_keywords()
         self.assertTrue(isinstance(active_keywords, str))
-
-    def test_network_list(self):
-        network_list = irc.network_list()
-        self.assertTrue("Pyhole" not in network_list)
