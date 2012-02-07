@@ -334,7 +334,10 @@ class IRC(irclib.SimpleIRCClient):
     def on_pubnotice(self, _connection, event):
         """Handle public notices."""
         target = event.target()
-        source = irclib.nm_to_n(event.source())
+        if event.source() is not None:
+            source = irclib.nm_to_n(event.source())
+        else:
+            source = None
         msg = event.arguments()[0]
         self.log.info(unicode("-%s- <%s> %s" % (target, source, msg),
                 "utf-8"))

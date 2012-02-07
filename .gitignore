@@ -6,5 +6,7 @@
 *.conf
 .DS_Store
 .coverage
-docs/_build/*
-build/
+docs/_build
+build
+dist
+irc_pyhole.egg-info
