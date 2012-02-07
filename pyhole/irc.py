@@ -327,7 +327,7 @@ class IRC(irclib.SimpleIRCClient):
         if event.source() is not None:
             source = irclib.nm_to_n(event.source())
         else:
-            source = u'undefined'
+            source = None
         msg = event.arguments()[0]
         self.log.info(unicode("-%s- %s" % (source, msg), "utf-8"))
 
