@@ -30,7 +30,7 @@ setuptools.setup(
         "eventlet",
         "beautifulsoup==3.2.0",
         "launchpadlib",
-        "pywapi"
+        "pywunderground"
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
