@@ -12,7 +12,7 @@ Plugin Requirements
 
     - launchpadlib
     - pycleverbot
-    - pywapi
+    - pywunderground
 
 
 Test Requirements

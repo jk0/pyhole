@@ -153,8 +153,11 @@ command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
 debug: False
-plugins: admin, dice, entertainment, news, search, urls, weather
+plugins: admin, dice, entertainment, news, search, urls
 networks: FreeNode, EFnet
+
+[Wunderground]
+key: abcd1234
 
 [Redmine]
 domain: redmine.example.com

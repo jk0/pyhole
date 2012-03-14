@@ -14,7 +14,7 @@
 
 """Pyhole Weather Plugin"""
 
-import pywapi
+import pywunderground
 
 from pyhole import plugin
 from pyhole import utils
@@ -27,6 +27,9 @@ class Weather(plugin.Plugin):
     @utils.spawn
     def weather(self, params=None, **kwargs):
         """Display current weather report (ex: .w [set] [<location>])"""
+        wunderground = utils.get_config("Wunderground")
+        api_key = wunderground.get("key")
+
         if params:
             location = params
             if location.startswith("set "):
@@ -40,21 +43,23 @@ class Weather(plugin.Plugin):
                 return
 
         try:
-            w = pywapi.get_weather_from_google(location)
+            w = pywunderground.request(api_key, ["conditions"], location)
         except Exception:
             self.irc.reply("Unable to fetch weather data")
             return
 
-        if w["current_conditions"]:
-            city = w["forecast_information"]["city"]
-            temp_f = w["current_conditions"]["temp_f"]
-            temp_c = w["current_conditions"]["temp_c"]
-            humidity = w["current_conditions"]["humidity"]
-            wind = w["current_conditions"]["wind_condition"]
-            condition = w["current_conditions"]["condition"]
+        if w.get("current_observation"):
+            city = w["current_observation"]["display_location"]["full"]
+            zip_code = w["current_observation"]["display_location"]["zip"]
+            temp = w["current_observation"]["temperature_string"]
+            humidity = w["current_observation"]["relative_humidity"]
+            wind = w["current_observation"]["wind_string"]
+            condition = w["current_observation"]["weather"]
 
-            result = "%s: %sF/%sC   %s   %s   %s" % (city, temp_f, temp_c,
-                    humidity, wind, condition)
+            zip_code = "" if zip_code == "00000" else " %s" % zip_code
+            result = "%s%s: %s   Humidity: %s   Wind: %s   %s" % (city,
+                    zip_code, temp, humidity, wind, condition)
+
             self.irc.reply(result)
         else:
             self.irc.reply("Location not found: '%s'" % location)
