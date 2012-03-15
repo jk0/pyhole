@@ -57,6 +57,8 @@ class Weather(plugin.Plugin):
             condition = w["current_observation"]["weather"]
 
             zip_code = "" if zip_code == "00000" else " %s" % zip_code
+            humidity = "N/A%" if len(humidity) > 3 else humidity
+
             result = "%s%s: %s   Humidity: %s   Wind: %s   %s" % (city,
                     zip_code, temp, humidity, wind, condition)
 
