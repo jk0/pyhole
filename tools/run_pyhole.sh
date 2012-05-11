@@ -14,4 +14,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-python -c "from pyhole import irc; irc.main()"
+python -c "from pyhole import irc; irc.main()" $@

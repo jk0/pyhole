@@ -150,6 +150,15 @@ class IRC(irclib.SimpleIRCClient):
         self.run_keyword_hooks(message, private)
         self.run_msg_regexp_hooks(message, private)
 
+    def poll_action(self, source, action, target=None, msg=None):
+        """Watch for known actions."""
+        for mod_name, func, act in plugin.hook_get_actions():
+            if action != act:
+                continue
+
+            self.run_hook_command(mod_name, func, source, target=target,
+                                  message=msg)
+
     def reply(self, msg):
         """Send a privmsg."""
         if not hasattr(msg, "encode"):
@@ -303,17 +312,20 @@ class IRC(irclib.SimpleIRCClient):
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s joined" % (target, source))
+        self.poll_action(source, "join", target)
 
     def on_part(self, _connection, event):
         """Handle parts."""
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s left" % (target, source))
+        self.poll_action(source, "part", target)
 
     def on_quit(self, _connection, event):
         """Handle quits."""
         source = irclib.nm_to_n(event.source())
         self.log.info("%s quit" % source)
+        self.poll_action(source, "part")
 
     def on_action(self, _connection, event):
         """Handle IRC actions."""
@@ -321,6 +333,7 @@ class IRC(irclib.SimpleIRCClient):
         source = irclib.nm_to_n(event.source())
         msg = event.arguments()[0]
         self.log.info(unicode("-%s- * %s %s" % (target, source, msg), "utf-8"))
+        self.poll_action(source, "action", target, msg=msg)
 
     def on_privnotice(self, _connection, event):
         """Handle private notices."""
