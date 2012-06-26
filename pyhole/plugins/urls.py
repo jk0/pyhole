@@ -62,6 +62,10 @@ class Url(plugin.Plugin):
 
         if soup.head:
             title = utils.decode_entities(soup.head.title.string)
-            self.irc.reply(title)
+            content_type = response.headers.get("Content-Type")
+            content_size = response.headers.get(
+                    "Content-Length", "N/A") + " bytes"
+
+            self.irc.reply("%s (%s, %s)" % (title, content_type, content_size))
         else:
             self.irc.reply("No title found for %s" % url)

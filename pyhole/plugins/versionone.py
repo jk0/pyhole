@@ -37,7 +37,8 @@ class VersionOne(plugin.Plugin):
             self.versionone_key = self.versionone.get("key")
             self.versionone_username = self.versionone.get("username")
             self.versionone_password = self.versionone.get("password")
-            self.versionone_url = "https://%s:%s@%s/%s/VersionOne/rest-1.v1" % (
+            self.versionone_url = ("https://%s:%s@%s/%s/VersionOne/"
+                    "rest-1.v1") % (
                     self.versionone_username, self.versionone_password,
                     self.versionone_domain, self.versionone_key)
         except Exception:
