@@ -1,5 +1,5 @@
 ..
-   Copyright 2011 Josh Kearney
+   Copyright 2011-2012 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -24,22 +24,6 @@ Pyhole Plugins
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.plugins.dice`
---------------------------
-.. automodule:: pyhole.plugins.dice
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`pyhole.plugins.entertainment`
------------------------------------
-.. automodule:: pyhole.plugins.entertainment
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`pyhole.plugins.kernel`
 ----------------------------
 .. automodule:: pyhole.plugins.kernel
@@ -51,14 +35,6 @@ Pyhole Plugins
 :mod:`pyhole.plugins.launchpad`
 -------------------------------
 .. automodule:: pyhole.plugins.launchpad
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`pyhole.plugins.news`
---------------------------
-.. automodule:: pyhole.plugins.news
     :noindex:
     :members:
     :undoc-members:
@@ -80,17 +56,17 @@ Pyhole Plugins
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.plugins.taskwarrior`
----------------------------------
-.. automodule:: pyhole.plugins.taskwarrior
+:mod:`pyhole.plugins.urls`
+--------------------------
+.. automodule:: pyhole.plugins.urls
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.plugins.urls`
---------------------------
-.. automodule:: pyhole.plugins.urls
+:mod:`pyhole.plugins.versionone`
+--------------------------------
+.. automodule:: pyhole.plugins.versionone
     :noindex:
     :members:
     :undoc-members:
