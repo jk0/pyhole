@@ -1,4 +1,4 @@
-#   Copyright 2011 Chris Behrens
+#   Copyright 2011-2012 Chris Behrens
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import utils
 
 
 LOG = log.get_logger()
+_plugin_instances = []
+_plugin_hooks = {}
 
 
 def _reset_variables():
