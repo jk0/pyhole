@@ -49,18 +49,22 @@ class Weather(plugin.Plugin):
             return
 
         if w.get("current_observation"):
-            city = w["current_observation"]["display_location"]["full"]
-            zip_code = w["current_observation"]["display_location"]["zip"]
-            temp = w["current_observation"]["temperature_string"]
-            humidity = w["current_observation"]["relative_humidity"]
-            wind = w["current_observation"]["wind_string"]
-            condition = w["current_observation"]["weather"]
+            w = w["current_observation"]
+
+            city = w["display_location"]["full"]
+            zip_code = w["display_location"]["zip"]
+            temp = w["temperature_string"]
+            heat_index = "%s F (%s C)" % (w["heat_index_f"], w["heat_index_c"])
+            humidity = w["relative_humidity"]
+            wind = w["wind_string"]
+            condition = w["weather"]
 
             zip_code = "" if zip_code == "00000" else " %s" % zip_code
             humidity = "N/A%" if len(humidity) > 3 else humidity
 
-            result = "%s%s: %s   Humidity: %s   Wind: %s   %s" % (city,
-                    zip_code, temp, humidity, wind, condition)
+            result = ("%s%s: [%s / Feels Like: %s]   Humidity: %s   "
+                    "Wind: %s   %s") % (city, zip_code, temp, heat_index,
+                    humidity, wind, condition)
 
             self.irc.reply(result)
         else:
