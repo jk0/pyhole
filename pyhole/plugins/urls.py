@@ -65,9 +65,10 @@ class Url(plugin.Plugin):
         soup = BeautifulSoup(response.read())
         if soup.head:
             title = utils.decode_entities(soup.head.title.string)
-            content_type = response.headers.get("Content-Type")
-            content_size = response.headers.get(
-                    "Content-Length", "N/A") + " bytes"
+            content_type = response.headers.get("Content-Type").split(";",
+                    1)[0]
+            content_size = response.headers.get("Content-Length")
+            content_size = content_size + " bytes" if content_size else "N/A"
 
             self.irc.reply("%s (%s, %s)" % (title, content_type, content_size))
         else:
