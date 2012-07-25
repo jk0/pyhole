@@ -153,7 +153,7 @@ command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
 debug: False
-plugins: admin, dice, entertainment, news, search, urls
+plugins: admin, calculator, search, urls
 networks: FreeNode, EFnet
 
 [Wunderground]
