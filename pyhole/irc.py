@@ -51,15 +51,15 @@ class IRC(irclib.SimpleIRCClient):
         self.rejoin_delay = CONFIG.get("rejoin_delay", type="int")
 
         self.server = network_config.get("server")
-        self.password = network_config.get("password", default="")
+        self.password = network_config.get("password", default=None)
         self.port = network_config.get("port", type="int", default=6667)
         self.ssl = network_config.get("ssl", type="bool", default=False)
         self.ipv6 = network_config.get("ipv6", type="bool", default=False)
-        self.bind_to = network_config.get("bind_to", default="")
+        self.bind_to = network_config.get("bind_to", default=None)
         self.nick = network_config.get("nick")
         self.username = network_config.get("username", default=None)
         self.identify_password = network_config.get("identify_password",
-                default="")
+                default=None)
         self.channels = network_config.get("channels", type="list")
 
         self.load_plugins()
@@ -67,7 +67,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to, 
+                ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to,
                 username=self.username)
 
     def load_plugins(self, reload_plugins=False):
@@ -262,7 +262,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                     ssl=self.ssl, username=self.username)
+                ssl=self.ssl, username=self.username)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked."""
