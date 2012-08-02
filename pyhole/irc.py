@@ -431,7 +431,7 @@ def main():
                     procs.remove(proc)
 
             if not procs:
-                LOG.info("No longer connected to any networks, exiting")
+                LOG.info("No longer connected to any networks, shutting down")
                 sys.exit(0)
 
     except KeyboardInterrupt:
