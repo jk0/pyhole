@@ -14,6 +14,8 @@
 
 """Pyhole Administration Plugin"""
 
+import sys
+
 from pyhole import irc
 from pyhole import plugin
 from pyhole import utils
@@ -93,6 +95,14 @@ class Admin(plugin.Plugin):
             self.irc.part_channel(params)
         else:
             self.irc.reply(self.part.__doc__)
+
+    @plugin.hook_add_command("quit")
+    @utils.admin
+    def quit(self, params=None, **kwargs):
+        """Quit a network entirely."""
+
+        self.irc.log.info("Disconnecting.")
+        sys.exit(0)
 
     @plugin.hook_add_command("say")
     @utils.admin

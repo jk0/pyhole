@@ -416,12 +416,23 @@ def main():
 
     LOG.info("Starting %s" % version.version_string())
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
+
+    procs = []
     for network in networks:
         proc = IRCProcess(network)
         proc.start()
+        procs.append(proc)
 
     try:
         while True:
             time.sleep(1)
+            for proc in procs:
+                if not proc.is_alive():
+                    procs.remove(proc)
+
+            if not procs:
+                LOG.info("No longer connected to any networks, exiting")
+                sys.exit(0)
+
     except KeyboardInterrupt:
         LOG.info("Caught KeyboardInterrupt, shutting down")
