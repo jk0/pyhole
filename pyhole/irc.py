@@ -152,14 +152,13 @@ class IRC(irclib.SimpleIRCClient):
         self.run_keyword_hooks(message, private)
         self.run_msg_regexp_hooks(message, private)
 
-    def reply(self, msg):
-        """Send a privmsg."""
+
+    def __mangle_msg(self, msg):
         if not hasattr(msg, "encode"):
             try:
                 msg = str(msg)
             except Exception:
                 self.log.error("msg cannot be converted to string")
-                return
 
         msg = msg.encode("utf-8").split("\n")
         # 10 is completely arbitrary for now
@@ -167,6 +166,24 @@ class IRC(irclib.SimpleIRCClient):
             msg = msg[0:8]
             msg.append("...")
 
+        return msg
+
+    def notice(self, msg):
+        """Send a notice."""
+
+        msg = self.__mangle_msg(msg)
+
+        for line in msg:
+            self.connection.notice(self.target, line)
+            if irclib.is_channel(self.target):
+                self.log.info("-%s- <%s> %s" % (self.target, self.nick, line))
+            else:
+                self.log.info("<%s> %s" % (self.nick, line))
+
+    def reply(self, msg):
+        """Send a privmsg."""
+
+        msg = self.__mangle_msg(msg)
         for line in msg:
             if self.addressed:
                 source = self.source.split("!")[0]
