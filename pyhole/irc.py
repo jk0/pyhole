@@ -90,7 +90,7 @@ class IRC(irclib.SimpleIRCClient):
                 self.log.debug("Calling: %s.%s(None)" % (mod_name,
                         func.__name__))
         except Exception, exc:
-            self.log.error(exc)
+            self.log.exception(exc)
 
     def run_msg_regexp_hooks(self, message, private):
         """Run regexp hooks."""
@@ -151,7 +151,6 @@ class IRC(irclib.SimpleIRCClient):
         self.run_command_hooks(message, private)
         self.run_keyword_hooks(message, private)
         self.run_msg_regexp_hooks(message, private)
-
 
     def _mangle_msg(self, msg):
         """Prepare the message for sending."""
