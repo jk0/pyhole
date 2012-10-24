@@ -52,15 +52,15 @@ class IRC(irclib.SimpleIRCClient):
         self.rejoin_delay = CONFIG.get("rejoin_delay", type="int")
 
         self.server = network_config.get("server")
-        self.password = network_config.get("password", default="")
+        self.password = network_config.get("password", default=None)
         self.port = network_config.get("port", type="int", default=6667)
         self.ssl = network_config.get("ssl", type="bool", default=False)
         self.ipv6 = network_config.get("ipv6", type="bool", default=False)
-        self.bind_to = network_config.get("bind_to", default="")
+        self.bind_to = network_config.get("bind_to", default=None)
         self.nick = network_config.get("nick")
         self.username = network_config.get("username", default=None)
         self.identify_password = network_config.get("identify_password",
-                default="")
+                default=None)
         self.channels = network_config.get("channels", type="list")
 
         self.load_plugins()
@@ -68,7 +68,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to, 
+                ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to,
                 username=self.username)
 
     def load_pollers(self, reload_pollers=False):
@@ -106,7 +106,7 @@ class IRC(irclib.SimpleIRCClient):
                 self.log.debug("Calling: %s.%s(None)" % (mod_name,
                         func.__name__))
         except Exception, exc:
-            self.log.error(exc)
+            self.log.exception(exc)
 
     def run_msg_regexp_hooks(self, message, private):
         """Run regexp hooks."""
@@ -168,8 +168,8 @@ class IRC(irclib.SimpleIRCClient):
         self.run_keyword_hooks(message, private)
         self.run_msg_regexp_hooks(message, private)
 
-
-    def __mangle_msg(self, msg):
+    def _mangle_msg(self, msg):
+        """Prepare the message for sending."""
         if not hasattr(msg, "encode"):
             try:
                 msg = str(msg)
@@ -177,7 +177,7 @@ class IRC(irclib.SimpleIRCClient):
                 self.log.error("msg cannot be converted to string")
 
         msg = msg.encode("utf-8").split("\n")
-        # 10 is completely arbitrary for now
+        # NOTE(jk0): 10 is completely arbitrary for now.
         if len(msg) > 10:
             msg = msg[0:8]
             msg.append("...")
@@ -186,9 +186,7 @@ class IRC(irclib.SimpleIRCClient):
 
     def notice(self, msg):
         """Send a notice."""
-
-        msg = self.__mangle_msg(msg)
-
+        msg = self._mangle_msg(msg)
         for line in msg:
             self.connection.notice(self.target, line)
             if irclib.is_channel(self.target):
@@ -198,8 +196,7 @@ class IRC(irclib.SimpleIRCClient):
 
     def reply(self, msg):
         """Send a privmsg."""
-
-        msg = self.__mangle_msg(msg)
+        msg = self._mangle_msg(msg)
         for line in msg:
             if self.addressed:
                 source = self.source.split("!")[0]
@@ -297,7 +294,7 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                     ssl=self.ssl, username=self.username)
+                ssl=self.ssl, username=self.username)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked."""
@@ -469,7 +466,7 @@ def main():
                     procs.remove(proc)
 
             if not procs:
-                LOG.info("No longer connected to any networks, exiting")
+                LOG.info("No longer connected to any networks, shutting down")
                 sys.exit(0)
 
     except KeyboardInterrupt:

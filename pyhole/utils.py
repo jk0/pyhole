@@ -173,6 +173,7 @@ password: abcd1234
 
 [FreeNode]
 server: verne.freenode.net
+username:
 password:
 port: 7000
 ssl: True
@@ -184,6 +185,7 @@ channels: #mychannel key, #mychannel2
 
 [EFnet]
 server: irc.efnet.net
+username:
 password:
 port: 6667
 ssl: False

@@ -99,9 +99,8 @@ class Admin(plugin.Plugin):
     @plugin.hook_add_command("quit")
     @utils.admin
     def quit(self, params=None, **kwargs):
-        """Quit a network entirely."""
-
-        self.irc.log.info("Disconnecting.")
+        """Quit all networks and shut down."""
+        self.irc.log.info("Disconnecting")
         sys.exit(0)
 
     @plugin.hook_add_command("say")
