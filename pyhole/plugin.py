@@ -17,6 +17,7 @@
 import functools
 import os
 import sys
+import time
 
 import log
 import utils
@@ -25,6 +26,7 @@ import utils
 LOG = log.get_logger()
 _plugin_instances = []
 _plugin_hooks = {}
+_loaded_pollers = []
 
 
 def _reset_variables():
@@ -60,6 +62,21 @@ def hook_get(hookname):
     generated calls 'hook_get_*' that are created below with the setattrs
     """
     return _plugin_hooks[hookname]
+
+
+def hook_in_poller(hookname, timer=60):
+    """Decorator to add poller hooks."""
+
+    def wrap(f):
+        @utils.spawn
+        def _wrap(self, *args, **kwargs):
+            while True:
+                time.sleep(timer)
+                f(self, *args, **kwargs)
+
+        _wrap._is_poller = True
+        return _wrap
+    return wrap
 
 
 def active_get(hookname):
@@ -133,6 +150,26 @@ def _init_plugins(*args, **kwargs):
                     _plugin_hooks[hook_key].append((attr.__module__, attr,
                             hook_arg))
 
+def load_pollers():
+    for instance in _plugin_instances:
+        for attr_name in dir(instance):
+            attr = getattr(instance, attr_name)
+
+            if getattr(attr, "_is_poller", False):
+                LOG.info("Loading %s poller" % attr_name)
+                _loaded_pollers.append(attr())
+
+def terminate_pollers():
+    global _loaded_pollers
+
+    for poller in _loaded_pollers:
+        try:
+            poller.throw(KeyboardInterrupt)
+        except:
+            pass
+
+    _loaded_pollers = []
+
 
 def load_user_plugin(plugin, *args, **kwargs):
     """Load a user plugin"""
@@ -147,7 +184,6 @@ def load_user_plugin(plugin, *args, **kwargs):
                     __import__(plugin, globals(), locals(), [plugin])
                 except Exception, exc:
                     LOG.error(exc)
-
 
 def load_plugins(*args, **kwargs):
     """Module function that loads plugins from a particular directory"""
@@ -177,9 +213,12 @@ def reload_plugins(*args, **kwargs):
     # Now reload all of the plugins
     plugins_to_reload = []
     plugindir = "pyhole.plugins"
+    local_plugin_dir = utils.get_home_directory() + "plugins"
 
     # Reload existing plugins
     for mod, val in sys.modules.items():
+        l_plugin_path = os.path.join(local_plugin_dir, mod)
+
         if plugindir in mod and val and mod != plugindir:
             mod_file = val.__file__
             if not os.path.isfile(mod_file):
@@ -187,6 +226,9 @@ def reload_plugins(*args, **kwargs):
             for p in config.get("plugins", type="list"):
                 if plugindir + "." + p == mod:
                     plugins_to_reload.append(mod)
+
+        if local_plugin_dir in str(val):
+            plugins_to_reload.append(mod)
 
     for plugin in plugins_to_reload:
         try:
@@ -196,6 +238,11 @@ def reload_plugins(*args, **kwargs):
 
     # Load new plugins
     load_plugins(*args, **kwargs)
+
+    # Terminate and load new pollers
+
+    terminate_pollers()
+    load_pollers()
 
 
 def active_plugins():
