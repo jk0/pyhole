@@ -44,7 +44,6 @@ class IRC(irclib.SimpleIRCClient):
         self.source = None
         self.target = None
         self.addressed = False
-        self.loaded_pollers = False
 
         self.admins = CONFIG.get("admins", type="list")
         self.command_prefix = CONFIG.get("command_prefix")
@@ -71,20 +70,23 @@ class IRC(irclib.SimpleIRCClient):
                 ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to,
                 username=self.username)
 
-    def load_pollers(self, reload_pollers=False):
-        """Load all the pollers."""
-
+    def run_hook_command(self, mod_name, func, arg, **kwargs):
+        """Make a call to a plugin hook."""
         try:
-            plugin.load_pollers()
-            self.loaded_pollers = True
-        except Exception, e:
-            self.log.error("ERROR WHILE LOADING POLLERS")
-            self.log.error(str(e))
+            if arg:
+                self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
+                        func.__name__, arg))
+            else:
+                self.log.debug("Calling: %s.%s(None)" % (mod_name,
+                        func.__name__))
+            func(arg, **kwargs)
+        except Exception, exc:
+            self.log.exception(exc)
 
-    def terminate_pollers(self):
-        self.log.info("Terminating pollers")
-        self.loaded_pollers = False
-        plugin.terminate_pollers()
+    def run_hook_polls(self):
+        """Run polls in the background."""
+        for mod_name, func, cmd in plugin.hook_get_polls():
+            self.run_hook_command(mod_name, func, cmd)
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively."""
@@ -94,19 +96,7 @@ class IRC(irclib.SimpleIRCClient):
             plugin.load_plugins(irc=self)
 
         self.log.info("Loaded Plugins: %s" % active_plugins())
-
-    def run_hook_command(self, mod_name, func, arg, **kwargs):
-        """Make a call to a plugin hook."""
-        try:
-            func(arg, **kwargs)
-            if arg:
-                self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
-                        func.__name__, arg))
-            else:
-                self.log.debug("Calling: %s.%s(None)" % (mod_name,
-                        func.__name__))
-        except Exception, exc:
-            self.log.exception(exc)
+        self.run_hook_polls()
 
     def run_msg_regexp_hooks(self, message, private):
         """Run regexp hooks."""
@@ -175,6 +165,7 @@ class IRC(irclib.SimpleIRCClient):
                 msg = str(msg)
             except Exception:
                 self.log.error("msg cannot be converted to string")
+                return
 
         msg = msg.encode("utf-8").split("\n")
         # NOTE(jk0): 10 is completely arbitrary for now.
@@ -286,10 +277,8 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_disconnect(self, _connection, _event):
         """Attempt to reconnect after disconnection."""
-
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
-        self.terminate_pollers()
         time.sleep(self.reconnect_delay)
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
@@ -337,9 +326,6 @@ class IRC(irclib.SimpleIRCClient):
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s joined" % (target, source))
-
-        if not self.loaded_pollers:
-            self.load_pollers()
 
     def on_part(self, _connection, event):
         """Handle parts."""
@@ -468,6 +454,5 @@ def main():
             if not procs:
                 LOG.info("No longer connected to any networks, shutting down")
                 sys.exit(0)
-
     except KeyboardInterrupt:
         LOG.info("Caught KeyboardInterrupt, shutting down")

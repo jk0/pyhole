@@ -24,9 +24,9 @@ import utils
 
 
 LOG = log.get_logger()
+
 _plugin_instances = []
 _plugin_hooks = {}
-_loaded_pollers = []
 
 
 def _reset_variables():
@@ -43,15 +43,28 @@ def _reset_variables():
         _plugin_hooks[x] = []
 
 
-def hook_add(hookname, arg):
+def hook_add(hookname, arg, poll_timer=60):
     """Generic decorator to add hooks.  Generally, this is not called
     directly by plugins.  Decorators that plugins use are automatically
     generated below with the setattrs you'll see
     """
     def wrap(f):
-        setattr(f, "_is_%s_hook" % hookname, True)
-        f._hook_arg = arg
-        return f
+        if hookname == "poll":
+            @utils.spawn
+            def _f(self, *args, **kwargs):
+                while True:
+                    f(self, *args, **kwargs)
+                    time.sleep(poll_timer)
+
+            setattr(_f, "_is_%s_hook" % hookname, True)
+            _f._hook_arg = arg
+
+            return _f
+        else:
+            setattr(f, "_is_%s_hook" % hookname, True)
+            f._hook_arg = arg
+
+            return f
 
     return wrap
 
@@ -64,21 +77,6 @@ def hook_get(hookname):
     return _plugin_hooks[hookname]
 
 
-def hook_in_poller(hookname, timer=60):
-    """Decorator to add poller hooks."""
-
-    def wrap(f):
-        @utils.spawn
-        def _wrap(self, *args, **kwargs):
-            while True:
-                time.sleep(timer)
-                f(self, *args, **kwargs)
-
-        _wrap._is_poller = True
-        return _wrap
-    return wrap
-
-
 def active_get(hookname):
     """Function to return the list of hook arguments.  Genearlly
     this is not called directly.  Callers tend to use the dynamically
@@ -87,9 +85,11 @@ def active_get(hookname):
     """
     return [x[2] for x in _plugin_hooks[hookname]]
 
-_hook_names = ["keyword", "command", "msg_regex"]
+
+_hook_names = ["keyword", "command", "msg_regex", "poll"]
 _reset_variables()
 _this_mod = sys.modules[__name__]
+
 
 for x in _hook_names:
     # Dynamically create the decorators and functions for various hooks
@@ -118,7 +118,6 @@ class PluginMetaClass(type):
 
 class Plugin(object):
     """The class that all plugin classes should inherit from"""
-
     __metaclass__ = PluginMetaClass
 
     def __init__(self, irc, *args, **kwargs):
@@ -150,26 +149,6 @@ def _init_plugins(*args, **kwargs):
                     _plugin_hooks[hook_key].append((attr.__module__, attr,
                             hook_arg))
 
-def load_pollers():
-    for instance in _plugin_instances:
-        for attr_name in dir(instance):
-            attr = getattr(instance, attr_name)
-
-            if getattr(attr, "_is_poller", False):
-                LOG.info("Loading %s poller" % attr_name)
-                _loaded_pollers.append(attr())
-
-def terminate_pollers():
-    global _loaded_pollers
-
-    for poller in _loaded_pollers:
-        try:
-            poller.throw(KeyboardInterrupt)
-        except:
-            pass
-
-    _loaded_pollers = []
-
 
 def load_user_plugin(plugin, *args, **kwargs):
     """Load a user plugin"""
@@ -184,6 +163,7 @@ def load_user_plugin(plugin, *args, **kwargs):
                     __import__(plugin, globals(), locals(), [plugin])
                 except Exception, exc:
                     LOG.error(exc)
+
 
 def load_plugins(*args, **kwargs):
     """Module function that loads plugins from a particular directory"""
@@ -204,6 +184,17 @@ def load_plugins(*args, **kwargs):
 def reload_plugins(*args, **kwargs):
     """Module function that'll reload all of the plugins"""
     config = utils.get_config()
+
+    # Terminate running poll instances
+    for plugin in _plugin_instances:
+        for attr_name in dir(plugin):
+            attr = getattr(plugin, attr_name)
+            if getattr(attr, "_is_poll_hook", False):
+                # TODO(jk0): Doing this kills the entire process. We need to
+                # figure out how to kill it properly. Until this is done,
+                # reloading will not work with polls.
+                #attr().throw(KeyboardInterrupt)
+                pass
 
     # When the modules are reloaded, the meta class will append
     # all of the classes again, so we need to make sure this is empty
@@ -238,11 +229,6 @@ def reload_plugins(*args, **kwargs):
 
     # Load new plugins
     load_plugins(*args, **kwargs)
-
-    # Terminate and load new pollers
-
-    terminate_pollers()
-    load_pollers()
 
 
 def active_plugins():
