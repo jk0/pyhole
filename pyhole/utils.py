@@ -46,7 +46,7 @@ def admin(func):
 def spawn(func):
     """Greenthread Spawning Decorator"""
     def wrap(self, *args, **kwargs):
-        eventlet.spawn_n(func, self, *args, **kwargs)
+        return eventlet.spawn_n(func, self, *args, **kwargs)
     wrap.__doc__ = func.__doc__
     wrap.__name__ = func.__name__
     wrap.__module__ = func.__module__

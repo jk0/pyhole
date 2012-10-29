@@ -44,6 +44,7 @@ class IRC(irclib.SimpleIRCClient):
         self.source = None
         self.target = None
         self.addressed = False
+        self.loaded_pollers = False
 
         self.admins = CONFIG.get("admins", type="list")
         self.command_prefix = CONFIG.get("command_prefix")
@@ -69,6 +70,21 @@ class IRC(irclib.SimpleIRCClient):
         self.connect(self.server, self.port, self.nick, self.password,
                 ssl=self.ssl, ipv6=self.ipv6, localaddress=self.bind_to,
                 username=self.username)
+
+    def load_pollers(self, reload_pollers=False):
+        """Load all the pollers."""
+
+        try:
+            plugin.load_pollers()
+            self.loaded_pollers = True
+        except Exception, e:
+            self.log.error("ERROR WHILE LOADING POLLERS")
+            self.log.error(str(e))
+
+    def terminate_pollers(self):
+        self.log.info("Terminating pollers")
+        self.loaded_pollers = False
+        plugin.terminate_pollers()
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively."""
@@ -159,7 +175,6 @@ class IRC(irclib.SimpleIRCClient):
                 msg = str(msg)
             except Exception:
                 self.log.error("msg cannot be converted to string")
-                return
 
         msg = msg.encode("utf-8").split("\n")
         # NOTE(jk0): 10 is completely arbitrary for now.
@@ -271,8 +286,10 @@ class IRC(irclib.SimpleIRCClient):
 
     def on_disconnect(self, _connection, _event):
         """Attempt to reconnect after disconnection."""
+
         self.log.info("Disconnected from %s:%d" % (self.server, self.port))
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
+        self.terminate_pollers()
         time.sleep(self.reconnect_delay)
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                 self.nick))
@@ -320,6 +337,9 @@ class IRC(irclib.SimpleIRCClient):
         target = event.target()
         source = irclib.nm_to_n(event.source())
         self.log.info("-%s- %s joined" % (target, source))
+
+        if not self.loaded_pollers:
+            self.load_pollers()
 
     def on_part(self, _connection, event):
         """Handle parts."""
