@@ -88,21 +88,33 @@ class VersionOne(plugin.Plugin):
             if params:
                 self._find_asset("Request", "R-%s" % params)
 
+    @plugin.hook_add_keyword("e-")
+    @utils.spawn
+    def keyword_epic(self, params=None, **kwargs):
+        """Retrieve VersionOne epic information (ex: E-01234)"""
+        if params and not self.disabled:
+            params = utils.ensure_int(params)
+            if params:
+                self._find_asset("Epic", "E-%s" % params)
+
+    @plugin.hook_add_keyword("i-")
+    @utils.spawn
+    def keyword_issue(self, params=None, **kwargs):
+        """Retrieve VersionOne issue information (ex: I-01234)"""
+        if params and not self.disabled:
+            params = utils.ensure_int(params)
+            if params:
+                self._find_asset("Issue", "I-%s" % params)
+
     def _find_asset(self, type, number):
         """Find and display a VersionOne object"""
         url = "%s/Data/%s?where=Number='%s'" % (self.versionone_url,
                                                 type, number)
-        print url
         response = self.irc.fetch_url(url, self.name)
         if not response:
             return
 
         try:
-            #data = response.read()
-            #import sys, xml.dom.minidom
-            #print xml.dom.minidom.parseString(data).toprettyxml()
-            #root = etree.XML(data)
-
             root = etree.XML(response.read())
             asset = root.find("Asset")
             id = asset.attrib['id']
@@ -118,7 +130,7 @@ class VersionOne(plugin.Plugin):
             traceback.print_exc()
             return
 
-        msg = "V1 %s #%s: %s" % (type, number, subject)
+        msg = "V1 %s %s: %s" % (type, number, subject)
 
         attrs = []
         if status:
