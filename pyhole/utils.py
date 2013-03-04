@@ -143,6 +143,13 @@ def read_file(directory, file_name):
         return None
 
 
+def check_file_exists(plugin, filename):
+    if os.path.exists(get_directory(plugin) + filename):
+	return True
+    else:
+	return False
+
+
 def generate_config():
     """Generate an example config"""
     example = """# Global Configuration

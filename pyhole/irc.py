@@ -20,6 +20,7 @@ import re
 import sys
 import time
 import urllib
+import urllib2
 
 import irclib
 import log
@@ -237,6 +238,19 @@ class IRC(irclib.SimpleIRCClient):
         self.channels.remove(params)
         self.reply("Parting %s" % params)
         self.connection.part(params)
+
+    def post_url(self, url, data):
+        class PyholeURLopener(urllib.FancyURLopener):
+            """Set a custom user agent."""
+            version = self.version
+
+        urllib._urlopener = PyholeURLopener()
+
+        try:
+            return urllib.urlopen(url, data)
+        except IOError:
+            self.reply("Unable to fetch %s data" % name)
+            return None
 
     def fetch_url(self, url, name):
         """Fetch a URL."""
