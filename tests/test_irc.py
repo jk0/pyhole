@@ -16,14 +16,14 @@
 
 import unittest
 
-from pyhole import irc
+from pyhole import client
 
 
 class TestIrc(unittest.TestCase):
     def test_active_commands(self):
-        active_commands = irc.active_commands()
+        active_commands = client.active_commands()
         self.assertTrue(isinstance(active_commands, str))
 
     def test_active_keywords(self):
-        active_keywords = irc.active_keywords()
+        active_keywords = client.active_keywords()
         self.assertTrue(isinstance(active_keywords, str))
