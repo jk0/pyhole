@@ -17,13 +17,14 @@
 import multiprocessing
 import random
 import re
+import ssl
 import sys
 import time
 import urllib
 
 import irc.client as irclib
 from irc import connection
-import ssl
+
 import log
 import plugin
 import utils
@@ -61,29 +62,29 @@ class IRC(irclib.SimpleIRCClient):
         self.nick = network_config.get("nick")
         self.username = network_config.get("username", default=None)
         self.identify_password = network_config.get("identify_password",
-                default=None)
+                                                    default=None)
         self.channels = network_config.get("channels", type="list")
 
         self.load_plugins()
 
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
-                self.nick))
+                      self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                username=self.username, 
-                connect_factory=connection.Factory(
-                    wrapper=ssl.wrap_socket, ipv6=self.ipv6)
-                            .connect
-                            if self.ssl else connection.Factory())
+                     username=self.username,
+                     connect_factory=connection.Factory(
+                         wrapper=ssl.wrap_socket,
+                         ipv6=self.ipv6).connect
+                     if self.ssl else connection.Factory())
 
     def run_hook_command(self, mod_name, func, arg, **kwargs):
         """Make a call to a plugin hook."""
         try:
             if arg:
                 self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
-                        func.__name__, arg))
+                               func.__name__, arg))
             else:
                 self.log.debug("Calling: %s.%s(None)" % (mod_name,
-                        func.__name__))
+                               func.__name__))
             func(arg, **kwargs)
         except Exception, exc:
             self.log.exception(exc)
@@ -109,7 +110,7 @@ class IRC(irclib.SimpleIRCClient):
             match = re.search(msg_regex, message, re.I)
             if match:
                 self.run_hook_command(mod_name, func, match, private=private,
-                        full_message=message)
+                                      full_message=message)
 
     def run_keyword_hooks(self, message, private):
         """Run keyword hooks."""
@@ -119,7 +120,8 @@ class IRC(irclib.SimpleIRCClient):
                 match = re.search("^%s(.+)" % kwarg, word, re.I)
                 if match:
                     self.run_hook_command(mod_name, func, match.group(1),
-                            private=private, full_message=message)
+                                          private=private,
+                                          full_message=message)
 
     def run_command_hooks(self, message, private):
         """Run command hooks."""
@@ -128,11 +130,12 @@ class IRC(irclib.SimpleIRCClient):
 
             if private:
                 match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), message,
-                        re.I)
+                                  re.I)
                 if match:
                     self.run_hook_command(mod_name, func, match.group(1),
-                            private=private, addressed=self.addressed,
-                            full_message=message)
+                                          private=private,
+                                          addressed=self.addressed,
+                                          full_message=message)
 
             if message.startswith(self.command_prefix):
                 # Strip off command prefix
@@ -143,7 +146,7 @@ class IRC(irclib.SimpleIRCClient):
                 if msg_start_upper == self.nick.upper() + ":":
                     # Get rest of string after "nick:" and white spaces
                     msg_rest = re.sub("^\s+", "",
-                            message[len(self.nick) + 1:])
+                                      message[len(self.nick) + 1:])
                 else:
                     continue
 
@@ -152,8 +155,9 @@ class IRC(irclib.SimpleIRCClient):
             match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
             if match:
                 self.run_hook_command(mod_name, func, match.group(1),
-                        private=private, addressed=self.addressed,
-                        full_message=message)
+                                      private=private,
+                                      addressed=self.addressed,
+                                      full_message=message)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands."""
@@ -198,12 +202,12 @@ class IRC(irclib.SimpleIRCClient):
                 source = self.source.split("!")[0]
                 self.connection.privmsg(self.target, "%s: %s" % (source, line))
                 self.log.info("-%s- <%s> %s: %s" % (self.target, self.nick,
-                        source, line))
+                              source, line))
             else:
                 self.connection.privmsg(self.target, line)
                 if irclib.is_channel(self.target):
                     self.log.info("-%s- <%s> %s" % (self.target, self.nick,
-                            line))
+                                  line))
                 else:
                     self.log.info("<%s> %s" % (self.nick, line))
 
@@ -286,9 +290,9 @@ class IRC(irclib.SimpleIRCClient):
         self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
-                self.nick))
+                      self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                ssl=self.ssl, username=self.username)
+                     ssl=self.ssl, username=self.username)
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked."""
@@ -299,12 +303,12 @@ class IRC(irclib.SimpleIRCClient):
         if nick == self.nick:
             self.log.info("-%s- kicked by %s: %s" % (target, source, reason))
             self.log.info("-%s- rejoining in %d seconds" % (target,
-                    self.rejoin_delay))
+                          self.rejoin_delay))
             time.sleep(self.rejoin_delay)
             connection.join(target)
         else:
             self.log.info("-%s- %s was kicked by %s: %s" % (target, nick,
-                    source, reason))
+                          source, reason))
 
     def on_invite(self, _connection, event):
         """Join a channel upon invitation."""
@@ -323,8 +327,7 @@ class IRC(irclib.SimpleIRCClient):
         elif ctcp == "PING":
             if len(event.arguments) > 1:
                 self.log.info("Received CTCP PING from %s" % source)
-                connection.ctcp_reply(source,
-                        "PING %s" % event.arguments[1])
+                connection.ctcp_reply(source, "PING %s" % event.arguments[1])
 
     def on_join(self, _connection, event):
         """Handle joins."""
@@ -367,8 +370,7 @@ class IRC(irclib.SimpleIRCClient):
         else:
             source = None
         msg = event.arguments[0]
-        self.log.info("-%s- <%s> %s" % (target, source, msg)
-              )
+        self.log.info("-%s- <%s> %s" % (target, source, msg))
 
     def on_privmsg(self, _connection, event):
         """Handle private messages."""
@@ -387,8 +389,7 @@ class IRC(irclib.SimpleIRCClient):
         nick = event.source.nick
         msg = event.arguments[0]
 
-        self.log.info("-%s- <%s> %s" % (self.target, nick, msg)
-              )
+        self.log.info("-%s- <%s> %s" % (self.target, nick, msg))
         self.poll_messages(msg)
 
 

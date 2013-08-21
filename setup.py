@@ -12,12 +12,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import setuptools
+from pip.req import parse_requirements
+from setuptools import setup
 
 from pyhole import version
 
+def requirements():
+    install_reqs = parse_requirements("requirements.txt")
+    return [str(ir.req) for ir in install_reqs]
 
-setuptools.setup(
+
+setup(
     name="irc-pyhole",
     version=version.version_hash(),
     author="Josh Kearney",
@@ -26,12 +31,7 @@ setuptools.setup(
     license="Apache License, Version 2.0",
     url="http://pyhole.org",
     packages=["pyhole", "pyhole.plugins"],
-    install_requires=[
-        "eventlet",
-        "beautifulsoup==3.2.0",
-        "launchpadlib",
-        "pywunderground"
-    ],
+    install_requires=requirements(),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -42,5 +42,6 @@ setuptools.setup(
     ],
     entry_points={
         "console_scripts": ["pyhole = pyhole.irc:main"]
-    }
+    },
+    setup_requires=['nose>=1.3.0']
 )
