@@ -41,7 +41,7 @@ setup(
         "Programming Language :: Python",
     ],
     entry_points={
-        "console_scripts": ["pyhole = pyhole.irc:main"]
+        "console_scripts": ["pyhole = pyhole.client:main"]
     },
     setup_requires=['nose>=1.3.0']
 )
