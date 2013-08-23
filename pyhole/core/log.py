@@ -36,8 +36,7 @@ def setup_logger(name="Pyhole"):
 
     log_file = "%s/%s.log"
     log = logging.handlers.TimedRotatingFileHandler(log_file % (log_dir,
-                                                                name.lower()),
-                                                    "midnight")
+                                                    name.lower()), "midnight")
     log.setLevel(log_level)
     formatter = logging.Formatter(log_format, log_datefmt)
     log.setFormatter(formatter)

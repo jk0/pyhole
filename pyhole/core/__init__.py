@@ -1,7 +1,6 @@
 #   Copyright 2010-2011 Josh Kearney
 #
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
+#   Licensed under the Apachedexcept in compliance with the License.
 #   You may obtain a copy of the License at
 #
 #       http://www.apache.org/licenses/LICENSE-2.0
@@ -12,6 +11,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""pyhole - A modular IRC bot for Python developers."""
+import log
 
-from main import Main
+from .irc.client import (Client,
+                         active_commands,
+                         active_keywords,
+                         active_plugins)
+
+from .irc.process import Process

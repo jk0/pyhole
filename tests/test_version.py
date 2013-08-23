@@ -16,7 +16,7 @@
 
 import unittest
 
-from pyhole import version
+from pyhole.core import version
 
 
 class TestVersion(unittest.TestCase):

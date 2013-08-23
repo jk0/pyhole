@@ -25,17 +25,14 @@ import urllib
 import irc.client as irclib
 from irc import connection
 
-import log
-import plugin
-import utils
-import version
+from .. import log, plugin, utils, version
 
 
 LOG = log.get_logger()
 CONFIG = utils.get_config()
 
 
-class IRC(irclib.SimpleIRCClient):
+class Client(irclib.SimpleIRCClient):
     """An IRClib connection."""
 
     def __init__(self, network):
@@ -188,7 +185,7 @@ class IRC(irclib.SimpleIRCClient):
         """Send a notice."""
         msg = self._mangle_msg(msg)
         for line in msg:
-            self.connection.notice(self.target, line)
+            self.notice(self.target, line)
             if irclib.is_channel(self.target):
                 self.log.info("-%s- <%s> %s" % (self.target, self.nick, line))
             else:
@@ -200,16 +197,20 @@ class IRC(irclib.SimpleIRCClient):
         for line in msg:
             if self.addressed:
                 source = self.source.split("!")[0]
-                self.connection.privmsg(self.target, "%s: %s" % (source, line))
+                self.privmsg(self.target, "%s: %s" % (source, line))
                 self.log.info("-%s- <%s> %s: %s" % (self.target, self.nick,
                               source, line))
             else:
-                self.connection.privmsg(self.target, line)
+                self.privmsg(self.target, line)
                 if irclib.is_channel(self.target):
                     self.log.info("-%s- <%s> %s" % (self.target, self.nick,
                                   line))
                 else:
                     self.log.info("<%s> %s" % (self.nick, line))
+
+    def notice(self, target, msg):
+        """Send a notice."""
+        self.connection.notice(target, msg)
 
     def privmsg(self, target, msg):
         """Send a privmsg."""
@@ -393,35 +394,6 @@ class IRC(irclib.SimpleIRCClient):
         self.poll_messages(msg)
 
 
-class IRCProcess(multiprocessing.Process):
-    """An IRC network connection process."""
-    def __init__(self, irc_network):
-        super(IRCProcess, self).__init__()
-        self.irc_network = irc_network
-        self.reconnect_delay = CONFIG.get("reconnect_delay", type="int")
-
-    def run(self):
-        """An IRC network connection."""
-        while True:
-            try:
-                connection = IRC(self.irc_network)
-            except Exception, exc:
-                LOG.exception(exc)
-                LOG.error("Retrying in %d seconds" % self.reconnect_delay)
-                time.sleep(self.reconnect_delay)
-                continue
-
-            try:
-                connection.start()
-            except KeyboardInterrupt:
-                sys.exit(0)
-            except Exception, exc:
-                LOG.exception(exc)
-                LOG.error("Retrying in %d seconds" % self.reconnect_delay)
-                time.sleep(self.reconnect_delay)
-                continue
-
-
 def active_plugins():
     """List active plugins."""
     return ", ".join(sorted(plugin.active_plugins()))
@@ -435,30 +407,3 @@ def active_commands():
 def active_keywords():
     """List active keywords."""
     return ", ".join(sorted(plugin.active_keywords()))
-
-
-def main():
-    """Main IRC loop."""
-    networks = CONFIG.get("networks", type="list")
-    log.setup_logger()
-    LOG.info("Starting %s" % version.version_string())
-    LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
-
-    procs = []
-    for network in networks:
-        proc = IRCProcess(network)
-        proc.start()
-        procs.append(proc)
-
-    try:
-        while True:
-            time.sleep(1)
-            for proc in procs:
-                if not proc.is_alive():
-                    procs.remove(proc)
-
-            if not procs:
-                LOG.info("No longer connected to any networks, shutting down")
-                sys.exit(0)
-    except KeyboardInterrupt:
-        LOG.info("Caught KeyboardInterrupt, shutting down")
