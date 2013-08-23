@@ -129,9 +129,9 @@ class Redmine(plugin.Plugin):
         except Exception:
             return
 
-        self.irc.reply("RM %s #%s: %s [Status: %s, Assignee: %s] "
-                "https://%s/issues/show/%s" % (
+        self.irc.reply("RM %s #%s: %s [Status: %s, Priority: %s, Assignee: %s] "
+                "https://%s/issues/%s" % (
                 issue["tracker"]["name"], issue["id"], issue["subject"],
-                issue["status"]["name"],
+                issue["status"]["name"], issue["priority"]["name"],
                 issue.get("assigned_to", {}).get("name", "N/A"),
                 self.redmine_domain, issue["id"]))
