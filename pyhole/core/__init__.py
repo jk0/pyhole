@@ -13,6 +13,8 @@
 
 import log
 
+from .irc.message import Message
+
 from .irc.client import (Client,
                          active_commands,
                          active_keywords,
