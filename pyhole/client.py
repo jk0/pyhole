@@ -41,7 +41,7 @@ class IRC(irclib.SimpleIRCClient):
     def __init__(self, network):
         irclib.SimpleIRCClient.__init__(self)
         network_config = utils.get_config(network)
-
+        log.setup_logger(str(network))
         self.log = log.get_logger(str(network))
         self.version = version.version_string()
         self.source = None
@@ -440,7 +440,7 @@ def active_keywords():
 def main():
     """Main IRC loop."""
     networks = CONFIG.get("networks", type="list")
-
+    log.setup_logger()
     LOG.info("Starting %s" % version.version_string())
     LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
 
