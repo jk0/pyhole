@@ -29,7 +29,7 @@ sys.path.insert(0, os.path.abspath('./'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage',
-        'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -185,8 +185,8 @@ htmlhelp_basename = 'pyholedoc'
 # (source start file, target name, title, author, documentclass
 # [howto/manual]).
 latex_documents = [
-  ('index', 'pyhole.tex', u'Pyhole Documentation',
-   u'Josh Kearney', 'manual'),
+    ('index', 'pyhole.tex', u'Pyhole Documentation', u'Josh Kearney',
+     'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

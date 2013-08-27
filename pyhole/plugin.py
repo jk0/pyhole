@@ -147,7 +147,7 @@ def _init_plugins(*args, **kwargs):
                     hook_arg = getattr(attr, "_hook_arg", None)
                     # Append (module, method, arg) tuple
                     _plugin_hooks[hook_key].append((attr.__module__, attr,
-                            hook_arg))
+                                                    hook_arg))
 
 
 def load_user_plugin(plugin, *args, **kwargs):

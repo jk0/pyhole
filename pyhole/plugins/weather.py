@@ -62,7 +62,11 @@ class Weather(plugin.Plugin):
             humidity = "N/A%" if len(humidity) > 3 else humidity
 
             result = ("%s%s: %s   Humidity: %s   Wind: %s   %s") % (city,
-                    zip_code, temp, humidity, wind, condition)
+                                                                    zip_code,
+                                                                    temp,
+                                                                    humidity,
+                                                                    wind,
+                                                                    condition)
 
             self.irc.reply(result)
         else:

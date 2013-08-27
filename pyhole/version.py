@@ -27,7 +27,7 @@ def current_git_hash():
     """Return the current git hash"""
     git_file = ".git/refs/heads/master"
     git_path = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
-            os.pardir, os.pardir, git_file))
+                                             os.pardir, os.pardir, git_file))
 
     if not os.path.exists(git_path):
         git_path = os.getcwd() + "/" + git_file

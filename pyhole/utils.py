@@ -58,8 +58,8 @@ def decode_entities(html):
     html = re.sub("\n", "", html)
     html = re.sub(" +", " ", html)
     html = " ".join(str(x).strip() for x in BeautifulStoneSoup(html,
-            convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
-            text=True))
+                    convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
+                    text=True))
 
     return filter(lambda x: ord(x) > 9 and ord(x) < 127, html)
 
@@ -77,9 +77,9 @@ def build_options():
     """Generate command line options"""
     parser = optparse.OptionParser(version=version.version_string())
     parser.add_option("-c", "--config", default=get_conf_file_path(),
-            help="specify the path to a configuration file")
+                      help="specify the path to a configuration file")
     parser.add_option("-d", "--debug", action="store_true",
-            help="show debugging output")
+                      help="show debugging output")
 
     return parser.parse_args()
 

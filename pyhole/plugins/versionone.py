@@ -37,9 +37,10 @@ class VersionOne(plugin.Plugin):
             self.versionone_username = self.versionone.get("username")
             self.versionone_password = self.versionone.get("password")
             self.versionone_url = ("https://%s:%s@%s/%s/VersionOne/"
-                    "rest-1.v1") % (
-                    self.versionone_username, self.versionone_password,
-                    self.versionone_domain, self.versionone_key)
+                                   "rest-1.v1") % (self.versionone_username,
+                                                   self.versionone_password,
+                                                   self.versionone_domain,
+                                                   self.versionone_key)
         except Exception:
             self.disabled = True
 
@@ -142,7 +143,6 @@ class VersionOne(plugin.Plugin):
             msg += " [%s]" % ", ".join(attrs)
 
         msg += " https://%s/%s/%s.mvc/Summary?oidToken=%s" % (
-                self.versionone_domain, self.versionone_key,
-                type, id)
+            self.versionone_domain, self.versionone_key, type, id)
 
         self.irc.reply(msg)

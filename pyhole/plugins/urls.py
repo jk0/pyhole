@@ -46,7 +46,7 @@ class Url(plugin.Plugin):
             host = self.url[7:]
 
             lookup_sites = ("open.spotify.com", "/open.spotify.com",
-                    "www.youtube.com", "/www.youtube.com")
+                            "www.youtube.com", "/www.youtube.com")
 
             if host.startswith(lookup_sites):
                 self._find_title(self.url)
@@ -66,7 +66,7 @@ class Url(plugin.Plugin):
         if soup.head:
             title = utils.decode_entities(soup.head.title.string)
             content_type = response.headers.get("Content-Type").split(";",
-                    1)[0]
+                                                                      1)[0]
             content_size = response.headers.get("Content-Length")
             content_size = content_size + " bytes" if content_size else "N/A"
 

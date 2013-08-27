@@ -36,7 +36,7 @@ class Redmine(plugin.Plugin):
             self.redmine_domain = self.redmine.get("domain")
             self.redmine_key = self.redmine.get("key")
             self.redmine_url = "https://%s:password@%s" % (
-                    self.redmine_key, self.redmine_domain)
+                self.redmine_key, self.redmine_domain)
         except Exception:
             self.disabled = True
 
@@ -55,7 +55,7 @@ class Redmine(plugin.Plugin):
                     self._find_issue(issue["id"])
                 else:
                     self.irc.reply("[...] truncated last %d bugs" % (
-                            len(issues) - i))
+                        len(issues) - i))
                     break
             else:
                 if i <= 0:
@@ -87,7 +87,7 @@ class Redmine(plugin.Plugin):
     def _find_issues(self, user_id):
         """Find all issues for a Redmine user"""
         url = "%s/issues.json?assigned_to_id=%s" % (
-                self.redmine_url, user_id)
+              self.redmine_url, user_id)
         response = self.irc.fetch_url(url, self.name)
         if not response:
             return
@@ -108,7 +108,7 @@ class Redmine(plugin.Plugin):
         """Find all Redmine users"""
         if offset:
             url = "%s/users.json?limit=100&offset=%d" % (
-                    self.redmine_url, offset)
+                  self.redmine_url, offset)
         else:
             url = "%s/users.json?limit=100" % self.redmine_url
         response = self.irc.fetch_url(url, self.name)
@@ -129,9 +129,13 @@ class Redmine(plugin.Plugin):
         except Exception:
             return
 
-        self.irc.reply("RM %s #%s: %s [Status: %s, Priority: %s, Assignee: %s] "
-                "https://%s/issues/%s" % (
-                issue["tracker"]["name"], issue["id"], issue["subject"],
-                issue["status"]["name"], issue["priority"]["name"],
-                issue.get("assigned_to", {}).get("name", "N/A"),
-                self.redmine_domain, issue["id"]))
+        msg = "RM %s #%s: %s [Status: %s, Priority: %s, Assignee: %s]" % (
+            issue["tracker"]["name"],
+            issue["id"],
+            issue["subject"],
+            issue["status"]["name"],
+            issue["priority"]["name"],
+            issue.get("assigned_to", {}).get("name", "N/A"))
+        url = "https://%s/issues/%s" % (self.redmine_domain, issue["id"])
+
+        self.irc.reply("%s %s" % (msg, url))

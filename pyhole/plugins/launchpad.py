@@ -27,7 +27,7 @@ class Launchpad(plugin.Plugin):
         self.irc = irc
         self.name = self.__class__.__name__
         self.launchpad = LP.login_anonymously("pyhole", "production",
-                utils.get_directory(self.name))
+                                              utils.get_directory(self.name))
 
     @plugin.hook_add_command("lbugs")
     @utils.spawn
@@ -49,7 +49,7 @@ class Launchpad(plugin.Plugin):
                             self._find_bugs(person, proj, False)
                         else:
                             self.irc.reply("[...] truncated last %d users" % (
-                                    len(members.members) - i))
+                                len(members.members) - i))
                             break
             except KeyError:
                 self.irc.reply("Unable to find user '%s' in Launchpad" % team)
@@ -70,8 +70,10 @@ class Launchpad(plugin.Plugin):
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
 
                 self.irc.reply("LP %s [Status: %s, Assignee: %s] %s" % (
-                        task.title, task.status,
-                        self._find_name(task.assignee_link), bug.web_link))
+                    task.title,
+                    task.status,
+                    self._find_name(task.assignee_link),
+                    bug.web_link))
             except Exception:
                 return
 
@@ -111,11 +113,12 @@ class Launchpad(plugin.Plugin):
         bugs = project.searchTasks(assignee=person)
         for i, bug in enumerate(bugs):
             if i <= 4:
-                self.irc.reply("LP %s [Assignee: %s] %s" % (bug.title,
-                        person.display_name, bug.web_link))
+                self.irc.reply("LP %s [Assignee: %s] %s" % (
+                    bug.title,
+                    person.display_name, bug.web_link))
             else:
                 self.irc.reply("[...] truncated last %d bugs" % (
-                        len(bugs) - i))
+                    len(bugs) - i))
                 break
 
         if single and i < 1:

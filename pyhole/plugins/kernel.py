@@ -59,18 +59,21 @@ class Kernel(plugin.Plugin):
             desc = utils.decode_entities(soup.head.title.string)
 
             try:
-                status = soup.find("span", {"id":
-                        "static_bug_status"}).string.strip().capitalize()
-                assignee = utils.decode_entities(soup.findAll("span",
-                        {"class": "vcard"})[0].contents[0].string)
+                status = soup.find("span", {
+                    "id":
+                    "static_bug_status"}).string.strip().capitalize()
+                assignee = utils.decode_entities(
+                    soup.findAll("span", {
+                        "class": "vcard"
+                    })[0].contents[0].string)
 
-                self.irc.reply("Kernel.org %s [Status: %s, Assignee: %s] %s" %
-                        (desc, status, assignee, url))
+                msg = "Kernel.org %s [Status: %s, Assignee: %s] %s"
+                self.irc.reply(msg % (desc, status, assignee, url))
             except TypeError:
                 return
 
     @plugin.hook_add_msg_regex(
-            "https?:\/\/bugzilla\.kernel\.org\/show\_bug\.cgi\?id\=")
+        "https?:\/\/bugzilla\.kernel\.org\/show\_bug\.cgi\?id\=")
     def _watch_for_k_bug_url(self, params=None, **kwargs):
         """Watch for kernel.org Bugzilla bug URLs"""
         try:
