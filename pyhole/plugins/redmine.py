@@ -35,7 +35,7 @@ class Redmine(plugin.Plugin):
             self.redmine_domain = self.redmine.get("domain")
             self.redmine_key = self.redmine.get("key")
             self.redmine_url = "https://%s:password@%s" % (
-                self.redmine_key, self.redmine_domain)
+                               self.redmine_key, self.redmine_domain)
         except Exception:
             self.disabled = True
 

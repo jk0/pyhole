@@ -79,8 +79,8 @@ class Search(plugin.Plugin):
             for result in results:
                 if len(result) > 3 and len(result.contents[2].attrs) > 0:
                     id = result.contents[2].attrs[0][1]
-                    title = utils.decode_entities(
-                        result.contents[2].contents[0])
+                    title = utils.decode_entities(result.contents[2]
+                                                  .contents[0])
                     year = result.contents[2].nextSibling.strip()[0:6]
 
                     if not title.startswith("aka") and len(year):
@@ -113,6 +113,7 @@ class Search(plugin.Plugin):
                     message.dispatch("@%s: %s" % (r["from_user"],
                                      utils.decode_entities(
                                      r["text"].encode("ascii", "ignore"))))
+
             else:
                 message.dispatch("No results found: '%s'" % params)
         else:
