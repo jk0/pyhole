@@ -25,7 +25,7 @@ import urllib
 import irc.client as irclib
 from irc import connection
 
-from .. import log, plugin, utils, version, Message
+from .. import log, plugin, utils, version, Reply
 
 
 LOG = log.get_logger()
@@ -73,7 +73,7 @@ class Client(irclib.SimpleIRCClient):
                          ipv6=self.ipv6).connect
                      if self.ssl else connection.Factory())
 
-    def run_hook_command(self, mod_name, func, arg, **kwargs):
+    def run_hook_command(self, mod_name, func, message, arg, **kwargs):
         """Make a call to a plugin hook."""
         try:
             if arg:
@@ -82,7 +82,7 @@ class Client(irclib.SimpleIRCClient):
             else:
                 self.log.debug("Calling: %s.%s(None)" % (mod_name,
                                func.__name__))
-            func(arg, **kwargs)
+            func(message, arg, **kwargs)
         except Exception, exc:
             self.log.exception(exc)
 
@@ -107,8 +107,8 @@ class Client(irclib.SimpleIRCClient):
         for mod_name, func, msg_regex in plugin.hook_get_msg_regexs():
             match = re.search(msg_regex, msg, re.I)
             if match:
-                self.run_hook_command(mod_name, func, match, private=private,
-                                      full_message=message)
+                self.run_hook_command(mod_name, func, message, match,
+                                      private=private)
 
     def run_keyword_hooks(self, message, private):
         """Run keyword hooks."""
@@ -118,9 +118,8 @@ class Client(irclib.SimpleIRCClient):
             for word in words:
                 match = re.search("^%s(.+)" % kwarg, word, re.I)
                 if match:
-                    self.run_hook_command(mod_name, func, match.group(1),
-                                          private=private,
-                                          full_message=message)
+                    self.run_hook_command(mod_name, func, message,
+                                          match.group(1), private=private)
 
     def run_command_hooks(self, message, private):
         """Run command hooks."""
@@ -132,10 +131,9 @@ class Client(irclib.SimpleIRCClient):
                 match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg,
                                   re.I)
                 if match:
-                    self.run_hook_command(mod_name, func, match.group(1),
-                                          private=private,
-                                          addressed=self.addressed,
-                                          full_message=message)
+                    self.run_hook_command(mod_name, func, message,
+                                          match.group(1), private=private,
+                                          addressed=self.addressed)
 
             if msg.startswith(self.command_prefix):
                 # Strip off command prefix
@@ -154,10 +152,9 @@ class Client(irclib.SimpleIRCClient):
 
             match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
             if match:
-                self.run_hook_command(mod_name, func, match.group(1),
+                self.run_hook_command(mod_name, func, message, match.group(1),
                                       private=private,
-                                      addressed=self.addressed,
-                                      full_message=message)
+                                      addressed=self.addressed)
 
     def poll_messages(self, message, private=False):
         """Watch for known commands."""
@@ -338,8 +335,7 @@ class Client(irclib.SimpleIRCClient):
 
         source = event.source.split("@", 1)[0]
         target = event.source.nick
-        _msg = Message.Factory("Reply", source, target)
-        _msg.message = msg
+        _msg = Reply(self, msg, source, target)
 
         if self.target != self.nick:
             self.log.info("<%s> %s" % (self.target, msg))
@@ -352,8 +348,7 @@ class Client(irclib.SimpleIRCClient):
 
         source = event.source.split("@", 1)[0]
         target = event.target
-        _msg = Message.Factory("Reply", source, target)
-        _msg.message = msg
+        _msg = Reply(self, msg, source, target)
 
         self.log.info("-%s- <%s> %s" % (self.target, nick, msg))
         self.poll_messages(_msg)

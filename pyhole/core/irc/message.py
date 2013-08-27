@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2013 Philip Schwartz
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-'''Pyhole Message'''
+"""Pyhole Message"""
 
 import irc.client as irclib
 from irc import connection
@@ -21,26 +21,10 @@ from .. import log
 
 
 class Message(object):
-    def __init__(self, source, target):
+    def __init__(self, irc, message):
         self.log = log.get_logger()
-        self.source = source
-        self.target = target
-
-    @property
-    def source(self):
-        return self._source
-
-    @source.setter
-    def source(self, _source):
-        self._source = _source
-
-    @property
-    def target(self):
-        return self._target
-
-    @target.setter
-    def target(self, _target):
-        self._target = _target
+        self.irc = irc
+        self.message = message
 
     @property
     def message(self):
@@ -51,12 +35,12 @@ class Message(object):
         self._message = _message
 
     @property
-    def reply(self):
-        return self._reply
+    def irc(self):
+        return self._irc
 
-    @reply.setter
-    def reply(self, _reply):
-        self._reply = self._mangle_msg(_reply)
+    @irc.setter
+    def irc(self, _irc):
+        self._irc = _irc
 
     def _mangle_msg(self, msg):
         """Prepare the message for sending."""
@@ -75,15 +59,8 @@ class Message(object):
 
         return msg
 
-    def dispatch(self):
+    def dispatch(self, reply):
         self.log.error("Message Dispatcher is not implemented")
-
-    @classmethod
-    def Factory(cls, _class, *args, **kwargs):
-        types = {}
-        for i in cls.__subclasses__():
-            types[i.__name__] = i
-        return types[_class](*args, **kwargs)
 
     @staticmethod
     def getMessage(**kwargs):
@@ -91,35 +68,41 @@ class Message(object):
 
 
 class Notice(Message):
-    def __init__(self, source, target):
-        super(Notice, self).__init__(source, target)
+    def __init__(self, irc, message, target):
+        super(Notice, self).__init__(irc, message)
+        self.target = target
 
-    def dispatch(self, irc):
+    def dispatch(self, reply):
         """Dispatch message as notice."""
-        for line in self.reply:
-            irc.notice(self.target, line)
+        _reply = self._mangle_msg(reply)
+        for line in _reply:
+            self.irc.notice(self.target, line)
             if irclib.is_channel(self.target):
-                self.log.info("-%s- <%s> %s" % (self.target, irc.nick, line))
+                self.log.info("-%s- <%s> %s" % (self.target, self.irc.nick,
+                              line))
             else:
-                self.log.info("<%s> %s" % (irc.nick, line))
+                self.log.info("<%s> %s" % (self.irc.nick, line))
 
 
 class Reply(Message):
-    def __init__(self, source, target):
-        super(Reply, self).__init__(source, target)
+    def __init__(self, irc, message, source, target):
+        super(Reply, self).__init__(irc, message)
+        self.source = source
+        self.target = target
 
-    def dispatch(self, irc):
+    def dispatch(self, reply):
         """dispatch message as a reply."""
-        for line in self.reply:
-            if irc.addressed:
+        _reply = self._mangle_msg(reply)
+        for line in _reply:
+            if self.irc.addressed:
                 source = self.source.split("!")[0]
-                irc.privmsg(self.target, "%s: %s" % (source, line))
-                self.log.info("-%s- <%s> %s: %s" % (self.target, irc.nick,
+                self.irc.privmsg(self.target, "%s: %s" % (source, line))
+                self.log.info("-%s- <%s> %s: %s" % (self.target, self.irc.nick,
                               source, line))
             else:
-                irc.privmsg(self.target, line)
+                self.irc.privmsg(self.target, line)
                 if irclib.is_channel(self.target):
-                    self.log.info("-%s- <%s> %s" % (self.target, irc.nick,
+                    self.log.info("-%s- <%s> %s" % (self.target, self.irc.nick,
                                   line))
                 else:
-                    self.log.info("<%s> %s" % (irc.nick, line))
+                    self.log.info("<%s> %s" % (self.irc.nick, line))

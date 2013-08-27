@@ -1,6 +1,7 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2013 Philip Schwartz
 #
-#   Licensed under the Apachedexcept in compliance with the License.
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
 #   You may obtain a copy of the License at
 #
 #       http://www.apache.org/licenses/LICENSE-2.0
@@ -13,7 +14,7 @@
 
 import log
 
-from .irc.message import Message
+from .irc.message import Message, Notice, Reply
 
 from .irc.client import (Client,
                          active_commands,
