@@ -1,5 +1,5 @@
 ..
-   Copyright 2011 Josh Kearney
+   Copyright 2011-2013 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -61,16 +61,6 @@ Docstrings
 
     Second paragraph goes like this. Ending quotes are on their own line.
     """
-
-Indentation
-^^^^^^^^^^^
-
-Should a line flow over 79 characters, you will indent as such: ::
-
-    log = logging.handlers.TimedRotatingFileHandler("%s/%s.log" % (log_dir,
-            name.lower()), "midnight")
-
-Make note of the double indent (8 characters in length).
 
 Testing
 -------
