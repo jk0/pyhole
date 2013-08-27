@@ -18,8 +18,7 @@ import traceback
 
 from lxml import etree
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class VersionOne(plugin.Plugin):
@@ -46,68 +45,68 @@ class VersionOne(plugin.Plugin):
 
     @plugin.hook_add_keyword("d-")
     @utils.spawn
-    def keyword_defect(self, params=None, **kwargs):
+    def keyword_defect(self, message, params=None, **kwargs):
         """Retrieve VersionOne defect information (ex: D-01234)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_asset("Defect", "D-%s" % params)
+                self._find_asset(message, "Defect", "D-%s" % params)
 
     @plugin.hook_add_keyword("b-")
     @utils.spawn
-    def keyword_backlog(self, params=None, **kwargs):
+    def keyword_backlog(self, message, params=None, **kwargs):
         """Retrieve VersionOne backlog information (ex: B-01234)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_asset("Story", "B-%s" % params)
+                self._find_asset(message, "Story", "B-%s" % params)
 
     @plugin.hook_add_keyword("tk-")
     @utils.spawn
-    def keyword_task(self, params=None, **kwargs):
+    def keyword_task(self, message, params=None, **kwargs):
         """Retrieve VersionOne task information (ex: TK-01234)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_asset("Task", "TK-%s" % params)
+                self._find_asset(message, "Task", "TK-%s" % params)
 
     @plugin.hook_add_keyword("g-")
     @utils.spawn
-    def keyword_goal(self, params=None, **kwargs):
+    def keyword_goal(self, message, params=None, **kwargs):
         """Retrieve VersionOne goal information (ex: G-01234)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_asset("Goal", "G-%s" % params)
+                self._find_asset(message, "Goal", "G-%s" % params)
 
     @plugin.hook_add_keyword("r-")
     @utils.spawn
-    def keyword_request(self, params=None, **kwargs):
+    def keyword_request(self, message, params=None, **kwargs):
         """Retrieve VersionOne request information (ex: R-01234)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_asset("Request", "R-%s" % params)
+                self._find_asset(message, "Request", "R-%s" % params)
 
     @plugin.hook_add_keyword("e-")
     @utils.spawn
-    def keyword_epic(self, params=None, **kwargs):
+    def keyword_epic(self, message, params=None, **kwargs):
         """Retrieve VersionOne epic information (ex: E-01234)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_asset("Epic", "E-%s" % params)
+                self._find_asset(message, "Epic", "E-%s" % params)
 
     @plugin.hook_add_keyword("i-")
     @utils.spawn
-    def keyword_issue(self, params=None, **kwargs):
+    def keyword_issue(self, message, params=None, **kwargs):
         """Retrieve VersionOne issue information (ex: I-01234)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_asset("Issue", "I-%s" % params)
+                self._find_asset(message, "Issue", "I-%s" % params)
 
-    def _find_asset(self, type, number):
+    def _find_asset(self, message, type, number):
         """Find and display a VersionOne object"""
         url = "%s/Data/%s?where=Number='%s'" % (self.versionone_url,
                                                 type, number)
@@ -145,4 +144,4 @@ class VersionOne(plugin.Plugin):
         msg += " https://%s/%s/%s.mvc/Summary?oidToken=%s" % (
             self.versionone_domain, self.versionone_key, type, id)
 
-        self.irc.reply(msg)
+        message.dispatch(msg)

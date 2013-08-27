@@ -25,8 +25,7 @@ import urllib
 from BeautifulSoup import BeautifulSoup
 from xml.dom import minidom
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class Search(plugin.Plugin):
@@ -34,7 +33,7 @@ class Search(plugin.Plugin):
 
     @plugin.hook_add_command("google")
     @utils.spawn
-    def google(self, params=None, **kwargs):
+    def google(self, message, params=None, **kwargs):
         """Search Google (ex: .g <query>)"""
         if params:
             query = urllib.urlencode({"q": params})
@@ -48,22 +47,23 @@ class Search(plugin.Plugin):
             results = json_obj["responseData"]["results"]
             if results:
                 for r in results:
-                    self.irc.reply("%s: %s" % (
-                        r["titleNoFormatting"].encode("ascii", "ignore"),
-                        r["unescapedUrl"]))
+                    message.dispatch("%s: %s" % (
+                                     r["titleNoFormatting"]
+                                     .encode("ascii", "ignore"),
+                                     r["unescapedUrl"]))
             else:
-                self.irc.reply("No results found: '%s'" % params)
+                message.dispatch("No results found: '%s'" % params)
         else:
-            self.irc.reply(self.google.__doc__)
+            message.dispatch(self.google.__doc__)
 
     @plugin.hook_add_command("g")
-    def alias_g(self, params=None, **kwargs):
+    def alias_g(self, message, params=None, **kwargs):
         """Alias of google"""
         self.google(params, **kwargs)
 
     @plugin.hook_add_command("imdb")
     @utils.spawn
-    def imdb(self, params=None, **kwargs):
+    def imdb(self, message, params=None, **kwargs):
         """Search IMDb (ex: .imdb <query>)"""
         if params:
             query = urllib.urlencode({"q": params})
@@ -84,20 +84,20 @@ class Search(plugin.Plugin):
                     year = result.contents[2].nextSibling.strip()[0:6]
 
                     if not title.startswith("aka") and len(year):
-                        self.irc.reply("%s %s: http://www.imdb.com%s" % (
-                            title, year, id))
+                        message.dispatch("%s %s: http://www.imdb.com%s" % (
+                                         title, year, id))
                         i += 1
                 elif i >= 4:
                     break
 
             if i == 0:
-                self.irc.reply("No results found: '%s'" % params)
+                message.dispatch("No results found: '%s'" % params)
         else:
-            self.irc.reply(self.imdb.__doc__)
+            message.dispatch(self.imdb.__doc__)
 
     @plugin.hook_add_command("twitter")
     @utils.spawn
-    def twitter(self, params=None, **kwargs):
+    def twitter(self, message, params=None, **kwargs):
         """Search Twitter (ex: .twitter <query>)"""
         if params:
             query = urllib.urlencode({"q": params, "rpp": 4})
@@ -110,18 +110,17 @@ class Search(plugin.Plugin):
             results = json_obj["results"]
             if results:
                 for r in results:
-                    self.irc.reply("@%s: %s" % (
-                        r["from_user"],
-                        utils.decode_entities(r["text"].encode("ascii",
-                                                               "ignore"))))
+                    message.dispatch("@%s: %s" % (r["from_user"],
+                                     utils.decode_entities(
+                                     r["text"].encode("ascii", "ignore"))))
             else:
-                self.irc.reply("No results found: '%s'" % params)
+                message.dispatch("No results found: '%s'" % params)
         else:
-            self.irc.reply(self.twitter.__doc__)
+            message.dispatch(self.twitter.__doc__)
 
     @plugin.hook_add_command("urban")
     @utils.spawn
-    def urban(self, params=None, **kwargs):
+    def urban(self, message, params=None, **kwargs):
         """Search Urban Dictionary (ex: .urban <query>)"""
         if params:
             query = urllib.urlencode({"term": params})
@@ -141,18 +140,18 @@ class Search(plugin.Plugin):
             if len(urban) > 0:
                 for i, line in enumerate(urban.split("<br/>")):
                     if i <= 4:
-                        self.irc.reply(utils.decode_entities(line))
+                        message.dispatch(utils.decode_entities(line))
                     else:
-                        self.irc.reply("[...] %s" % url)
+                        message.dispatch("[...] %s" % url)
                         break
             else:
-                self.irc.reply("No results found: '%s'" % params)
+                message.dispatch("No results found: '%s'" % params)
         else:
-            self.irc.reply(self.urban.__doc__)
+            message.dispatch(self.urban.__doc__)
 
     @plugin.hook_add_command("wikipedia")
     @utils.spawn
-    def wikipedia(self, params=None, **kwargs):
+    def wikipedia(self, message, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)"""
         if params:
             query = urllib.urlencode({"action": "query",
@@ -167,13 +166,13 @@ class Search(plugin.Plugin):
             for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
                 title = i._attrs["title"].firstChild.data
                 title = re.sub(" ", "_", title)
-                self.irc.reply("http://en.wikipedia.org/wiki/%s" % title)
+                message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
         else:
-            self.irc.reply(self.wikipedia.__doc__)
+            message.dispatch(self.wikipedia.__doc__)
 
     @plugin.hook_add_command("youtube")
     @utils.spawn
-    def youtube(self, params=None, **kwargs):
+    def youtube(self, message, params=None, **kwargs):
         """Search YouTube (ex: .youtube <query>)"""
         if params:
             query = urllib.urlencode({"q": params, "v": 2, "max-results": 4,
@@ -188,8 +187,8 @@ class Search(plugin.Plugin):
             if len(results) > 4:
                 for r in results["items"]:
                     v = r["player"]["default"].split("&", 1)[0]
-                    self.irc.reply("%s: %s" % (r["title"], v))
+                    message.dispatch("%s: %s" % (r["title"], v))
             else:
-                self.irc.reply("No results found: '%s'" % params)
+                message.dispatch("No results found: '%s'" % params)
         else:
-            self.irc.reply(self.youtube.__doc__)
+            message.dispatch(self.youtube.__doc__)

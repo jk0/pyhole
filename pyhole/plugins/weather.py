@@ -16,8 +16,7 @@
 
 import pywunderground
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class Weather(plugin.Plugin):
@@ -25,7 +24,7 @@ class Weather(plugin.Plugin):
 
     @plugin.hook_add_command("weather")
     @utils.spawn
-    def weather(self, params=None, **kwargs):
+    def weather(self, message, params=None, **kwargs):
         """Display current weather report (ex: .w [set] [<location>])"""
         wunderground = utils.get_config("Wunderground")
         api_key = wunderground.get("key")
@@ -35,17 +34,17 @@ class Weather(plugin.Plugin):
             if location.startswith("set "):
                 location = location[4:]
                 utils.write_file(self.name, self.irc.source, location)
-                self.irc.reply("Location information saved")
+                message.dispatch("Location information saved")
         else:
             location = utils.read_file(self.name, self.irc.source)
             if not location:
-                self.irc.reply(self.weather.__doc__)
+                message.dispatch(self.weather.__doc__)
                 return
 
         try:
             w = pywunderground.request(api_key, ["conditions"], location)
         except Exception:
-            self.irc.reply("Unable to fetch weather data")
+            message.dispatch("Unable to fetch weather data")
             return
 
         if w.get("current_observation"):
@@ -68,11 +67,11 @@ class Weather(plugin.Plugin):
                                                                     wind,
                                                                     condition)
 
-            self.irc.reply(result)
+            message.dispatch(result)
         else:
-            self.irc.reply("Location not found: '%s'" % location)
+            message.dispatch("Location not found: '%s'" % location)
 
     @plugin.hook_add_command("w")
-    def alias_w(self, params=None, **kwargs):
+    def alias_w(self, message, params=None, **kwargs):
         """Alias of weather"""
-        self.weather(params, **kwargs)
+        self.weather(message, params, **kwargs)

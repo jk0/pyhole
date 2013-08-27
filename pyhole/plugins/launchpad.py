@@ -16,8 +16,7 @@
 
 from launchpadlib.launchpad import Launchpad as LP
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class Launchpad(plugin.Plugin):
@@ -31,7 +30,7 @@ class Launchpad(plugin.Plugin):
 
     @plugin.hook_add_command("lbugs")
     @utils.spawn
-    def lbugs(self, params=None, **kwargs):
+    def lbugs(self, message, params=None, **kwargs):
         """Launchpad bugs for a team (ex: .lbugs <project> <team>|<user>)"""
         if params:
             project, team = params.split(" ", 2)
@@ -46,19 +45,20 @@ class Launchpad(plugin.Plugin):
                     # Find everyone on the team
                     for i, person in enumerate(members.members):
                         if i <= 4:
-                            self._find_bugs(person, proj, False)
+                            self._find_bugs(message, person, proj, False)
                         else:
-                            self.irc.reply("[...] truncated last %d users" % (
-                                len(members.members) - i))
+                            msg = "[...] truncated last %d users"
+                            message.dispatch(msg % (len(members.members) - i))
                             break
             except KeyError:
-                self.irc.reply("Unable to find user '%s' in Launchpad" % team)
+                msg = "Unable to find user '%s' in Launchpad"
+                message.dispatch(msg % team)
         else:
-            self.irc.reply(self.lbugs.__doc__)
+            message.dispatch(self.lbugs.__doc__)
 
     @plugin.hook_add_keyword("lp")
     @utils.spawn
-    def keyword_lp(self, params=None, **kwargs):
+    def keyword_lp(self, message, params=None, **kwargs):
         """Retrieve Launchpad bug information (ex: LP12345)"""
         if params:
             params = utils.ensure_int(params)
@@ -68,17 +68,15 @@ class Launchpad(plugin.Plugin):
             try:
                 bug = self.launchpad.bugs[params]
                 task = bug.bug_tasks[len(bug.bug_tasks) - 1]
-
-                self.irc.reply("LP %s [Status: %s, Assignee: %s] %s" % (
-                    task.title,
-                    task.status,
-                    self._find_name(task.assignee_link),
-                    bug.web_link))
+                message.dispatch("LP %s [Status: %s, Assignee: %s] %s" % (
+                                 task.title, task.status,
+                                 self._find_name(task.assignee_link),
+                                 bug.web_link))
             except Exception:
                 return
 
     @plugin.hook_add_msg_regex("https?:\/\/bugs\.launchpad\.net\/.*\/\+bug")
-    def _watch_for_lp_bug_url(self, params=None, **kwargs):
+    def _watch_for_lp_bug_url(self, message, params=None, **kwargs):
         """Watch for Launchpad bug URLs"""
         try:
             line = kwargs["full_message"].split("/")
@@ -90,7 +88,7 @@ class Launchpad(plugin.Plugin):
             return
 
     @plugin.hook_add_msg_regex("https?:\/\/bugs\.launchpad\.net\/bugs")
-    def _watch_for_short_lp_bug_url(self, params=None, **kwargs):
+    def _watch_for_short_lp_bug_url(self, message, params=None, **kwargs):
         """Watch for short Launchpad bug URLs"""
         try:
             line = kwargs["full_message"].split("/")
@@ -108,18 +106,17 @@ class Launchpad(plugin.Plugin):
         except ValueError:
             return "None"
 
-    def _find_bugs(self, person, project, single=True):
+    def _find_bugs(self, message, person, project, single=True):
         """Lookup Launchpad bugs"""
         bugs = project.searchTasks(assignee=person)
         for i, bug in enumerate(bugs):
             if i <= 4:
-                self.irc.reply("LP %s [Assignee: %s] %s" % (
-                    bug.title,
-                    person.display_name, bug.web_link))
+                message.dispatch("LP %s [Assignee: %s] %s" % (bug.title,
+                                 person.display_name, bug.web_link))
             else:
-                self.irc.reply("[...] truncated last %d bugs" % (
-                    len(bugs) - i))
+                message.dispatch("[...] truncated last %d bugs" % (
+                                 len(bugs) - i))
                 break
 
         if single and i < 1:
-            self.irc.reply("No bugs found for %s" % (person.display_name))
+            message.dispatch("No bugs found for %s" % (person.display_name))

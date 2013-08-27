@@ -16,8 +16,7 @@
 
 import urllib
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class Calculator(plugin.Plugin):
@@ -25,7 +24,7 @@ class Calculator(plugin.Plugin):
 
     @plugin.hook_add_command("calc")
     @utils.spawn
-    def calc(self, params=None, **kwargs):
+    def calc(self, message, params=None, **kwargs):
         """Use Google's calculator (ex: .c <expression>)"""
         if params:
             query = urllib.urlencode({"q": params})
@@ -48,13 +47,13 @@ class Calculator(plugin.Plugin):
                     answer = result[1]
 
             if expression and answer:
-                self.irc.reply("%s is %s" % (expression, answer))
+                message.dispatch("%s is %s" % (expression, answer))
             else:
-                self.irc.reply("Unable to calculate '%s'" % params)
+                message.dispatch("Unable to calculate '%s'" % params)
         else:
-            self.irc.reply(self.calc.__doc__)
+            message.dispatch(self.calc.__doc__)
 
     @plugin.hook_add_command("c")
-    def alias_c(self, params=None, **kwargs):
+    def alias_c(self, message, params=None, **kwargs):
         """Alias of calc"""
-        self.calc(params, **kwargs)
+        self.calc(message, params, **kwargs)

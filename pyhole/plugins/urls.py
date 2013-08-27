@@ -16,8 +16,7 @@
 
 from BeautifulSoup import BeautifulSoup
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class Url(plugin.Plugin):
@@ -30,16 +29,16 @@ class Url(plugin.Plugin):
 
     @plugin.hook_add_command("title")
     @utils.spawn
-    def title(self, params=None, **kwargs):
+    def title(self, message, params=None, **kwargs):
         """Display the title of the a URL (ex: .title <url>)"""
         if params:
-            self._find_title(params.split(" ", 1)[0])
+            self._find_title(message, params.split(" ", 1)[0])
         else:
             if self.url:
-                self._find_title(self.url)
+                self._find_title(message, self.url)
 
     @plugin.hook_add_msg_regex("https?:\/\/|www\.")
-    def _watch_for_url(self, params=None, **kwargs):
+    def _watch_for_url(self, message, params=None, **kwargs):
         """Watch and keep track of the latest URL"""
         try:
             self.url = kwargs["full_message"].split(" ", 1)[0]
@@ -49,11 +48,11 @@ class Url(plugin.Plugin):
                             "www.youtube.com", "/www.youtube.com")
 
             if host.startswith(lookup_sites):
-                self._find_title(self.url)
+                self._find_title(message, self.url)
         except TypeError:
             return
 
-    def _find_title(self, url):
+    def _find_title(self, message, url):
         """Find the title of a given URL"""
         if not url.startswith(("http://", "https://")):
             url = "http://" + url
@@ -70,6 +69,7 @@ class Url(plugin.Plugin):
             content_size = response.headers.get("Content-Length")
             content_size = content_size + " bytes" if content_size else "N/A"
 
-            self.irc.reply("%s (%s, %s)" % (title, content_type, content_size))
+            message.dispatch("%s (%s, %s)" % (title, content_type,
+                             content_size))
         else:
-            self.irc.reply("No title found for %s" % url)
+            message.dispatch("No title found for %s" % url)
