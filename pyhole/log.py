@@ -19,8 +19,7 @@ import logging.handlers
 
 import utils
 
-
-def get_logger(name="Pyhole"):
+def setup_logger(name="Pyhole"):
     """Log handler"""
     debug_option = utils.get_option("debug")
     debug_config = utils.get_config().get("debug", type="bool")
@@ -41,4 +40,5 @@ def get_logger(name="Pyhole"):
     log.setFormatter(formatter)
     logging.getLogger(name).addHandler(log)
 
+def get_logger(name="Pyhole"):
     return logging.getLogger(name)
