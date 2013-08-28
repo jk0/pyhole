@@ -64,7 +64,7 @@ def subprocess(func):
             ret = func(*args, **kwargs)
         except Exception:
             ex_type, ex_value, tb = sys.exc_info()
-            error = ex_type, ex_value, ''.join(traceback.format_tb(tb))
+            error = ex_type, ex_value, "".join(traceback.format_tb(tb))
             ret = None
         else:
             error = None
@@ -81,7 +81,7 @@ def subprocess(func):
 
         if error:
             ex_type, ex_value, tb_str = error
-            message = '%s (in subprocess)\n%s' % (ex_value.message, tb_str)
+            message = "%s (in subprocess)\n%s" % (ex_value.message, tb_str)
             raise ex_type(message)
 
         return ret
