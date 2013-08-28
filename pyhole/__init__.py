@@ -13,3 +13,5 @@
 #   limitations under the License.
 
 """pyhole - A modular IRC bot for Python developers."""
+
+from main import Main

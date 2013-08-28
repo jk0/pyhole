@@ -17,8 +17,7 @@
 import os
 import unittest
 
-from pyhole import log
-from pyhole import utils
+from pyhole.core import log, utils
 
 
 class TestLog(unittest.TestCase):

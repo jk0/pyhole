@@ -14,6 +14,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-rm pyhole/*.pyc
-rm pyhole/plugins/*.pyc
-rm tests/*.pyc
+find . -name '*.pyc' | grep -v '.venv' | xargs -I{} rm {}
