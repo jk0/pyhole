@@ -17,13 +17,14 @@
 import os
 import unittest
 
-from pyhole import utils
+from pyhole.core import utils
 
 
 class TestUtils(unittest.TestCase):
     def setUp(self):
         utils.write_file("tests", "pyhole_test_file", "foo")
         self.new_file = utils.get_home_directory() + "tests/pyhole_test_file"
+        self.cpid = os.getpid()
 
     def tearDown(self):
         os.unlink(self.new_file)
@@ -80,3 +81,10 @@ class TestUtils(unittest.TestCase):
 
     def test_read_file(self):
         self.assertEquals(utils.read_file("tests", "pyhole_test_file"), "foo")
+
+    def test_subprocess(self):
+        @utils.subprocess
+        def test_pid():
+            return os.getpid()
+
+        self.assertNotEquals(self.cpid, test_pid())

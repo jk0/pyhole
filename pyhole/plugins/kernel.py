@@ -19,8 +19,7 @@ import urllib
 
 from BeautifulSoup import BeautifulSoup
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class Kernel(plugin.Plugin):
@@ -28,7 +27,7 @@ class Kernel(plugin.Plugin):
 
     @plugin.hook_add_command("kernel")
     @utils.spawn
-    def kernel(self, params=None, **kwargs):
+    def kernel(self, message, params=None, **kwargs):
         """Retrieve the current kernel version (ex: .kernel)"""
         url = "http://kernel.org/kdist/finger_banner"
         response = self.irc.fetch_url(url, self.name)
@@ -38,11 +37,11 @@ class Kernel(plugin.Plugin):
         r = re.compile("(.* mainline .*)")
         m = r.search(response.read())
         kernel = m.group(1).replace("  ", "")
-        self.irc.reply(kernel)
+        message.dispatch(kernel)
 
     @plugin.hook_add_keyword("k")
     @utils.spawn
-    def keyword_k(self, params=None, **kwargs):
+    def keyword_k(self, message, params=None, **kwargs):
         """Retrieve kernel.org Bugzilla bug information (ex: K12345)"""
         if params:
             params = utils.ensure_int(params)
@@ -68,16 +67,17 @@ class Kernel(plugin.Plugin):
                     })[0].contents[0].string)
 
                 msg = "Kernel.org %s [Status: %s, Assignee: %s] %s"
-                self.irc.reply(msg % (desc, status, assignee, url))
+                message.dispatch(msg % (desc, status, assignee, url))
+
             except TypeError:
                 return
 
     @plugin.hook_add_msg_regex(
         "https?:\/\/bugzilla\.kernel\.org\/show\_bug\.cgi\?id\=")
-    def _watch_for_k_bug_url(self, params=None, **kwargs):
+    def _watch_for_k_bug_url(self, message, params=None, **kwargs):
         """Watch for kernel.org Bugzilla bug URLs"""
         try:
             bug_id = kwargs["full_message"].split("id=", 1)[1].split(" ", 1)[0]
-            self.keyword_k(bug_id)
+            self.keyword_k(message, bug_id)
         except TypeError:
             return

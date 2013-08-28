@@ -19,8 +19,7 @@ try:
 except ImportError:
     import simplejson as json
 
-from pyhole import plugin
-from pyhole import utils
+from pyhole.core import plugin, utils
 
 
 class Redmine(plugin.Plugin):
@@ -36,13 +35,13 @@ class Redmine(plugin.Plugin):
             self.redmine_domain = self.redmine.get("domain")
             self.redmine_key = self.redmine.get("key")
             self.redmine_url = "https://%s:password@%s" % (
-                self.redmine_key, self.redmine_domain)
+                               self.redmine_key, self.redmine_domain)
         except Exception:
             self.disabled = True
 
     @plugin.hook_add_command("rbugs")
     @utils.spawn
-    def rbugs(self, params=None, **kwargs):
+    def rbugs(self, message, params=None, **kwargs):
         """Redmine bugs for a user (ex: .rbugs <login>)"""
         if params and not self.disabled:
             login = params.split(" ", 1)[0]
@@ -52,28 +51,28 @@ class Redmine(plugin.Plugin):
             issues = self._find_issues(user_id)
             for i, issue in enumerate(issues):
                 if i <= 4:
-                    self._find_issue(issue["id"])
+                    self._find_issue(message, issue["id"])
                 else:
-                    self.irc.reply("[...] truncated last %d bugs" % (
-                        len(issues) - i))
+                    message.dispatch("[...] truncated last %d bugs" % (
+                                     len(issues) - i))
                     break
             else:
                 if i <= 0:
-                    self.irc.reply("No Redmine bugs found for '%s'" % login)
+                    message.dispatch("No Redmine bugs found for '%s'" % login)
         else:
-            self.irc.reply(self.rbugs.__doc__)
+            message.dispatch(self.rbugs.__doc__)
 
     @plugin.hook_add_keyword("rm")
     @utils.spawn
-    def keyword_rm(self, params=None, **kwargs):
+    def keyword_rm(self, message, params=None, **kwargs):
         """Retrieve Redmine bug information (ex: RM12345)"""
         if params and not self.disabled:
             params = utils.ensure_int(params)
             if params:
-                self._find_issue(params)
+                self._find_issue(message, params)
 
     @plugin.hook_add_msg_regex("https?:\/\/redmine\..*/issues")
-    def _watch_for_rm_bug_url(self, params=None, **kwargs):
+    def _watch_for_rm_bug_url(self, message, params=None, **kwargs):
         """Watch for Redmine bug URLs"""
         try:
             line = kwargs["full_message"].split("/")
@@ -117,7 +116,7 @@ class Redmine(plugin.Plugin):
 
         return json.loads(response.read())["users"]
 
-    def _find_issue(self, issue_id):
+    def _find_issue(self, message, issue_id):
         """Find and display a Redmine issue"""
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
         response = self.irc.fetch_url(url, self.name)
@@ -138,4 +137,4 @@ class Redmine(plugin.Plugin):
             issue.get("assigned_to", {}).get("name", "N/A"))
         url = "https://%s/issues/%s" % (self.redmine_domain, issue["id"])
 
-        self.irc.reply("%s %s" % (msg, url))
+        message.dispatch("%s %s" % (msg, url))

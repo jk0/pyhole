@@ -185,8 +185,8 @@ htmlhelp_basename = 'pyholedoc'
 # (source start file, target name, title, author, documentclass
 # [howto/manual]).
 latex_documents = [
-    ('index', 'pyhole.tex', u'Pyhole Documentation', u'Josh Kearney',
-     'manual'),
+    ('index', 'pyhole.tex', u'Pyhole Documentation',
+     u'Josh Kearney', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

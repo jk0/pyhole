@@ -15,7 +15,7 @@
 from pip.req import parse_requirements
 from setuptools import setup
 
-from pyhole import version
+from pyhole.core import version
 
 
 def requirements():
@@ -31,7 +31,7 @@ setup(
     description="A modular IRC bot for Python developers.",
     license="Apache License, Version 2.0",
     url="http://pyhole.org",
-    packages=["pyhole", "pyhole.plugins"],
+    packages=["pyhole", "pyhole.core", "pyhole.core.irc", "pyhole.plugins"],
     install_requires=requirements(),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -42,7 +42,7 @@ setup(
         "Programming Language :: Python",
     ],
     entry_points={
-        "console_scripts": ["pyhole = pyhole.client:main"]
+        "console_scripts": ["pyhole = pyhole:Main"]
     },
     setup_requires=['nose>=1.3.0']
 )

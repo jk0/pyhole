@@ -16,14 +16,12 @@
 
 import unittest
 
-from pyhole import client
+from pyhole.core import active_commands, active_keywords
 
 
 class TestIrc(unittest.TestCase):
     def test_active_commands(self):
-        active_commands = client.active_commands()
-        self.assertTrue(isinstance(active_commands, str))
+        self.assertTrue(isinstance(active_commands(), str))
 
     def test_active_keywords(self):
-        active_keywords = client.active_keywords()
-        self.assertTrue(isinstance(active_keywords, str))
+        self.assertTrue(isinstance(active_keywords(), str))
