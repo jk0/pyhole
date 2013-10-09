@@ -41,7 +41,7 @@ class Url(plugin.Plugin):
     def _watch_for_url(self, message, params=None, **kwargs):
         """Watch and keep track of the latest URL"""
         try:
-            self.url = kwargs["full_message"].split(" ", 1)[0]
+            self.url = message.message.split(" ", 1)[0]
             host = self.url[7:]
 
             lookup_sites = ("open.spotify.com", "/open.spotify.com",
