@@ -75,7 +75,7 @@ class Redmine(plugin.Plugin):
     def _watch_for_rm_bug_url(self, message, params=None, **kwargs):
         """Watch for Redmine bug URLs"""
         try:
-            line = kwargs["full_message"].split("/")
+            line = message.message.split("/")
             for i, word in enumerate(line):
                 if word == "issues":
                     bug_id = line[i + 1].split(" ", 1)[0]

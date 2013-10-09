@@ -79,7 +79,7 @@ class Launchpad(plugin.Plugin):
     def _watch_for_lp_bug_url(self, message, params=None, **kwargs):
         """Watch for Launchpad bug URLs"""
         try:
-            line = kwargs["full_message"].split("/")
+            line = message.message.split("/")
             for i, word in enumerate(line):
                 if word == "+bug":
                     bug_id = line[i + 1].split(" ", 1)[0]
@@ -91,7 +91,7 @@ class Launchpad(plugin.Plugin):
     def _watch_for_short_lp_bug_url(self, message, params=None, **kwargs):
         """Watch for short Launchpad bug URLs"""
         try:
-            line = kwargs["full_message"].split("/")
+            line = message.message.split("/")
             for i, word in enumerate(line):
                 if word == "bugs":
                     bug_id = line[i + 1].split(" ", 1)[0]
