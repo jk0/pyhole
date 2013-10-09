@@ -36,11 +36,12 @@ eventlet.monkey_patch()
 
 def admin(func):
     """Administration Decorator"""
-    def wrap(self, *args, **kwargs):
-        if self.irc.source in self.irc.admins:
-            func(self, *args, **kwargs)
-        else:
-            self.irc.reply("Sorry, you are not authorized to do that.")
+    def wrap(self, message, *args, **kwargs):
+        if message.source in self.irc.admins:
+            return func(self, message, *args, **kwargs)
+
+        return message.dispatch("Sorry, you are not authorized to do that.")
+
     wrap.__doc__ = func.__doc__
     wrap.__name__ = func.__name__
     wrap.__module__ = func.__module__
