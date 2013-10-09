@@ -33,10 +33,10 @@ class Weather(plugin.Plugin):
             location = params
             if location.startswith("set "):
                 location = location[4:]
-                utils.write_file(self.name, self.irc.source, location)
+                utils.write_file(self.name, message.source, location)
                 message.dispatch("Location information saved")
         else:
-            location = utils.read_file(self.name, self.irc.source)
+            location = utils.read_file(self.name, message.source)
             if not location:
                 message.dispatch(self.weather.__doc__)
                 return
