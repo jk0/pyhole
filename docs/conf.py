@@ -52,7 +52,7 @@ copyright = u'2011, Josh Kearney'
 # built documents.
 #
 # The short X.Y version.
-from pyhole import version as v
+from pyhole.core import version as v
 version = v.version()
 # The full version, including alpha/beta/rc tags.
 release = v.version_hash()
