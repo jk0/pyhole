@@ -20,7 +20,6 @@ import time
 
 from core import Process, log, utils, version
 
-
 LOG = log.get_logger()
 CONFIG = utils.get_config()
 
