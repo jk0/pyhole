@@ -31,7 +31,13 @@ setup(
     description="A modular IRC bot for Python developers.",
     license="Apache License, Version 2.0",
     url="http://pyhole.org",
-    packages=["pyhole", "pyhole.core", "pyhole.core.irc", "pyhole.plugins"],
+    packages=[
+        "pyhole",
+        "pyhole.core",
+        "pyhole.core.colormaps",
+        "pyhole.core.irc",
+        "pyhole.plugins"
+    ],
     install_requires=requirements(),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
