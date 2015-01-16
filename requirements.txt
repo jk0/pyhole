@@ -3,3 +3,4 @@ Eventlet
 irc
 launchpadlib
 pywunderground
+requests
