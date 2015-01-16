@@ -37,7 +37,8 @@ class Allergies(plugin.Plugin):
             message.dispatch("Unable to fetch allergy data on weekends")
             return
 
-        URL = "http://saallergy.info/today"
+        today = "%s-%s-%s" % (d.year, d.month, d.day)
+        URL = "http://saallergy.info/day/%s" % today
         HEADERS = {"accept": "application/json"}
 
         try:
