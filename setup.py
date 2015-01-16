@@ -17,9 +17,11 @@ from setuptools import setup
 
 from pyhole.core import version
 
+import uuid
+
 
 def requirements():
-    install_reqs = parse_requirements("requirements.txt")
+    install_reqs = parse_requirements("requirements.txt", session=uuid.uuid1())
     return [str(ir.req) for ir in install_reqs]
 
 
