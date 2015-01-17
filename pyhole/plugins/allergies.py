@@ -56,3 +56,8 @@ class Allergies(plugin.Plugin):
         text = text.rstrip("|")
 
         message.dispatch(text)
+    
+    @plugin.hook_add_command("pollen")
+    def alias_pollen(self, message, params=None, **kwargs):
+        """Alias of allergies"""
+        self.allergies(message, params, **kwargs)
