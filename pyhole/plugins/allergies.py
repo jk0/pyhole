@@ -37,7 +37,7 @@ class Allergies(plugin.Plugin):
             message.dispatch("Unable to fetch allergy data on weekends")
             return
 
-        today = "%s-%s-%s" % (d.year, d.month, d.day)
+        today = d.strftime("%Y-%m-%d")
         URL = "http://saallergy.info/day/%s" % today
         HEADERS = {"accept": "application/json"}
 
@@ -47,9 +47,8 @@ class Allergies(plugin.Plugin):
             message.dispatch("Unable to fetch allergy data")
             return
 
-        data = r.json
-        date = data["results"][0]["date"]
-        text = "Allergies for %s: " % date
+        data = r.json()
+        text = "Allergies for %s: " % today
         for a in data["results"]:
             text = text + "%s - %s (%s) | " % (a["allergen"], a["level"],
                                                a["count"])
