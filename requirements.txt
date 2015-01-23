@@ -4,3 +4,4 @@ irc
 launchpadlib
 pywunderground
 requests
+yahoo-finance
