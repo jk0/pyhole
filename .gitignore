@@ -6,6 +6,7 @@
 # Packages
 *.egg
 *.egg-info
+.eggs
 dist
 build
 eggs
@@ -35,6 +36,7 @@ nosetests.xml
 .pydevproject
 
 .venv
+nohup.out
 
 # Generated documentation
 docs/_build/
