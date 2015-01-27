@@ -23,7 +23,7 @@ class Stocks(plugin.Plugin):
 
     @plugin.hook_add_command("stock")
     @utils.spawn
-    def allergies(self, message, params=None, **kwargs):
+    def stocks(self, message, params=None, **kwargs):
         """Display current stock value for user provided symbol(s)
         (ex: .stock rax,yhoo,aapl)
         """
