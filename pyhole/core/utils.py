@@ -199,6 +199,11 @@ key: abcd1234
 domain: redmine.example.com
 key: abcd1234
 
+[Jira]
+domain: jira.example.com
+username: abcd1234
+password: pass12345
+
 [VersionOne]
 domain: www1.v1host.com
 key: EXAMPL
