@@ -249,7 +249,11 @@ class Client(irclib.SimpleIRCClient):
         self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
                       self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
-                     ssl=self.ssl, username=self.username)
+                     username=self.username,
+                     connect_factory=connection.Factory(
+                         wrapper=ssl.wrap_socket,
+                         ipv6=self.ipv6).connect
+                     if self.ssl else connection.Factory())
 
     def on_kick(self, connection, event):
         """Automatically rejoin channel if kicked."""
