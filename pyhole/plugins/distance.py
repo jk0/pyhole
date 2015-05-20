@@ -56,7 +56,7 @@ class Distance(plugin.Plugin):
 
         resp =  requests.get('https://maps.googleapis.com/maps/api'
                              '/directions/json?origin=%s&destination=%s'
-                             '&key=%s' % (origin, destination, key)
+                             '&key=%s' % (origin, destination, key))
         if resp.status_code == 200:
             msg = resp.json()['routes'][0]['legs'][0]['distance']['text']
         else:
