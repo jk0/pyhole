@@ -218,6 +218,9 @@ key: EXAMPL
 username: user
 password: abcd1234
 
+[Xsa]
+notify: #channel1, #channel2
+
 # IRC Network Configuration
 
 [FreeNode]
