@@ -13,6 +13,8 @@
 #   limitations under the License.
 
 """Pyhole Distance to User Plugin"""
+import shlex
+
 import requests
 
 from pyhole.core import plugin, utils
@@ -32,15 +34,15 @@ class Distance(plugin.Plugin):
             message.dispatch("No Google Maps API key set")
             return
 
-        parts = params.split(' ')
+        parts = shlex.split(params)
         if not parts:
             message.dispatch(self.distance.__doc__)
             return
 
-        dest_nick = parts[0]
+        dest_nick = parts[0].strip()
 
         if len(parts) > 1:
-            origin_nick = parts[1]
+            origin_nick = parts[1].strip()
         else:
             origin_nick = message.source.split('!')[0]
 
