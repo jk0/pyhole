@@ -24,10 +24,11 @@ class Distance(plugin.Plugin):
     @plugin.hook_add_command("distance")
     @utils.spawn
     def distance(self, message, params=None, **kwargs):
-        """Display distance between users (ex: .dist <handle> [<handle>])"""
+        """Display distance between users (ex: .dist <nick> [<nick>])"""
         maps_api = utils.get_config("Googlemaps")
-        key = maps_api.get("key")
-        if not key:
+        try:
+            key = maps_api.get("key")
+        except Exception:
             message.dispatch("No Google Maps API key set")
             return
 
@@ -36,27 +37,35 @@ class Distance(plugin.Plugin):
             message.dispatch(self.distance.__doc__)
             return
 
-        dest_handle = parts[0]
-        destination = utils.read_file('weather', dest_handle)
-        if not destination:
-            message.dispatch("No location set for '%s' yet"
-                             " (use: .w set <zip>" % dest_handle)
-            return
+        dest_nick = parts[0]
 
         if len(parts) > 1:
-            origin_handle = parts[1]
+            origin_nick = parts[1]
         else:
-            origin_handle = message.source
+            origin_nick = message.source.split('!')[0]
 
-        origin = utils.read_file('weather', origin_handle)
-        if not origin:
+        dest_zip = None
+        origin_zip = None
+        for filename in utils.list_files('Weather'):
+            nick, ident = filename.split('!')
+            if nick == dest_nick:
+                dest_zip = utils.read_file('Weather', filename)
+            if nick == origin_nick:
+                origin_zip = utils.read_file('Weather', filename)
+
+        if not dest_zip:
             message.dispatch("No location set for '%s' yet"
-                             " (use: .w set <zip>" % origin_handle)
+                             " (use: .w set <zip>)" % dest_nick)
+            return
+
+        if not origin_zip:
+            message.dispatch("No location set for '%s' yet"
+                             " (use: .w set <zip>)" % origin_nick)
             return
 
         resp =  requests.get('https://maps.googleapis.com/maps/api'
                              '/directions/json?origin=%s&destination=%s'
-                             '&key=%s' % (origin, destination, key))
+                             '&key=%s' % (origin_zip, dest_zip, key))
         if resp.status_code == 200:
             msg = resp.json()['routes'][0]['legs'][0]['distance']['text']
         else:

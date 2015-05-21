@@ -179,6 +179,11 @@ def read_file(directory, file_name):
         return None
 
 
+def list_files(directory):
+    directory = get_directory(directory)
+    return os.listdir(directory)
+
+
 def generate_config():
     """Generate an example config"""
     example = """# Global Configuration
@@ -193,6 +198,9 @@ plugins: admin, calculator, search, urls
 networks: FreeNode, EFnet
 
 [Wunderground]
+key: abcd1234
+
+[Googlemaps]
 key: abcd1234
 
 [Redmine]
