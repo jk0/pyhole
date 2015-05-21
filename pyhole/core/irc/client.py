@@ -88,8 +88,9 @@ class Client(irclib.SimpleIRCClient):
 
     def run_hook_polls(self):
         """Run polls in the background."""
+        message = None
         for mod_name, func, cmd in plugin.hook_get_polls():
-            self.run_hook_command(mod_name, func, cmd)
+            self.run_hook_command(mod_name, func, message, cmd)
 
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively."""

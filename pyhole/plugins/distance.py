@@ -13,8 +13,6 @@
 #   limitations under the License.
 
 """Pyhole Distance to User Plugin"""
-import shlex
-
 import requests
 
 from pyhole.core import plugin, utils
@@ -26,7 +24,7 @@ class Distance(plugin.Plugin):
     @plugin.hook_add_command("distance")
     @utils.spawn
     def distance(self, message, params=None, **kwargs):
-        """Display distance between users (ex: .dist <nick> [<nick>])"""
+        """Display distance between users (ex: .dist <nick|location> [to <nick|location>])"""
         maps_api = utils.get_config("Googlemaps")
         try:
             key = maps_api.get("key")
@@ -34,7 +32,7 @@ class Distance(plugin.Plugin):
             message.dispatch("No Google Maps API key set")
             return
 
-        parts = shlex.split(params)
+        parts = params.split(' to ')
         if not parts:
             message.dispatch(self.distance.__doc__)
             return
