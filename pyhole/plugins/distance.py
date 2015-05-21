@@ -44,31 +44,35 @@ class Distance(plugin.Plugin):
         else:
             origin_nick = message.source.split('!')[0]
 
-        dest_zip = None
-        origin_zip = None
+        dest = None
+        origin = None
         for filename in utils.list_files('Weather'):
             nick, ident = filename.split('!')
             if nick == dest_nick:
-                dest_zip = utils.read_file('Weather', filename)
+                dest = utils.read_file('Weather', filename)
             if nick == origin_nick:
-                origin_zip = utils.read_file('Weather', filename)
+                origin = utils.read_file('Weather', filename)
 
-        if not dest_zip:
-            message.dispatch("No location set for '%s' yet"
-                             " (use: .w set <zip>)" % dest_nick)
-            return
+        if not dest:
+            # They passed in a location
+            dest = dest_nick
 
-        if not origin_zip:
-            message.dispatch("No location set for '%s' yet"
-                             " (use: .w set <zip>)" % origin_nick)
-            return
+        if not origin:
+            # They passed in a location
+            origin = origin_nick
 
         resp =  requests.get('https://maps.googleapis.com/maps/api'
                              '/directions/json?origin=%s&destination=%s'
-                             '&key=%s' % (origin_zip, dest_zip, key))
+                             '&key=%s' % (origin, dest, key))
+
+        msg = None
         if resp.status_code == 200:
-            msg = resp.json()['routes'][0]['legs'][0]['distance']['text']
-        else:
+            try:
+                msg = resp.json()['routes'][0]['legs'][0]['distance']['text']
+            except IndexError:
+                pass
+
+        if not msg:
             msg = "Unable to fetch data from Google Maps"
 
         message.dispatch(msg)
