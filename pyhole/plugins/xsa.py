@@ -30,24 +30,54 @@ class Xsa(plugin.Plugin):
         """Retrieve XSA information (ex: xsa123 or xsa-123)"""
         # abs is needed in case we get 'xsa-123', that would be -123
         xsa_num = abs(utils.ensure_int(params))
+        xsa_id = 'XSA-%d' % xsa_num
         data = self._load_cached_xsa_data()
-        try:
-            xsa_info = data['XSA-%d' % xsa_num]
-        except:
-            message.dispatch("Unable to find matching XSA")
-            return
-        else:
-            message.dispatch(
-                "%(link)s: %(title)s (Public Release: %(public_release)s)"
-                % xsa_info)
+        msg = self._make_xsa_message(xsa_id, data)
+        if not msg:
+            msg = "Unable to find matching XSA"
+        message.dispatch(msg)
 
-    @plugin.hook_add_poll("poll_xsa_list", poll_timer=3600)
+    def _make_xsa_message(self, xsa_id, data):
+        try:
+            xsa_info = data[xsa_id]
+        except:
+            return None
+        else:
+            # Use ID if we don't have a link
+            if not xsa_info['link']:
+                xsa_info['link'] = xsa_info['id']
+            return ("%(link)s: %(title)s (Public Release: %(public_release)s)"
+                    % xsa_info)
+
+    @plugin.hook_add_poll("poll_xsa_list", poll_timer=900)
     def poll_xsa_list(self, message, params=None, **kwargs):
-        data = self._fetch_xsa_data()
-        if not data:
+        old_data = self._load_cached_xsa_data()
+
+        new_data = self._fetch_xsa_data()
+        if not new_data:
             return
-        data_json = json.dumps(data)
-        utils.write_file(self.name, 'xsas.json', data_json)
+        new_data_json = json.dumps(new_data)
+        utils.write_file(self.name, 'xsas.json', new_data_json)
+
+        # Notify subscribed channels on new XSAs
+        old_xsa_ids = set(old_data.keys())
+        new_xsa_ids = set(new_data.keys())
+        added_xsa_ids = new_xsa_ids - old_xsa_ids
+        if old_xsa_ids and added_xsa_ids:
+            self._notify_new_xsas(added_xsa_ids, new_data)
+
+    def _notify_new_xsas(self, added_xsa_ids, new_data):
+        xsa_config = utils.get_config("Xsa")
+        try:
+            notify_str = xsa_config.get("notify")
+        except Exception:
+            return
+        channels = notify_str.split(',')
+        for xsa_id in added_xsa_ids:
+            msg = self._make_xsa_message(xsa_id, new_data)
+            for channel in channels:
+                channel = channel.strip()
+                self.irc.notice(channel, msg)
 
     def _load_cached_xsa_data(self):
         data_json = utils.read_file(self.name, 'xsas.json')
@@ -77,7 +107,7 @@ class Xsa(plugin.Plugin):
             except:
                 xsa_link = None
             try:
-                public_release = children[2].contents[0]
+                public_release = children[1].contents[0]
             except:
                 public_release = None
             try:
