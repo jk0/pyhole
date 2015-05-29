@@ -49,7 +49,7 @@ class Xsa(plugin.Plugin):
             return ("%(link)s: %(title)s (Public Release: %(public_release)s)"
                     % xsa_info)
 
-    @plugin.hook_add_poll("poll_xsa_list", poll_timer=900)
+    @plugin.hook_add_poll("poll_xsa_list", poll_timer=300)
     def poll_xsa_list(self, message, params=None, **kwargs):
         old_data = self._load_cached_xsa_data()
 
