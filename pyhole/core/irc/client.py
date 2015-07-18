@@ -102,6 +102,16 @@ class Client(irclib.SimpleIRCClient):
         self.log.info("Loaded Plugins: %s" % active_plugins())
         self.run_hook_polls()
 
+    def run_chan_event_hooks(self, event, private):
+        """Run channel event hooks."""
+        for mod_name, func, ev_type in plugin.hook_get_chan_events():
+            #FIXME: what if i'm comparing ansii vs UTF-8 ?
+            if ev_type == '*' or event.type == ev_type:
+                self.run_hook_command(
+                    mod_name, func, event,
+                    ev_type, private=private
+                    )
+
     def run_msg_regexp_hooks(self, message, private):
         """Run regexp hooks."""
         msg = message.message
@@ -164,6 +174,10 @@ class Client(irclib.SimpleIRCClient):
         self.run_command_hooks(message, private)
         self.run_keyword_hooks(message, private)
         self.run_msg_regexp_hooks(message, private)
+
+    def poll_events(self, event, private=False):
+        """Watch for evenrs. (like join, leave...)"""
+        self.run_chan_event_hooks(event, private)
 
     def notice(self, target, msg):
         """Send a notice."""
@@ -296,17 +310,23 @@ class Client(irclib.SimpleIRCClient):
         target = event.target
         source = event.source.nick
         self.log.info("-%s- %s joined" % (target, source))
+        #FIXME: private
+        self.poll_events(event, private=False)
 
     def on_part(self, _connection, event):
         """Handle parts."""
         target = event.target
         source = event.source.nick
         self.log.info("-%s- %s left" % (target, source))
+        #FIXME: private
+        self.poll_events(event, private=False)
 
     def on_quit(self, _connection, event):
         """Handle quits."""
         source = event.source.nick
         self.log.info("%s quit" % source)
+        #FIXME: private
+        self.poll_events(event, private=False)
 
     def on_action(self, _connection, event):
         """Handle IRC actions."""
@@ -314,6 +334,8 @@ class Client(irclib.SimpleIRCClient):
         source = event.source.nick
         msg = event.arguments[0]
         self.log.info("-%s- * %s %s" % (target, source, msg))
+        #FIXME: private
+        self.poll_events(event, private=False)
 
     def on_privnotice(self, _connection, event):
         """Handle private notices."""

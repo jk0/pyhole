@@ -86,7 +86,7 @@ def active_get(hookname):
     return [x[2] for x in _plugin_hooks[hookname]]
 
 
-_hook_names = ["keyword", "command", "msg_regex", "poll"]
+_hook_names = ["keyword", "command", "msg_regex", "poll", "chan_event"]
 _reset_variables()
 _this_mod = sys.modules[__name__]
 
