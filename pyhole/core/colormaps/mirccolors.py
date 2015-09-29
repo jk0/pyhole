@@ -28,7 +28,8 @@ class MircColors(ColorMap):
     _separator = u','
     _digit = u'\x16\x16'
     _reset = u'\x0f'
-    _clean = re.compile(r"([\x02\x0F\x1F\x0E\x16\x1B]|\x03([0-9]{0,2})(,([0-9]{0,2}))?|\x04[0-9A-Fa-f]{6}(,([0-9A-Fa-f]){6})?)*")
+    _clean = re.compile(r"([\x02\x0F\x1F\x0E\x16\x1B]|\x03([0-9]{0,2})(,([0-9"
+                        "]{0,2}))?|\x04[0-9A-Fa-f]{6}(,([0-9A-Fa-f]){6})?)*")
     _color_map = {
         u'white': u'0',
         u'black': u'1',
@@ -51,7 +52,7 @@ class MircColors(ColorMap):
     def color(self, _color):
         _color = _color.lower().strip()
         if _color not in self._color_map:
-            raise UnknownColor, _color
+            raise (UnknownColor, _color)
         return self._color_map[_color]
 
     def strip(self, text):

@@ -17,8 +17,9 @@
 import sys
 
 
-from pyhole import core
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
+from pyhole.core.irc import client
 
 
 class Admin(plugin.Plugin):
@@ -36,8 +37,8 @@ class Admin(plugin.Plugin):
                 message.dispatch("No help available for %s" % params)
         else:
             message.dispatch(self.help.__doc__)
-            message.dispatch("Active Commands: %s" % core.active_commands())
-            message.dispatch("Active Keywords: %s" % core.active_keywords())
+            message.dispatch("Active Commands: %s" % client.active_commands())
+            message.dispatch("Active Keywords: %s" % client.active_keywords())
 
     @plugin.hook_add_command("version")
     def version(self, message, params=None, **kwargs):
@@ -49,7 +50,7 @@ class Admin(plugin.Plugin):
     def reload(self, message, params=None, **kwargs):
         """Reload all plugins"""
         self.irc.load_plugins(reload_plugins=True)
-        message.dispatch("Loaded Plugins: %s" % core.active_plugins())
+        message.dispatch("Loaded Plugins: %s" % client.active_plugins())
 
     @plugin.hook_add_command("op")
     @utils.admin

@@ -88,8 +88,7 @@ class Scorekeeper(plugin.Plugin):
             nick = params.strip()
             score = self._get_score(nick)
             if score is None:
-                return message.dispatch(
-                        "No score found for '%s'" % nick)
+                return message.dispatch("No score found for '%s'" % nick)
             else:
                 message.dispatch(score)
                 return

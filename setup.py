@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2011-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,35 +12,35 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from pip.req import parse_requirements
 from setuptools import setup
 
 from pyhole.core import version
 
-import uuid
-
-
-def requirements():
-    install_reqs = parse_requirements("requirements.txt", session=uuid.uuid1())
-    return [str(ir.req) for ir in install_reqs]
-
 
 setup(
     name="irc-pyhole",
-    version=version.version_hash(),
+    version=version.version(),
     author="Josh Kearney",
     author_email="josh@jk0.org",
     description="A modular IRC bot for Python developers.",
     license="Apache License, Version 2.0",
-    url="http://pyhole.org",
+    url="https://github.com/jk0/pyhole",
     packages=[
         "pyhole",
-        "pyhole.core",
-        "pyhole.core.colormaps",
-        "pyhole.core.irc",
-        "pyhole.plugins"
     ],
-    install_requires=requirements(),
+    install_requires=[
+        "BeautifulSoup==3.2.0",
+        "Eventlet",
+        "irc",
+        "jira",
+        "launchpadlib",
+        "pywunderground",
+        "requests",
+        "yahoo-finance"
+    ],
+    setup_requires=[
+        "flake8"
+    ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -50,7 +50,7 @@ setup(
         "Programming Language :: Python",
     ],
     entry_points={
-        "console_scripts": ["pyhole = pyhole:Main"]
+        "console_scripts": ["pyhole = pyhole.main:Main"]
     },
-    setup_requires=['nose>=1.3.0']
+    test_suite="pyhole.tests"
 )

@@ -15,7 +15,6 @@
 """Pyhole Message"""
 
 import irc.client as irclib
-from irc import connection
 
 from .. import log
 

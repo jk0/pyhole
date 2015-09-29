@@ -193,7 +193,7 @@ def reload_plugins(*args, **kwargs):
                 # TODO(jk0): Doing this kills the entire process. We need to
                 # figure out how to kill it properly. Until this is done,
                 # reloading will not work with polls.
-                #attr().throw(KeyboardInterrupt)
+                # attr().throw(KeyboardInterrupt)
                 pass
 
     # When the modules are reloaded, the meta class will append
@@ -208,8 +208,6 @@ def reload_plugins(*args, **kwargs):
 
     # Reload existing plugins
     for mod, val in sys.modules.items():
-        l_plugin_path = os.path.join(local_plugin_dir, mod)
-
         if plugindir in mod and val and mod != plugindir:
             mod_file = val.__file__
             if not os.path.isfile(mod_file):

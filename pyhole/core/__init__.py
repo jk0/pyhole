@@ -1,4 +1,4 @@
-#   Copyright 2013 Philip Schwartz
+#   Copyright 2013-2015 Philip Schwartz
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,14 +11,3 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
-import log
-
-from .irc.message import Message, Notice, Reply
-
-from .irc.client import (Client,
-                         active_commands,
-                         active_keywords,
-                         active_plugins)
-
-from .irc.process import Process

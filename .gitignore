@@ -35,7 +35,7 @@ nosetests.xml
 .project
 .pydevproject
 
-.venv
+*venv
 nohup.out
 
 # Generated documentation

@@ -14,18 +14,20 @@
 
 """Event-based IRC Class"""
 
-import multiprocessing
 import random
 import re
 import ssl
-import sys
 import time
 import urllib
 
 import irc.client as irclib
 from irc import connection
 
-from .. import log, plugin, utils, version, Reply
+from pyhole.core import log
+from pyhole.core import plugin
+from pyhole.core import utils
+from pyhole.core import version
+from pyhole.core.irc import message
 
 
 LOG = log.get_logger()
@@ -340,7 +342,7 @@ class Client(irclib.SimpleIRCClient):
 
         source = event.source.split("@", 1)[0]
         target = event.source.nick
-        _msg = Reply(self, msg, source, target)
+        _msg = message.Reply(self, msg, source, target)
 
         if self.target != self.nick:
             self.log.info("<%s> %s" % (self.target, msg))
@@ -353,7 +355,7 @@ class Client(irclib.SimpleIRCClient):
 
         source = event.source.split("@", 1)[0]
         target = event.target
-        _msg = Reply(self, msg, source, target)
+        _msg = message.Reply(self, msg, source, target)
 
         self.log.info("-%s- <%s> %s" % (self.target, nick, msg))
         self.poll_messages(_msg)

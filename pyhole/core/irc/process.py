@@ -18,7 +18,9 @@ import multiprocessing
 import sys
 import time
 
-from .. import Client, log, utils
+from pyhole.core import log
+from pyhole.core import utils
+from pyhole.core.irc import client
 
 
 LOG = log.get_logger()
@@ -36,7 +38,7 @@ class Process(multiprocessing.Process):
         """An IRC network connection."""
         while True:
             try:
-                connection = Client(self.irc_network)
+                connection = client.Client(self.irc_network)
             except Exception, exc:
                 LOG.exception(exc)
                 LOG.error("Retrying in %d seconds" % self.reconnect_delay)

@@ -18,7 +18,10 @@
 import sys
 import time
 
-from core import Process, log, utils, version
+from pyhole.core import log
+from pyhole.core import utils
+from pyhole.core import version
+from pyhole.core.irc import process
 
 LOG = log.get_logger()
 CONFIG = utils.get_config()
@@ -33,7 +36,7 @@ def Main():
 
     procs = []
     for network in networks:
-        proc = Process(network)
+        proc = process.Process(network)
         proc.start()
         procs.append(proc)
 

@@ -27,7 +27,6 @@ class Color(object):
             _colors = MircColors
         self._colors = _colors()
 
-
     def colorize(self, fg=None, bg=None, text=None):
         """Generate colored text using passed parameters"""
         if not fg and not bg:

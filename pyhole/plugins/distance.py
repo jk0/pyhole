@@ -24,7 +24,7 @@ class Distance(plugin.Plugin):
     @plugin.hook_add_command("distance")
     @utils.spawn
     def distance(self, message, params=None, **kwargs):
-        """Display distance between users (ex: .dist <nick|location> [to <nick|location>])"""
+        """Display distances (ex: .dist <nick|loc> [to <nick|loc>])"""
         maps_api = utils.get_config("Googlemaps")
         try:
             key = maps_api.get("key")
@@ -61,9 +61,9 @@ class Distance(plugin.Plugin):
             # They passed in a location
             origin = origin_nick
 
-        resp =  requests.get('https://maps.googleapis.com/maps/api'
-                             '/directions/json?origin=%s&destination=%s'
-                             '&key=%s' % (origin, dest, key))
+        resp = requests.get('https://maps.googleapis.com/maps/api'
+                            '/directions/json?origin=%s&destination=%s'
+                            '&key=%s' % (origin, dest, key))
 
         msg = None
         if resp.status_code == 200:

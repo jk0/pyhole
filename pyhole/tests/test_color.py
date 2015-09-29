@@ -25,7 +25,8 @@ class MockColors(colormap.ColorMap):
     _separator = u','
     _digit = u'\x16\x16'
     _reset = u'\x0f'
-    _clean = re.compile(r"([\x02\x0F\x1F\x0E\x16\x1B]|\x03([0-9]{0,2})(,([0-9]{0,2}))?|\x04[0-9A-Fa-f]{6}(,([0-9A-Fa-f]){6})?)*")
+    _clean = re.compile(r"([\x02\x0F\x1F\x0E\x16\x1B]|\x03([0-9]{0,2})(,([0-9]"
+                        "{0,2}))?|\x04[0-9A-Fa-f]{6}(,([0-9A-Fa-f]){6})?)*")
     _color_map = {
         u'red': u'0',
         u'white': u'1',

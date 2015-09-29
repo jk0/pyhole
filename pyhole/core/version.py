@@ -20,7 +20,7 @@ import os
 import sys
 
 
-__VERSION__ = "0.6.6"
+__VERSION__ = "0.6.7"
 
 
 def current_git_hash():
@@ -46,9 +46,10 @@ def version_string():
     """Return the full version"""
     git_hash = current_git_hash()
     if git_hash:
-        return "pyhole v%s (%s) - http://pyhole.org" % (__VERSION__, git_hash)
+        return "pyhole v%s (%s) - https://github.com/jk0/pyhole" % (
+            __VERSION__, git_hash)
 
-    return "pyhole v%s - http://pyhole.org" % __VERSION__
+    return "pyhole v%s - https://github.com/jk0/pyhole" % __VERSION__
 
 
 def version_hash():

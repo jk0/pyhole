@@ -56,12 +56,9 @@ class Jira(plugin.Plugin):
         except Exception:
             return
 
-        msg = "JIRA %s #%s: %s [Status: %s, Priority: %s, Labels: %s, Assignee: %s]" % (
-            issue.fields.tracker.name,
-            issue.id,
-            issue.fields.summary,
-            issue.fields.status.name,
-            issue.fields.priority.name,
+        msg = "JIRA %s #%s: %s [S: %s, P: %s, L: %s, A: %s]" % (
+            issue.fields.tracker.name, issue.id, issue.fields.summary,
+            issue.fields.status.name, issue.fields.priority.name,
             ",".join(issue.fields.labels),
             issue.get("fields", {}).get("assignee", "N/A"))
         url = "https://%s/browse/%s" % (self.jira_url, issue.key)

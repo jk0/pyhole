@@ -14,4 +14,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-find . -name '*.pyc' | grep -v '.venv' | xargs -I{} rm {}
+find . -name '*.pyc' | xargs -I{} rm {}
