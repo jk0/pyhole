@@ -31,7 +31,8 @@ setup(
         "yahoo-finance"
     ],
     setup_requires=[
-        "flake8"
+        "flake8",
+        "sphinx"
     ],
     entry_points={
         "console_scripts": [
