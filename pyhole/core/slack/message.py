@@ -18,9 +18,9 @@ from pyhole.core import log
 
 
 class Message(object):
-    def __init__(self, client, message):
+    def __init__(self, session, message):
         self.log = log.get_logger()
-        self.client = client
+        self.session = session
         self.message = message
 
     @property
@@ -32,12 +32,12 @@ class Message(object):
         self._message = _message
 
     @property
-    def client(self):
-        return self._client
+    def session(self):
+        return self._session
 
-    @client.setter
-    def client(self, _client):
-        self._client = _client
+    @session.setter
+    def session(self, _session):
+        self._session = _session
 
     def dispatch(self, reply):
         self.log.error("Message Dispatcher is not implemented")
@@ -48,18 +48,18 @@ class Message(object):
 
 
 class Reply(Message):
-    def __init__(self, client, message, source, target):
-        super(Reply, self).__init__(client, message)
+    def __init__(self, session, message, source, target):
+        super(Reply, self).__init__(session, message)
         self.source = source
         self.target = target
 
     def dispatch(self, msg):
         """Dispatch message as a reply."""
-        if self.client.addressed:
-            self.client.reply(self.target, "%s: %s" % (self.source, msg))
-            self.log.info("-%s- <%s> %s: %s" % (self.target, self.client.nick,
+        if self.session.addressed:
+            self.session.reply(self.target, "%s: %s" % (self.source, msg))
+            self.log.info("-%s- <%s> %s: %s" % (self.target, self.session.nick,
                           self.source, msg))
         else:
-            self.client.reply(self.target, msg)
-            self.log.info("-%s- <%s> %s" % (self.target, self.client.nick,
+            self.session.reply(self.target, msg)
+            self.log.info("-%s- <%s> %s" % (self.target, self.session.nick,
                                             msg))
