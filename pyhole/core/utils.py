@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2010-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import os
 import re
 import sys
 import traceback
+import urllib
 
 from BeautifulSoup import BeautifulStoneSoup
 from functools import wraps
@@ -37,7 +38,7 @@ eventlet.monkey_patch()
 def admin(func):
     """Administration Decorator"""
     def wrap(self, message, *args, **kwargs):
-        if message.source in self.irc.admins:
+        if message.source in self.session.admins:
             return func(self, message, *args, **kwargs)
 
         return message.dispatch("Sorry, you are not authorized to do that.")
@@ -45,6 +46,7 @@ def admin(func):
     wrap.__doc__ = func.__doc__
     wrap.__name__ = func.__name__
     wrap.__module__ = func.__module__
+
     return wrap
 
 
@@ -55,6 +57,7 @@ def spawn(func):
     wrap.__doc__ = func.__doc__
     wrap.__name__ = func.__name__
     wrap.__module__ = func.__module__
+
     return wrap
 
 
@@ -86,6 +89,7 @@ def subprocess(func):
             raise ex_type(message)
 
         return ret
+
     return wrapper
 
 
@@ -104,6 +108,7 @@ def ensure_int(param):
     """Ensure the given param is an int"""
     try:
         param = re.sub("\W", "", param)
+
         return int(param)
     except ValueError:
         return None
@@ -123,6 +128,7 @@ def build_options():
 def get_option(option):
     """Retrive an option from the command line."""
     options, _args = build_options()
+
     return vars(options).get(option)
 
 
@@ -174,6 +180,7 @@ def read_file(directory, file_name):
     try:
         with open(directory + file_name, "r") as open_file:
             data = open_file.read()
+
         return data
     except IOError:
         return None
@@ -181,6 +188,7 @@ def read_file(directory, file_name):
 
 def list_files(directory):
     directory = get_directory(directory)
+
     return os.listdir(directory)
 
 
@@ -189,13 +197,13 @@ def generate_config():
     example = """# Global Configuration
 
 [Pyhole]
-admins: nick!ident, nick2!ident
+admins: nick!ident, nick2!ident, slack.username
 command_prefix: .
 reconnect_delay: 60
 rejoin_delay: 5
 debug: False
 plugins: admin, calculator, search, urls
-networks: FreeNode, EFnet
+networks: FreeNode, EFnet, SlackNetwork
 
 [Wunderground]
 key: abcd1234
@@ -210,7 +218,7 @@ key: abcd1234
 [Jira]
 domain: jira.example.com
 username: abcd1234
-password: pass12345
+password: pass1234
 
 [VersionOne]
 domain: www1.v1host.com
@@ -221,7 +229,7 @@ password: abcd1234
 [Xsa]
 notify: #channel1, #channel2
 
-# IRC Network Configuration
+# Network Configuration
 
 [FreeNode]
 server: verne.freenode.net
@@ -232,7 +240,7 @@ ssl: True
 ipv6: True
 bind_to: fe80::1
 nick: mynick
-identify_password: mypass
+identify_password: abcd1234
 channels: #mychannel key, #mychannel2
 
 [EFnet]
@@ -246,6 +254,10 @@ bind_to:
 nick: mynick
 identify_password:
 channels: #mychannel key, #mychannel2
+
+[SlackNetwork]
+api_token: abcd1234
+nick: mynick
 """
 
     conf_file = get_conf_file()
@@ -256,3 +268,19 @@ channels: #mychannel key, #mychannel2
     with open(conf_file, "w") as open_file:
         open_file.write(example)
     print "Done"
+
+
+def fetch_url(session, url, name):
+    """Fetch a URL."""
+    class PyholeURLopener(urllib.FancyURLopener):
+        """Set a custom user agent."""
+        version = session.version
+
+    urllib._urlopener = PyholeURLopener()
+
+    try:
+        return urllib.urlopen(url)
+    except IOError:
+        session.reply("Unable to fetch %s data" % name)
+
+        return None

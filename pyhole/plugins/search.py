@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2010-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import urllib
 from BeautifulSoup import BeautifulSoup
 from xml.dom import minidom
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Search(plugin.Plugin):
@@ -39,7 +40,7 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params})
             url = ("http://ajax.googleapis.com/ajax/"
                    "services/search/web?v=1.0&%s" % query)
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response:
                 return
 
@@ -68,7 +69,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params})
             url = "http://www.imdb.com/find?s=all&%s" % query
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response:
                 return
 
@@ -102,7 +103,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params, "rpp": 4})
             url = "http://search.twitter.com/search.json?%s" % query
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response:
                 return
 
@@ -126,7 +127,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"term": params})
             url = "http://www.urbandictionary.com/define.php?%s" % query
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response:
                 return
 
@@ -159,7 +160,7 @@ class Search(plugin.Plugin):
                                       "generator": "allpages", "gaplimit": 4,
                                       "gapfrom": params, "format": "xml"})
             url = "http://en.wikipedia.org/w/api.php?%s" % query
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response:
                 return
 
@@ -179,7 +180,7 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params, "v": 2, "max-results": 4,
                                       "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response:
                 return
 

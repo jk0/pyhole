@@ -1,5 +1,5 @@
 ..
-   Copyright 2011 Josh Kearney
+   Copyright 2012-2015 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ From here you can make your changes::
 
     ...make changes...
 
-    ./tools/run_tests.sh
+    python setup.py test
     git commit -a -m "Detailed commit message."
-    git push
+    git push origin HEAD
 
 When done, open a Pull Request [#]_ on GitHub.
 

@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2010-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Event-based IRC Class"""
+"""Network Process Class"""
 
 import multiprocessing
 import sys
@@ -20,7 +20,6 @@ import time
 
 from pyhole.core import log
 from pyhole.core import utils
-from pyhole.core.irc import client
 
 
 LOG = log.get_logger()
@@ -28,21 +27,30 @@ CONFIG = utils.get_config()
 
 
 class Process(multiprocessing.Process):
-    """An IRC network connection process."""
-    def __init__(self, irc_network):
+    """A network connection process."""
+    def __init__(self, network):
         super(Process, self).__init__()
-        self.irc_network = irc_network
+        self.network = network
         self.reconnect_delay = CONFIG.get("reconnect_delay", type="int")
 
     def run(self):
-        """An IRC network connection."""
+        """A network connection."""
         while True:
             try:
-                connection = client.Client(self.irc_network)
+                network_config = utils.get_config(self.network)
+                if network_config.get("api_token", default=None):
+                    from pyhole.core.slack import client
+
+                    connection = client.Client(self.network)
+                else:
+                    from pyhole.core.irc import client
+
+                    connection = client.Client(self.network)
             except Exception, exc:
                 LOG.exception(exc)
                 LOG.error("Retrying in %d seconds" % self.reconnect_delay)
                 time.sleep(self.reconnect_delay)
+
                 continue
 
             try:
@@ -53,4 +61,5 @@ class Process(multiprocessing.Process):
                 LOG.exception(exc)
                 LOG.error("Retrying in %d seconds" % self.reconnect_delay)
                 time.sleep(self.reconnect_delay)
+
                 continue

@@ -1,4 +1,4 @@
-#   Copyright 2011-2015 Josh Kearney
+#   Copyright 2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,32 +11,3 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
-from setuptools import setup
-
-from pyhole.core import version
-
-
-setup(
-    version=version.version(),
-    install_requires=[
-        "BeautifulSoup==3.2.0",
-        "Eventlet",
-        "irc",
-        "jira",
-        "launchpadlib",
-        "pywunderground",
-        "requests",
-        "slackclient",
-        "yahoo-finance"
-    ],
-    setup_requires=[
-        "flake8"
-    ],
-    entry_points={
-        "console_scripts": [
-            "pyhole = pyhole.main:Main"
-        ]
-    },
-    test_suite="pyhole.tests"
-)

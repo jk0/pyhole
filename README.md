@@ -1,4 +1,4 @@
-pyhole - A modular IRC bot for Python developers.
+pyhole - A modular IRC & Slack bot for Python developers.
 
 Development / Installation
 ````

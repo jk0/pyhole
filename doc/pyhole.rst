@@ -16,41 +16,41 @@
 Pyhole Modules
 ==============
 
-:mod:`pyhole.config`
---------------------
-.. automodule:: pyhole.config
+:mod:`pyhole.core.config`
+-------------------------
+.. automodule:: pyhole.core.config
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.irc`
------------------
-.. automodule:: pyhole.irc
+:mod:`pyhole.core.irc`
+----------------------
+.. automodule:: pyhole.core.irc
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.irclib`
---------------------
-.. automodule:: pyhole.irclib
+:mod:`pyhole.core.plugin`
+-------------------------
+.. automodule:: pyhole.core.plugin
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.plugin`
---------------------
-.. automodule:: pyhole.plugin
+:mod:`pyhole.core.slack`
+------------------------
+.. automodule:: pyhole.core.slack
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.utils`
--------------------
-.. automodule:: pyhole.utils
+:mod:`pyhole.core.utils`
+------------------------
+.. automodule:: pyhole.core.utils
     :noindex:
     :members:
     :undoc-members:

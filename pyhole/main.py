@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2010-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,16 +12,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Event-based IRC Class"""
+"""pyhole - A modular IRC & Slack bot for Python developers."""
 
 
 import sys
 import time
 
 from pyhole.core import log
+from pyhole.core import process
 from pyhole.core import utils
 from pyhole.core import version
-from pyhole.core.irc import process
+
 
 LOG = log.get_logger()
 CONFIG = utils.get_config()
@@ -32,7 +33,7 @@ def Main():
     networks = CONFIG.get("networks", type="list")
     log.setup_logger()
     LOG.info("Starting %s" % version.version_string())
-    LOG.info("Connecting to IRC Networks: %s" % ", ".join(networks))
+    LOG.info("Connecting to networks: %s" % ", ".join(networks))
 
     procs = []
     for network in networks:

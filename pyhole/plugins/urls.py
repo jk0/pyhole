@@ -1,4 +1,4 @@
-#   Copyright 2011-2012 Josh Kearney
+#   Copyright 2011-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 from BeautifulSoup import BeautifulSoup
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Url(plugin.Plugin):
@@ -57,7 +58,7 @@ class Url(plugin.Plugin):
         if not url.startswith(("http://", "https://")):
             url = "http://" + url
 
-        response = self.irc.fetch_url(url, self.name)
+        response = utils.fetch_url(self, url, self.name)
         if not response:
             return
 

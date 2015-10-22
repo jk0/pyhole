@@ -1,5 +1,5 @@
 ..
-   Copyright 2011-2012 Josh Kearney
+   Copyright 2011-2015 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -64,17 +64,9 @@ Pyhole Plugins
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.plugins.versionone`
---------------------------------
-.. automodule:: pyhole.plugins.versionone
-    :noindex:
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`pyhole.plugins.weather`
------------------------------
-.. automodule:: pyhole.plugins.weather
+:mod:`pyhole.plugins.wunderground`
+----------------------------------
+.. automodule:: pyhole.plugins.wunderground
     :noindex:
     :members:
     :undoc-members:
