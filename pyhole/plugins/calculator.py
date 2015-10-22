@@ -1,4 +1,4 @@
-#   Copyright 2012 Josh Kearney
+#   Copyright 2012-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 import urllib
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Calculator(plugin.Plugin):
@@ -29,7 +30,7 @@ class Calculator(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params})
             url = "http://www.google.com/ig/calculator?hl=en&%s" % query
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response:
                 return
 

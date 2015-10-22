@@ -16,25 +16,25 @@
 Pyhole Tests
 ============
 
-:mod:`tests.test_config`
-------------------------
-.. automodule:: tests.test_config
+:mod:`pyhole.tests.test_config`
+-------------------------------
+.. automodule:: pyhole.tests.test_config
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`tests.test_utils`
------------------------
-.. automodule:: tests.test_utils
+:mod:`pyhole.tests.test_utils`
+------------------------------
+.. automodule:: pyhole.tests.test_utils
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`tests.test_version`
--------------------------
-.. automodule:: tests.test_version
+:mod:`pyhole.tests.test_version`
+--------------------------------
+.. automodule:: pyhole.tests.test_version
     :noindex:
     :members:
     :undoc-members:

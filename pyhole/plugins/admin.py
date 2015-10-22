@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2010-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 import sys
 
-
 from pyhole.core import plugin
 from pyhole.core import utils
-from pyhole.core.irc import client
 
 
 class Admin(plugin.Plugin):
@@ -27,105 +25,106 @@ class Admin(plugin.Plugin):
 
     @plugin.hook_add_command("help")
     def help(self, message, params=None, **kwargs):
-        """Learn how to use active commands (ex: .help <command>)"""
+        """Learn how to use active commands (ex: .help <command>)."""
 
         if params:
-            doc = self._find_doc_string(params)
+            doc = _find_doc_string(params)
             if doc:
                 message.dispatch(doc)
             else:
-                message.dispatch("No help available for %s" % params)
+                message.dispatch("No help available for '%s'" % params)
         else:
             message.dispatch(self.help.__doc__)
-            message.dispatch("Active Commands: %s" % client.active_commands())
-            message.dispatch("Active Keywords: %s" % client.active_keywords())
+            message.dispatch("Active Commands: %s" % plugin.active_commands())
+            message.dispatch("Active Keywords: %s" % plugin.active_keywords())
 
     @plugin.hook_add_command("version")
     def version(self, message, params=None, **kwargs):
-        """Display the current version"""
-        message.dispatch(self.irc.version)
+        """Display the current version."""
+        message.dispatch(self.session.version)
 
     @plugin.hook_add_command("reload")
     @utils.admin
     def reload(self, message, params=None, **kwargs):
-        """Reload all plugins"""
-        self.irc.load_plugins(reload_plugins=True)
-        message.dispatch("Loaded Plugins: %s" % client.active_plugins())
+        """Reload all plugins."""
+        self.session.load_plugins(reload_plugins=True)
+        message.dispatch("Loaded Plugins: %s" % plugin.active_plugins())
 
     @plugin.hook_add_command("op")
     @utils.admin
     def op(self, message, params=None, **kwargs):
-        """Op a user (ex: .op <channel> <nick>)"""
+        """Op a user (ex: .op <channel> <nick>)."""
         if params:
-            self.irc.op_user(params)
+            self.session.op_user(params)
         else:
             message.dispatch(self.op.__doc__)
 
     @plugin.hook_add_command("deop")
     @utils.admin
     def deop(self, message, params=None, **kwargs):
-        """De-op a user (ex: .deop <channel> <nick>)"""
+        """De-op a user (ex: .deop <channel> <nick>)."""
         if params:
-            self.irc.deop_user(params)
+            self.session.deop_user(params)
         else:
             message.dispatch(self.deop.__doc__)
 
     @plugin.hook_add_command("nick")
     @utils.admin
     def nick(self, message, params=None, **kwargs):
-        """Change IRC nick (ex: .nick <nick>)"""
+        """Change nick (ex: .nick <nick>)."""
         if params:
-            self.irc.set_nick(params)
+            self.session.set_nick(params)
         else:
             message.dispatch(self.nick.__doc__)
 
     @plugin.hook_add_command("join")
     @utils.admin
     def join(self, message, params=None, **kwargs):
-        """Join a channel (ex: .join #channel [<key>])"""
+        """Join a channel (ex: .join #channel [<key>])."""
         if params:
-            self.irc.join_channel(params)
+            self.session.join_channel(params)
         else:
             message.dispatch(self.join.__doc__)
 
     @plugin.hook_add_command("part")
     @utils.admin
     def part(self, message, params=None, **kwargs):
-        """Part a channel (ex: .part <channel>)"""
+        """Part a channel (ex: .part <channel>)."""
         if params:
-            self.irc.part_channel(params)
+            self.session.part_channel(params)
         else:
             message.dispatch(self.part.__doc__)
+
+    @plugin.hook_add_command("say")
+    @utils.admin
+    def say(self, message, params=None, **kwargs):
+        """Send a PRIVMSG (ex: .say <channel>|<nick> message)."""
+        if params:
+            (target, msg) = params.split(" ", 1)
+            self.session.privmsg(target, msg)
+        else:
+            message.dispatch(self.say.__doc__)
 
     @plugin.hook_add_command("quit")
     @utils.admin
     def quit(self, message, params=None, **kwargs):
         """Quit all networks and shut down."""
-        self.irc.log.info("Disconnecting")
+        self.session.log.info("Disconnecting")
         sys.exit(0)
 
-    @plugin.hook_add_command("say")
-    @utils.admin
-    def say(self, message, params=None, **kwargs):
-        """Send a PRIVMSG (ex: .say <channel>|<nick> message)"""
-        if params:
-            (target, msg) = params.split(" ", 1)
-            self.irc.privmsg(target, msg)
-        else:
-            message.dispatch(self.say.__doc__)
 
-    def _find_doc_string(self, params):
-        """Find the doc string for a plugin, command or keyword hook"""
-        for p in plugin.active_plugin_classes():
-            if p.__name__.upper() == params.upper():
-                return p.__doc__
+def _find_doc_string(params):
+    """Find the doc string for a plugin, command or keyword hook."""
+    for p in plugin.active_plugin_classes():
+        if p.__name__.upper() == params.upper():
+            return p.__doc__
 
-        for _, cmd_hook, cmd in plugin.hook_get_commands():
-            if cmd.upper() == params.upper():
-                return cmd_hook.__doc__
+    for _, cmd_hook, cmd in plugin.hook_get_commands():
+        if cmd.upper() == params.upper():
+            return cmd_hook.__doc__
 
-        for _, kw_hook, kw in plugin.hook_get_keywords():
-            if kw.upper() == params.upper():
-                return kw_hook.__doc__
+    for _, kw_hook, kw in plugin.hook_get_keywords():
+        if kw.upper() == params.upper():
+            return kw_hook.__doc__
 
-        return None
+    return None

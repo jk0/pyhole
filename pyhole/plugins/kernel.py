@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2011-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ import urllib
 
 from BeautifulSoup import BeautifulSoup
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Kernel(plugin.Plugin):
@@ -30,7 +31,7 @@ class Kernel(plugin.Plugin):
     def kernel(self, message, params=None, **kwargs):
         """Retrieve the current kernel version (ex: .kernel)"""
         url = "http://kernel.org/kdist/finger_banner"
-        response = self.irc.fetch_url(url, self.name)
+        response = utils.fetch_url(self, url, self.name)
         if not response:
             return
 
@@ -50,7 +51,7 @@ class Kernel(plugin.Plugin):
 
             query = urllib.urlencode({"id": params})
             url = "http://bugzilla.kernel.org/show_bug.cgi?%s" % query
-            response = self.irc.fetch_url(url, self.name)
+            response = utils.fetch_url(self, url, self.name)
             if not response or not isinstance(params, int):
                 return
 

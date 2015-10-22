@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2010-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@ try:
 except ImportError:
     import simplejson as json
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Redmine(plugin.Plugin):
@@ -87,7 +88,7 @@ class Redmine(plugin.Plugin):
         """Find all issues for a Redmine user"""
         url = "%s/issues.json?assigned_to_id=%s" % (
               self.redmine_url, user_id)
-        response = self.irc.fetch_url(url, self.name)
+        response = utils.fetch_url(self, url, self.name)
         if not response:
             return
 
@@ -110,7 +111,7 @@ class Redmine(plugin.Plugin):
                   self.redmine_url, offset)
         else:
             url = "%s/users.json?limit=100" % self.redmine_url
-        response = self.irc.fetch_url(url, self.name)
+        response = utils.fetch_url(self, url, self.name)
         if not response:
             return
 
@@ -119,7 +120,7 @@ class Redmine(plugin.Plugin):
     def _find_issue(self, message, issue_id):
         """Find and display a Redmine issue"""
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
-        response = self.irc.fetch_url(url, self.name)
+        response = utils.fetch_url(self, url, self.name)
         if not response:
             return
 

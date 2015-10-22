@@ -1,5 +1,5 @@
 ..
-   Copyright 2011-2013 Josh Kearney
+   Copyright 2011-2015 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ When contributing to the pyhole project, please be sure to read over the
 following information.
 
 Python Style
--------------
+------------
 
 General
 ^^^^^^^
@@ -67,4 +67,4 @@ Testing
 
 Every new piece of code must be covered by a unit test. One must also ensure
 that all tests pass before submitting code. Testing examples can be found in
-the *tests* directory.
+the *pyhole/tests* directory.

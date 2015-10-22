@@ -1,5 +1,5 @@
 ..
-   Copyright 2011 Josh Kearney
+   Copyright 2011-2015 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -23,10 +23,14 @@ From Source
 
     git clone git://github.com/jk0/pyhole.git
     cd pyhole
-    sudo pip install -r tools/pip-requires
-    ./tools/run_pyhole.sh
-    vi ~/.pyhole/pyhole.conf
-    ./tools/run_pyhole.sh
+    virtualenv venv
+    . venv/bin/activate
+    python setup.py flake8
+    python setup.py test
+    python setup.py develop
+    pyhole
+    vim ~/.pyhole/pyhole.conf
+    pyhole
 
 Python Package
 ^^^^^^^^^^^^^^
@@ -35,5 +39,5 @@ Python Package
 
     pip install irc-pyhole
     pyhole
-    vi ~/.pyhole/pyhole.conf
+    vim ~/.pyhole/pyhole.conf
     pyhole

@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2010-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,13 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Event-based IRC Class"""
+"""IRC Client Class"""
 
 import random
-import re
 import ssl
 import time
-import urllib
 
 import irc.client as irclib
 from irc import connection
@@ -30,8 +28,8 @@ from pyhole.core import version
 from pyhole.core.irc import message
 
 
-LOG = log.get_logger()
 CONFIG = utils.get_config()
+LOG = log.get_logger()
 
 
 class Client(irclib.SimpleIRCClient):
@@ -39,8 +37,8 @@ class Client(irclib.SimpleIRCClient):
 
     def __init__(self, network):
         irclib.SimpleIRCClient.__init__(self)
-        network_config = utils.get_config(network)
         log.setup_logger(str(network))
+        self.network_config = utils.get_config(network)
         self.log = log.get_logger(str(network))
         self.version = version.version_string()
         self.source = None
@@ -52,17 +50,17 @@ class Client(irclib.SimpleIRCClient):
         self.reconnect_delay = CONFIG.get("reconnect_delay", type="int")
         self.rejoin_delay = CONFIG.get("rejoin_delay", type="int")
 
-        self.server = network_config.get("server")
-        self.password = network_config.get("password", default=None)
-        self.port = network_config.get("port", type="int", default=6667)
-        self.ssl = network_config.get("ssl", type="bool", default=False)
-        self.ipv6 = network_config.get("ipv6", type="bool", default=False)
-        self.bind_to = network_config.get("bind_to", default=None)
-        self.nick = network_config.get("nick")
-        self.username = network_config.get("username", default=None)
-        self.identify_password = network_config.get("identify_password",
-                                                    default=None)
-        self.channels = network_config.get("channels", type="list")
+        self.server = self.network_config.get("server")
+        self.password = self.network_config.get("password", default=None)
+        self.port = self.network_config.get("port", type="int", default=6667)
+        self.ssl = self.network_config.get("ssl", type="bool", default=False)
+        self.ipv6 = self.network_config.get("ipv6", type="bool", default=False)
+        self.bind_to = self.network_config.get("bind_to", default=None)
+        self.nick = self.network_config.get("nick")
+        self.username = self.network_config.get("username", default=None)
+        self.identify_password = self.network_config.get("identify_password",
+                                                         default=None)
+        self.channels = self.network_config.get("channels", type="list")
 
         self.load_plugins()
 
@@ -75,97 +73,15 @@ class Client(irclib.SimpleIRCClient):
                          ipv6=self.ipv6).connect
                      if self.ssl else connection.Factory())
 
-    def run_hook_command(self, mod_name, func, message, arg, **kwargs):
-        """Make a call to a plugin hook."""
-        try:
-            if arg:
-                self.log.debug("Calling: %s.%s(\"%s\")" % (mod_name,
-                               func.__name__, arg))
-            else:
-                self.log.debug("Calling: %s.%s(None)" % (mod_name,
-                               func.__name__))
-            func(message, arg, **kwargs)
-        except Exception, exc:
-            self.log.exception(exc)
-
-    def run_hook_polls(self):
-        """Run polls in the background."""
-        message = None
-        for mod_name, func, cmd in plugin.hook_get_polls():
-            self.run_hook_command(mod_name, func, message, cmd)
-
     def load_plugins(self, reload_plugins=False):
         """Load plugins and their commands respectively."""
         if reload_plugins:
-            plugin.reload_plugins(irc=self)
+            plugin.reload_plugins(session=self)
         else:
-            plugin.load_plugins(irc=self)
+            plugin.load_plugins(session=self)
 
-        self.log.info("Loaded Plugins: %s" % active_plugins())
-        self.run_hook_polls()
-
-    def run_msg_regexp_hooks(self, message, private):
-        """Run regexp hooks."""
-        msg = message.message
-        for mod_name, func, msg_regex in plugin.hook_get_msg_regexs():
-            match = re.search(msg_regex, msg, re.I)
-            if match:
-                self.run_hook_command(mod_name, func, message, match,
-                                      private=private)
-
-    def run_keyword_hooks(self, message, private):
-        """Run keyword hooks."""
-        msg = message.message
-        words = msg.split(" ")
-        for mod_name, func, kwarg in plugin.hook_get_keywords():
-            for word in words:
-                match = re.search("^%s(.+)" % kwarg, word, re.I)
-                if match:
-                    self.run_hook_command(mod_name, func, message,
-                                          match.group(1), private=private)
-
-    def run_command_hooks(self, message, private):
-        """Run command hooks."""
-        msg = message.message
-        for mod_name, func, cmd in plugin.hook_get_commands():
-            self.addressed = False
-
-            if private:
-                match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg,
-                                  re.I)
-                if match:
-                    self.run_hook_command(mod_name, func, message,
-                                          match.group(1), private=private,
-                                          addressed=self.addressed)
-
-            if msg.startswith(self.command_prefix):
-                # Strip off command prefix
-                msg_rest = msg[len(self.command_prefix):]
-            else:
-                # Check for command starting with nick being addressed
-                msg_start_upper = msg[:len(self.nick) + 1].upper()
-                if msg_start_upper == self.nick.upper() + ":":
-                    # Get rest of string after "nick:" and white spaces
-                    msg_rest = re.sub("^\s+", "",
-                                      msg[len(self.nick) + 1:])
-                else:
-                    continue
-
-                self.addressed = True
-
-            match = re.search("^%s$|^%s\s(.*)$" % (cmd, cmd), msg_rest, re.I)
-            if match:
-                self.run_hook_command(mod_name, func, message, match.group(1),
-                                      private=private,
-                                      addressed=self.addressed)
-
-    def poll_messages(self, message, private=False):
-        """Watch for known commands."""
-        self.addressed = False
-
-        self.run_command_hooks(message, private)
-        self.run_keyword_hooks(message, private)
-        self.run_msg_regexp_hooks(message, private)
+        self.log.info("Loaded Plugins: %s" % plugin.active_plugins())
+        plugin.run_hook_polls(self)
 
     def notice(self, target, msg):
         """Send a notice."""
@@ -206,20 +122,6 @@ class Client(irclib.SimpleIRCClient):
         self.channels.remove(params)
         self.reply("Parting %s" % params)
         self.connection.part(params)
-
-    def fetch_url(self, url, name):
-        """Fetch a URL."""
-        class PyholeURLopener(urllib.FancyURLopener):
-            """Set a custom user agent."""
-            version = self.version
-
-        urllib._urlopener = PyholeURLopener()
-
-        try:
-            return urllib.urlopen(url)
-        except IOError:
-            self.reply("Unable to fetch %s data" % name)
-            return None
 
     def on_nicknameinuse(self, connection, _event):
         """Ensure the use of unique IRC nick."""
@@ -345,8 +247,8 @@ class Client(irclib.SimpleIRCClient):
         _msg = message.Reply(self, msg, source, target)
 
         if self.target != self.nick:
-            self.log.info("<%s> %s" % (self.target, msg))
-            self.poll_messages(_msg, private=True)
+            self.log.info("<%s> %s" % (target, msg))
+            plugin.poll_messages(self, _msg, private=True)
 
     def on_pubmsg(self, _connection, event):
         """Handle public messages."""
@@ -357,20 +259,5 @@ class Client(irclib.SimpleIRCClient):
         target = event.target
         _msg = message.Reply(self, msg, source, target)
 
-        self.log.info("-%s- <%s> %s" % (self.target, nick, msg))
-        self.poll_messages(_msg)
-
-
-def active_plugins():
-    """List active plugins."""
-    return ", ".join(sorted(plugin.active_plugins()))
-
-
-def active_commands():
-    """List active commands."""
-    return ", ".join(sorted(plugin.active_commands()))
-
-
-def active_keywords():
-    """List active keywords."""
-    return ", ".join(sorted(plugin.active_keywords()))
+        self.log.info("-%s- <%s> %s" % (target, nick, msg))
+        plugin.poll_messages(self, _msg)
