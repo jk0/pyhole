@@ -220,12 +220,6 @@ domain: jira.example.com
 username: abcd1234
 password: pass1234
 
-[VersionOne]
-domain: www1.v1host.com
-key: EXAMPL
-username: user
-password: abcd1234
-
 [Xsa]
 notify: #channel1, #channel2
 
