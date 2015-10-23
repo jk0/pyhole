@@ -30,7 +30,7 @@ class Calculator(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params})
             url = "http://www.google.com/ig/calculator?hl=en&%s" % query
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response:
                 return
 

@@ -20,9 +20,9 @@ import eventlet
 import optparse
 import os
 import re
+import requests
 import sys
 import traceback
-import urllib
 
 from BeautifulSoup import BeautifulStoneSoup
 from functools import wraps
@@ -264,17 +264,9 @@ nick: mynick
     print "Done"
 
 
-def fetch_url(session, url, name):
+def fetch_url(url, **kwargs):
     """Fetch a URL."""
-    class PyholeURLopener(urllib.FancyURLopener):
-        """Set a custom user agent."""
-        version = session.version
-
-    urllib._urlopener = PyholeURLopener()
-
     try:
-        return urllib.urlopen(url)
-    except IOError:
-        session.reply("Unable to fetch %s data" % name)
-
+        return requests.get(url, **kwargs)
+    except Exception:
         return None

@@ -88,7 +88,7 @@ class Redmine(plugin.Plugin):
         """Find all issues for a Redmine user"""
         url = "%s/issues.json?assigned_to_id=%s" % (
               self.redmine_url, user_id)
-        response = utils.fetch_url(self, url, self.name)
+        response = utils.fetch_url(url)
         if not response:
             return
 
@@ -111,7 +111,7 @@ class Redmine(plugin.Plugin):
                   self.redmine_url, offset)
         else:
             url = "%s/users.json?limit=100" % self.redmine_url
-        response = utils.fetch_url(self, url, self.name)
+        response = utils.fetch_url(url)
         if not response:
             return
 
@@ -120,7 +120,7 @@ class Redmine(plugin.Plugin):
     def _find_issue(self, message, issue_id):
         """Find and display a Redmine issue"""
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
-        response = utils.fetch_url(self, url, self.name)
+        response = utils.fetch_url(url)
         if not response:
             return
 

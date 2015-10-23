@@ -13,39 +13,41 @@
 #   limitations under the License.
 
 """Pyhole Box Office Plugin"""
-import requests
+
 from BeautifulSoup import BeautifulSoup
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Boxoffice(plugin.Plugin):
-    """Display top box office movies"""
+    """Display top box office movies."""
 
     @plugin.hook_add_command("boxoffice")
     @utils.spawn
     def boxoffice(self, message, params=None, **kwargs):
         """Display top box office movies"""
-        resp = requests.get('http://www.rottentomatoes.com/')
+        resp = utils.fetch_url("http://www.rottentomatoes.com")
         if resp.status_code != 200:
-            message.dispatch("Could not fetch box office results")
+            message.dispatch("Could not fetch box office results.")
             return
 
         message.dispatch("Top 10 at the Box Office")
-        message.dispatch("=" * 54)
+        message.dispatch("=" * 64)
         soup = BeautifulSoup(resp.text)
-        rows = soup.findAll('table', id='Top-Box-Office')[0].findAll('tr')
+        rows = soup.findAll("table", id="Top-Box-Office")[0].findAll("tr")
         for row in rows:
-            children = row.findAll('td')
-            score = row('span', **{'class': 'tMeterScore'})[0].contents[0]
-            title = children[1].find('a').string
-            take = children[2].string.strip()
-            msg = "%s %s%s" % (score.rjust(3),
-                               title.ljust(40),
-                               take.rjust(10))
+            children = row.findAll("td")
+            try:
+                score = row("span", **{"class": "tMeterScore"})[0].contents[0]
+                title = children[1].find("a").string
+                take = children[2].string.strip()
+            except Exception:
+                pass
+            msg = "%s %s%s" % (score.rjust(3), title.ljust(40), take.rjust(10))
             message.dispatch(msg)
 
     @plugin.hook_add_command("bo")
     def alias_bo(self, message, params=None, **kwargs):
-        """Alias of boxoffice"""
+        """Alias of boxoffice."""
         self.boxoffice(message, params, **kwargs)

@@ -40,7 +40,7 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params})
             url = ("http://ajax.googleapis.com/ajax/"
                    "services/search/web?v=1.0&%s" % query)
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response:
                 return
 
@@ -69,7 +69,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params})
             url = "http://www.imdb.com/find?s=all&%s" % query
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response:
                 return
 
@@ -103,7 +103,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"q": params, "rpp": 4})
             url = "http://search.twitter.com/search.json?%s" % query
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response:
                 return
 
@@ -127,7 +127,7 @@ class Search(plugin.Plugin):
         if params:
             query = urllib.urlencode({"term": params})
             url = "http://www.urbandictionary.com/define.php?%s" % query
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response:
                 return
 
@@ -160,7 +160,7 @@ class Search(plugin.Plugin):
                                       "generator": "allpages", "gaplimit": 4,
                                       "gapfrom": params, "format": "xml"})
             url = "http://en.wikipedia.org/w/api.php?%s" % query
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response:
                 return
 
@@ -180,7 +180,7 @@ class Search(plugin.Plugin):
             query = urllib.urlencode({"q": params, "v": 2, "max-results": 4,
                                       "alt": "jsonc"})
             url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response:
                 return
 

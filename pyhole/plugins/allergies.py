@@ -1,4 +1,4 @@
-#   Copyright 2010-2012 Josh Kearney
+#   Copyright 2015 Jason Meridth
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,39 +15,33 @@
 """Pyhole Allergies Plugin"""
 
 import datetime
-import requests
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Allergies(plugin.Plugin):
-    """Provide access to current allergy data"""
+    """Provide access to current allergy data."""
 
     @plugin.hook_add_command("allergies")
     @utils.spawn
     def allergies(self, message, params=None, **kwargs):
-        """Display current allergies in San Antonio, TX (ex: .allergies)
-
-        original code:
-        https://github.com/kremlinkev/Supybot-Pollen/blob/master/plugin.py
-        """
+        """Display current allergies in San Antonio, TX (ex: .allergies)."""
         d = datetime.datetime.now()
         weekend = d.isoweekday() in (6, 7)
         if weekend:
-            message.dispatch("Unable to fetch allergy data on weekends")
+            message.dispatch("Unable to fetch allergy data on weekends.")
             return
 
         today = d.strftime("%Y-%m-%d")
-        URL = "http://saallergy.info/day/%s" % today
-        HEADERS = {"accept": "application/json"}
+        url = "http://saallergy.info/day/%s" % today
+        headers = {"accept": "application/json"}
 
-        try:
-            r = requests.get(URL, headers=HEADERS)
-        except Exception:
-            message.dispatch("Unable to fetch allergy data")
+        response = utils.fetch_url(url, headers=headers)
+        if not response:
             return
 
-        data = r.json()
+        data = response.json()
         text = "Allergies for %s: " % today
         for a in data["results"]:
             text = text + "%s - %s (%s) | " % (a["allergen"], a["level"],
@@ -59,5 +53,5 @@ class Allergies(plugin.Plugin):
 
     @plugin.hook_add_command("pollen")
     def alias_pollen(self, message, params=None, **kwargs):
-        """Alias of allergies"""
+        """Alias of allergies."""
         self.allergies(message, params, **kwargs)

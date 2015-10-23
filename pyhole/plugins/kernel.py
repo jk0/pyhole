@@ -31,7 +31,7 @@ class Kernel(plugin.Plugin):
     def kernel(self, message, params=None, **kwargs):
         """Retrieve the current kernel version (ex: .kernel)"""
         url = "http://kernel.org/kdist/finger_banner"
-        response = utils.fetch_url(self, url, self.name)
+        response = utils.fetch_url(url)
         if not response:
             return
 
@@ -51,7 +51,7 @@ class Kernel(plugin.Plugin):
 
             query = urllib.urlencode({"id": params})
             url = "http://bugzilla.kernel.org/show_bug.cgi?%s" % query
-            response = utils.fetch_url(self, url, self.name)
+            response = utils.fetch_url(url)
             if not response or not isinstance(params, int):
                 return
 

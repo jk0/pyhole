@@ -58,7 +58,7 @@ class Url(plugin.Plugin):
         if not url.startswith(("http://", "https://")):
             url = "http://" + url
 
-        response = utils.fetch_url(self, url, self.name)
+        response = utils.fetch_url(url)
         if not response:
             return
 
