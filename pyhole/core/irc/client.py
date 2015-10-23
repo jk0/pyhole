@@ -257,7 +257,8 @@ class Client(irclib.SimpleIRCClient):
 
         source = event.source.split("@", 1)[0]
         target = event.target
-        _msg = message.Reply(self, msg, source, target)
 
         self.log.info("-%s- <%s> %s" % (target, nick, msg))
+
+        _msg = message.Reply(self, msg, source, target)
         plugin.poll_messages(self, _msg)

@@ -86,3 +86,21 @@ class Client(object):
         """Reply to a channel."""
         channel = self.client.server.channels.find(target)
         channel.send_message(msg)
+
+    def op_user(self, *args, **kwargs):
+        pass
+
+    def deop_user(self, *args, **kwargs):
+        pass
+
+    def set_nick(self, *args, **kwargs):
+        pass
+
+    def join_channel(self, *args, **kwargs):
+        pass
+
+    def part_channel(self, *args, **kwargs):
+        pass
+
+    def privmsg(self, *args, **kwargs):
+        pass

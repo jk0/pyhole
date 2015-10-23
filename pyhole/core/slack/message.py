@@ -14,12 +14,9 @@
 
 """Slack Message Class"""
 
-from pyhole.core import log
-
 
 class Message(object):
     def __init__(self, session, message):
-        self.log = log.get_logger()
         self.session = session
         self.message = message
 
@@ -40,7 +37,7 @@ class Message(object):
         self._session = _session
 
     def dispatch(self, reply):
-        self.log.error("Message Dispatcher is not implemented")
+        raise NotImplementedError("Message Dispatcher is not implemented")
 
     @staticmethod
     def getMessage(**kwargs):
@@ -57,9 +54,5 @@ class Reply(Message):
         """Dispatch message as a reply."""
         if self.session.addressed:
             self.session.reply(self.target, "%s: %s" % (self.source, msg))
-            self.log.info("-%s- <%s> %s: %s" % (self.target, self.session.nick,
-                          self.source, msg))
         else:
             self.session.reply(self.target, msg)
-            self.log.info("-%s- <%s> %s" % (self.target, self.session.nick,
-                                            msg))

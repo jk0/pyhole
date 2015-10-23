@@ -105,13 +105,6 @@ class Admin(plugin.Plugin):
         else:
             message.dispatch(self.say.__doc__)
 
-    @plugin.hook_add_command("quit")
-    @utils.admin
-    def quit(self, message, params=None, **kwargs):
-        """Quit all networks and shut down."""
-        self.session.log.info("Disconnecting")
-        sys.exit(0)
-
 
 def _find_doc_string(params):
     """Find the doc string for a plugin, command or keyword hook."""

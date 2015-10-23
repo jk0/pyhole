@@ -18,7 +18,20 @@ from pyhole.core import version
 
 
 setup(
+    name="irc-pyhole",
     version=version.version(),
+    author="Josh Kearney",
+    author_email="josh@jk0.org",
+    description="A modular IRC & Slack bot for Python developers.",
+    url="https://github.com/jk0/pyhole",
+    classifiers=[
+        "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: System Administrators",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python"
+    ],
     install_requires=[
         "BeautifulSoup==3.2.0",
         "Eventlet",
@@ -34,10 +47,13 @@ setup(
         "flake8",
         "sphinx"
     ],
+    test_suite="pyhole.tests",
+    packages=[
+        "pyhole"
+    ],
     entry_points={
         "console_scripts": [
             "pyhole = pyhole.main:Main"
         ]
-    },
-    test_suite="pyhole.tests"
+    }
 )
