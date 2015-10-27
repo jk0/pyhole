@@ -208,7 +208,7 @@ networks: FreeNode, EFnet, SlackNetwork
 [Wunderground]
 key: abcd1234
 
-[Googlemaps]
+[GoogleMaps]
 key: abcd1234
 
 [Redmine]

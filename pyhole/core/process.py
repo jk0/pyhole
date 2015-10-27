@@ -40,15 +40,14 @@ class Process(multiprocessing.Process):
                 network_config = utils.get_config(self.network)
                 if network_config.get("api_token", default=None):
                     from pyhole.core.slack import client
-
-                    connection = client.Client(self.network)
                 else:
                     from pyhole.core.irc import client
 
-                    connection = client.Client(self.network)
+                connection = client.Client(self.network)
             except Exception, exc:
                 LOG.exception(exc)
                 LOG.error("Retrying in %d seconds" % self.reconnect_delay)
+
                 time.sleep(self.reconnect_delay)
 
                 continue
@@ -57,9 +56,12 @@ class Process(multiprocessing.Process):
                 connection.start()
             except KeyboardInterrupt:
                 sys.exit(0)
-            except Exception, exc:
-                LOG.exception(exc)
+            except Exception, ex:
+                del connection
+
+                LOG.exception(ex)
                 LOG.error("Retrying in %d seconds" % self.reconnect_delay)
+
                 time.sleep(self.reconnect_delay)
 
                 continue

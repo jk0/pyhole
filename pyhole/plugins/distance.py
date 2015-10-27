@@ -13,9 +13,9 @@
 #   limitations under the License.
 
 """Pyhole Distance to User Plugin"""
-import requests
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Distance(plugin.Plugin):
@@ -25,14 +25,14 @@ class Distance(plugin.Plugin):
     @utils.spawn
     def distance(self, message, params=None, **kwargs):
         """Display distances (ex: .dist <nick|loc> [to <nick|loc>])"""
-        maps_api = utils.get_config("Googlemaps")
+        maps_api = utils.get_config("GoogleMaps")
         try:
             key = maps_api.get("key")
         except Exception:
             message.dispatch("No Google Maps API key set")
             return
 
-        parts = params.split(' to ')
+        parts = params.split(" to ")
         if not parts:
             message.dispatch(self.distance.__doc__)
             return
@@ -42,16 +42,16 @@ class Distance(plugin.Plugin):
         if len(parts) > 1:
             origin_nick = parts[1].strip()
         else:
-            origin_nick = message.source.split('!')[0]
+            origin_nick = message.source.split("!")[0]
 
         dest = None
         origin = None
-        for filename in utils.list_files('Weather'):
-            nick, ident = filename.split('!')
+        for filename in utils.list_files("Wunderground"):
+            nick, ident = filename.split("!")
             if nick == dest_nick:
-                dest = utils.read_file('Weather', filename)
+                dest = utils.read_file("Wunderground", filename)
             if nick == origin_nick:
-                origin = utils.read_file('Weather', filename)
+                origin = utils.read_file("Wunderground", filename)
 
         if not dest:
             # They passed in a location
@@ -61,14 +61,14 @@ class Distance(plugin.Plugin):
             # They passed in a location
             origin = origin_nick
 
-        resp = requests.get('https://maps.googleapis.com/maps/api'
-                            '/directions/json?origin=%s&destination=%s'
-                            '&key=%s' % (origin, dest, key))
+        resp = utils.fetch_url("https://maps.googleapis.com/maps/api"
+                               "/directions/json?origin=%s&destination=%s"
+                               "&key=%s" % (origin, dest, key))
 
         msg = None
         if resp.status_code == 200:
             try:
-                msg = resp.json()['routes'][0]['legs'][0]['distance']['text']
+                msg = resp.json()["routes"][0]["legs"][0]["distance"]["text"]
             except IndexError:
                 pass
 
