@@ -12,12 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from setuptools import setup
+import setuptools
 
 from pyhole.core import version
 
 
-setup(
+setuptools.setup(
     name="irc-pyhole",
     version=version.version(),
     author="Josh Kearney",
@@ -48,9 +48,7 @@ setup(
         "sphinx"
     ],
     test_suite="pyhole.tests",
-    packages=[
-        "pyhole"
-    ],
+    packages=setuptools.find_packages(),
     entry_points={
         "console_scripts": [
             "pyhole = pyhole.main:Main"

@@ -57,8 +57,6 @@ class Process(multiprocessing.Process):
             except KeyboardInterrupt:
                 sys.exit(0)
             except Exception, ex:
-                del connection
-
                 LOG.exception(ex)
                 LOG.error("Retrying in %d seconds" % self.reconnect_delay)
 

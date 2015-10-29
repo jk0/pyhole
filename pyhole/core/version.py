@@ -20,7 +20,7 @@ import os
 import sys
 
 
-__VERSION__ = "0.7.2"
+__VERSION__ = "0.7.3"
 
 
 def current_git_hash():

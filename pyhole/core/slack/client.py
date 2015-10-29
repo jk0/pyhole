@@ -67,7 +67,7 @@ class Client(object):
             for response in self.client.rtm_read():
                 self.log.debug(response)
 
-                if "text" in response and "channel" in response:
+                if all(x in response for x in ("text", "channel", "user")):
                     r_channel = response["channel"]
                     r_user = response["user"]
 
