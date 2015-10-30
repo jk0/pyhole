@@ -26,8 +26,8 @@ from pyhole.core import utils
 class Redmine(plugin.Plugin):
     """Provide access to the Redmine API"""
 
-    def __init__(self, irc):
-        self.irc = irc
+    def __init__(self, session):
+        self.session = session
         self.name = self.__class__.__name__
         self.disabled = False
 
