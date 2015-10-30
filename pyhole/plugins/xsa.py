@@ -11,18 +11,20 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+
 """Pyhole Xen Security Advisory (XSA) Plugin"""
+
 import json
 
 from BeautifulSoup import BeautifulSoup
-import requests
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Xsa(plugin.Plugin):
-    """Display information regarding Xen Security Advisories (XSAs)"""
-    XSA_URL = 'http://xenbits.xen.org/xsa/'
+    """Display information regarding Xen Security Advisories (XSAs)."""
+    XSA_URL = "http://xenbits.xen.org/xsa/"
 
     @plugin.hook_add_keyword("xsa")
     @utils.spawn
@@ -30,11 +32,11 @@ class Xsa(plugin.Plugin):
         """Retrieve XSA information (ex: xsa123 or xsa-123)"""
         # abs is needed in case we get 'xsa-123', that would be -123
         xsa_num = abs(utils.ensure_int(params))
-        xsa_id = 'XSA-%d' % xsa_num
+        xsa_id = "XSA-%d" % xsa_num
         data = self._load_cached_xsa_data()
         msg = self._make_xsa_message(xsa_id, data)
         if not msg:
-            msg = "Unable to find matching XSA"
+            msg = "Unable to find matching XSA."
         message.dispatch(msg)
 
     def _make_xsa_message(self, xsa_id, data):
@@ -44,8 +46,8 @@ class Xsa(plugin.Plugin):
             return None
         else:
             # Use ID if we don't have a link
-            if not xsa_info['link']:
-                xsa_info['link'] = xsa_info['id']
+            if not xsa_info["link"]:
+                xsa_info["link"] = xsa_info["id"]
             return ("%(link)s: %(title)s (Public Release: %(public_release)s)"
                     % xsa_info)
 
@@ -56,8 +58,9 @@ class Xsa(plugin.Plugin):
         new_data = self._fetch_xsa_data()
         if not new_data:
             return
+
         new_data_json = json.dumps(new_data)
-        utils.write_file(self.name, 'xsas.json', new_data_json)
+        utils.write_file(self.name, "xsas.json", new_data_json)
 
         # Notify subscribed channels on new XSAs
         old_xsa_ids = set(old_data.keys())
@@ -67,12 +70,13 @@ class Xsa(plugin.Plugin):
             self._notify_new_xsas(added_xsa_ids, new_data)
 
     def _notify_new_xsas(self, added_xsa_ids, new_data):
-        xsa_config = utils.get_config("Xsa")
+        xsa_config = utils.get_config("XSA")
         try:
             notify_str = xsa_config.get("notify")
         except Exception:
             return
-        channels = notify_str.split(',')
+
+        channels = notify_str.split(",")
         for xsa_id in added_xsa_ids:
             msg = self._make_xsa_message(xsa_id, new_data)
             for channel in channels:
@@ -80,21 +84,21 @@ class Xsa(plugin.Plugin):
                 self.irc.notice(channel, msg)
 
     def _load_cached_xsa_data(self):
-        data_json = utils.read_file(self.name, 'xsas.json')
+        data_json = utils.read_file(self.name, "xsas.json")
         if data_json is None:
             return {}
         return json.loads(data_json)
 
     def _fetch_xsa_data(self):
-        resp = requests.get(self.XSA_URL)
+        resp = utils.fetch_url(self.XSA_URL)
         if resp.status_code != 200:
             print "Error fetching XSAs: %s" % resp.status_code
             return {}
         soup = BeautifulSoup(resp.text)
-        rows = soup.findAll('tr')
+        rows = soup.findAll("tr")
         data = {}
         for row in rows:
-            children = row.findChildren('td')
+            children = row.findChildren("td")
             if not children:
                 continue
             try:
@@ -102,8 +106,8 @@ class Xsa(plugin.Plugin):
             except:
                 continue
             try:
-                xsa_link = ''.join([self.XSA_URL,
-                                    children[0].contents[0]['href']])
+                xsa_link = "".join([self.XSA_URL,
+                                    children[0].contents[0]["href"]])
             except:
                 xsa_link = None
             try:

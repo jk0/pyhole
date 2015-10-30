@@ -220,7 +220,7 @@ domain = jira.example.com
 username = abcd1234
 password = pass1234
 
-[Xsa]
+[XSA]
 notify = #channel1, #channel2
 
 # Network Configuration
