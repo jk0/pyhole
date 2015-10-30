@@ -48,7 +48,8 @@ class Url(plugin.Plugin):
             host = self.url[7:]
 
             lookup_sites = ("open.spotify.com", "/open.spotify.com",
-                            "www.youtube.com", "/www.youtube.com")
+                            "www.youtube.com", "/www.youtube.com",
+                            "youtu.be", "/youtu.be")
 
             if host.startswith(lookup_sites):
                 self._find_title(message, self.url)
