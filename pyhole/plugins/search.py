@@ -59,7 +59,7 @@ class Search(plugin.Plugin):
 
     @plugin.hook_add_command("g")
     def alias_g(self, message, params=None, **kwargs):
-        """Alias of google"""
+        """Alias of google."""
         self.google(message, params, **kwargs)
 
     @plugin.hook_add_command("urban")
@@ -106,3 +106,8 @@ class Search(plugin.Plugin):
                 message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
         else:
             message.dispatch(self.wikipedia.__doc__)
+
+    @plugin.hook_add_command("wiki")
+    def alias_g(self, message, params=None, **kwargs):
+        """Alias of wikipedia."""
+        self.wikipedia(message, params, **kwargs)

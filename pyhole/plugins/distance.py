@@ -79,5 +79,5 @@ class Distance(plugin.Plugin):
 
     @plugin.hook_add_command("dist")
     def alias_dist(self, message, params=None, **kwargs):
-        """Alias of distance"""
+        """Alias of distance."""
         self.distance(message, params, **kwargs)

@@ -84,7 +84,7 @@ def active_get(hookname):
     generated calls 'active_get_*' that are created below with the
     setattrs
     """
-    return [x[2] for x in _plugin_hooks[hookname]]
+    return ", ".join(sorted([x[2] for x in _plugin_hooks[hookname]]))
 
 
 _hook_names = ["keyword", "command", "msg_regex", "poll"]
@@ -232,7 +232,7 @@ def reload_plugins(*args, **kwargs):
 
 def active_plugins():
     """Get the loaded plugin names"""
-    return [x.__name__ for x in Plugin._plugin_classes]
+    return ", ".join(sorted([x.__name__ for x in Plugin._plugin_classes]))
 
 
 def active_plugin_classes():

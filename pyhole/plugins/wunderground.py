@@ -74,5 +74,5 @@ class Wunderground(plugin.Plugin):
 
     @plugin.hook_add_command("w")
     def alias_w(self, message, params=None, **kwargs):
-        """Alias of weather"""
+        """Alias of weather."""
         self.weather(message, params, **kwargs)
