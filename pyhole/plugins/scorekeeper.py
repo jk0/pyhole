@@ -14,8 +14,7 @@
 
 """Pyhole Scorekeeper Plugin
 
-Scorekeeper is a fun way to high-five someone or playfully boo them in the IRC
-room.
+Scorekeeper is a fun way to playfully high-five or boo someone.
 
 Each user gets a score which can be incremented like:
     <nick>++
@@ -29,7 +28,9 @@ The running highscore can displayed with:
 An individual's score can be displayed with:
     .score <nick>
 """
-from pyhole.core import plugin, utils
+
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Scorekeeper(plugin.Plugin):
@@ -70,7 +71,7 @@ class Scorekeeper(plugin.Plugin):
             scores.append((score, nick))
 
         if not scores:
-            message.dispatch("No scores yet")
+            message.dispatch("No scores yet.")
             return
 
         message.dispatch("Highscores (Top 5)")
@@ -88,7 +89,7 @@ class Scorekeeper(plugin.Plugin):
             nick = params.strip()
             score = self._get_score(nick)
             if score is None:
-                return message.dispatch("No score found for '%s'" % nick)
+                return message.dispatch("No score found for '%s'." % nick)
             else:
                 message.dispatch(score)
                 return
