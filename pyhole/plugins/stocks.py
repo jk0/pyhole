@@ -1,4 +1,4 @@
-#   Copyright 2010-2012 Josh Kearney
+#   Copyright 2015 Jason Meridth
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,29 +14,27 @@
 
 """Pyhole Stocks Plugin"""
 
-from pyhole.core import plugin, utils
 from yahoo_finance import Share
+
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Stocks(plugin.Plugin):
-    """Provide access to current stock values"""
+    """Provide access to current stock values."""
 
     @plugin.hook_add_command("stock")
     @utils.spawn
     def stocks(self, message, params=None, **kwargs):
-        """Display current stock value for user provided symbol(s)
-        (ex: .stock rax,yhoo,aapl)
-        """
+        """Display current stock values (ex: .stock rax,yhoo,aapl)"""
 
         if not params:
-            message.dispatch("No stock symbol provided, please provide "
-                             "at least one symbol. Example: .stock rax or "
-                             ".stock rax,yhoo,aapl")
+            message.dispatch(self.stocks.__doc__)
             return
 
         text = ""
         try:
-            symbols = params.upper().split(',')
+            symbols = params.upper().split(",")
             for s in symbols:
                 share = Share(s)
                 text = (text + "%s: %s (%s) | " %
