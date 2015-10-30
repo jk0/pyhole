@@ -1,4 +1,4 @@
-#   Copyright 2010-2011 Josh Kearney
+#   Copyright 2015 Jason Meridth
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
 """Pyhole Jira Plugin"""
 
 from jira import JIRA
-from pyhole.core import plugin, utils
+
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Jira(plugin.Plugin):

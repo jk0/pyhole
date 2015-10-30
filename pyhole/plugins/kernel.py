@@ -24,7 +24,7 @@ from pyhole.core import utils
 
 
 class Kernel(plugin.Plugin):
-    """Provide access to kernel.org data"""
+    """Provide access to kernel.org data."""
 
     @plugin.hook_add_command("kernel")
     @utils.spawn
@@ -36,7 +36,7 @@ class Kernel(plugin.Plugin):
             return
 
         r = re.compile("(.* mainline .*)")
-        m = r.search(response.read())
+        m = r.search(response.content)
         kernel = m.group(1).replace("  ", "")
         message.dispatch(kernel)
 
@@ -55,21 +55,20 @@ class Kernel(plugin.Plugin):
             if not response or not isinstance(params, int):
                 return
 
-            soup = BeautifulSoup(response.read())
+            soup = BeautifulSoup(response.content)
             desc = utils.decode_entities(soup.head.title.string)
 
             try:
-                status = soup.find("span", {
-                    "id":
-                    "static_bug_status"}).string.strip().capitalize()
+                status = soup.find("span", {"id": "static_bug_status"}).string
+                status = status.capitalize().split("\n")[0]
+
                 assignee = utils.decode_entities(
                     soup.findAll("span", {
                         "class": "vcard"
                     })[0].contents[0].string)
 
-                msg = "Kernel.org %s [Status: %s, Assignee: %s] %s"
+                msg = "%s [Status: %s, Assignee: %s] %s"
                 message.dispatch(msg % (desc, status, assignee, url))
-
             except TypeError:
                 return
 
