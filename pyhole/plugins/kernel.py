@@ -15,7 +15,6 @@
 """Pyhole Kernel.org Plugin"""
 
 import re
-import urllib
 
 from BeautifulSoup import BeautifulSoup
 
@@ -30,10 +29,10 @@ class Kernel(plugin.Plugin):
     @utils.spawn
     def kernel(self, message, params=None, **kwargs):
         """Retrieve the current kernel version (ex: .kernel)"""
-        url = "http://kernel.org/kdist/finger_banner"
+        url = "https://www.kernel.org/kdist/finger_banner"
         response = utils.fetch_url(url)
-        if not response:
-            return
+        if response.status_code != 200:
+                return
 
         r = re.compile("(.* mainline .*)")
         m = r.search(response.content)
@@ -49,10 +48,10 @@ class Kernel(plugin.Plugin):
             if not params:
                 return
 
-            query = urllib.urlencode({"id": params})
-            url = "http://bugzilla.kernel.org/show_bug.cgi?%s" % query
-            response = utils.fetch_url(url)
-            if not response or not isinstance(params, int):
+            params = {"id": params}
+            url = "https://bugzilla.kernel.org/show_bug.cgi"
+            response = utils.fetch_url(url, params=params)
+            if response.status_code != 200:
                 return
 
             soup = BeautifulSoup(response.content)

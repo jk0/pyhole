@@ -63,8 +63,8 @@ class Url(plugin.Plugin):
             url = "http://" + url
 
         response = utils.fetch_url(url)
-        if not response:
-            return
+        if response.status_code != 200:
+                return
 
         soup = BeautifulSoup(response.content)
         if soup.head:

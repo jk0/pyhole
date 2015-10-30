@@ -266,7 +266,4 @@ nick = mynick
 
 def fetch_url(url, **kwargs):
     """Fetch a URL."""
-    try:
-        return requests.get(url, **kwargs)
-    except Exception:
-        return None
+    return requests.get(url, **kwargs)

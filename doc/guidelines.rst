@@ -42,8 +42,8 @@ Imports
 
 ::
 
+    import json
     import re
-    import urllib
 
     from BeautifulSoup import BeautifulSoup
 

@@ -89,8 +89,8 @@ class Redmine(plugin.Plugin):
         url = "%s/issues.json?assigned_to_id=%s" % (
               self.redmine_url, user_id)
         response = utils.fetch_url(url)
-        if not response:
-            return
+        if response.status_code != 200:
+                return
 
         return json.loads(response.content)["issues"]
 
@@ -112,8 +112,8 @@ class Redmine(plugin.Plugin):
         else:
             url = "%s/users.json?limit=100" % self.redmine_url
         response = utils.fetch_url(url)
-        if not response:
-            return
+        if response.status_code != 200:
+                return
 
         return json.loads(response.content)["users"]
 
@@ -121,8 +121,8 @@ class Redmine(plugin.Plugin):
         """Find and display a Redmine issue"""
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
         response = utils.fetch_url(url)
-        if not response:
-            return
+        if response.status_code != 200:
+                return
 
         try:
             issue = json.loads(response.content)["issue"]

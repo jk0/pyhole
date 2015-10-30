@@ -14,16 +14,10 @@
 
 """Pyhole Search Plugin"""
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
+import json
 import re
-import urllib
 
 from BeautifulSoup import BeautifulSoup
-from xml.dom import minidom
 
 from pyhole.core import plugin
 from pyhole.core import utils
@@ -37,11 +31,9 @@ class Search(plugin.Plugin):
     def google(self, message, params=None, **kwargs):
         """Search Google (ex: .g <query>)"""
         if params:
-            query = urllib.urlencode({"q": params})
-            url = ("http://ajax.googleapis.com/ajax/"
-                   "services/search/web?v=1.0&%s" % query)
-            response = utils.fetch_url(url)
-            if not response:
+            url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0"
+            response = utils.fetch_url(url, params={"q": params})
+            if response.status_code != 200:
                 return
 
             json_obj = json.loads(response.content)
@@ -67,10 +59,9 @@ class Search(plugin.Plugin):
     def urban(self, message, params=None, **kwargs):
         """Search Urban Dictionary (ex: .urban <query>)"""
         if params:
-            query = urllib.urlencode({"term": params})
-            url = "http://www.urbandictionary.com/define.php?%s" % query
-            response = utils.fetch_url(url)
-            if not response:
+            url = "http://www.urbandictionary.com/define.php"
+            response = utils.fetch_url(url, params={"term": params})
+            if response.status_code != 200:
                 return
 
             soup = BeautifulSoup(response.content)
@@ -93,17 +84,21 @@ class Search(plugin.Plugin):
     def wikipedia(self, message, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)"""
         if params:
-            query = urllib.urlencode({"action": "query",
-                                      "generator": "allpages", "gaplimit": 4,
-                                      "gapfrom": params, "format": "xml"})
-            url = "http://en.wikipedia.org/w/api.php?%s" % query
-            response = utils.fetch_url(url)
-            if not response:
+            url = "https://en.wikipedia.org/w/api.php"
+            response = utils.fetch_url(url, params={
+                "action": "query",
+                "generator": "allpages",
+                "gaplimit": 4,
+                "gapfrom": params,
+                "format": "json"
+            })
+
+            if response.status_code != 200:
                 return
 
-            xml = minidom.parseString(response.content)
-            for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
-                title = i._attrs["title"].firstChild.data
+            pages = json.loads(response.content)["query"]["pages"]
+            for page in pages.values():
+                title = page["title"]
                 title = re.sub(" ", "_", title)
                 message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
         else:

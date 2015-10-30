@@ -38,8 +38,8 @@ class Allergies(plugin.Plugin):
         headers = {"accept": "application/json"}
 
         response = utils.fetch_url(url, headers=headers)
-        if not response:
-            return
+        if response.status_code != 200:
+                return
 
         data = response.json()
         text = "Allergies for %s: " % today
