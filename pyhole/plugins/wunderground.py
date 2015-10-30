@@ -16,7 +16,8 @@
 
 import pywunderground
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Wunderground(plugin.Plugin):

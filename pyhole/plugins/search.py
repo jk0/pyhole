@@ -44,7 +44,7 @@ class Search(plugin.Plugin):
             if not response:
                 return
 
-            json_obj = json.loads(response.read())
+            json_obj = json.loads(response.content)
             results = json_obj["responseData"]["results"]
             if results:
                 for r in results:
@@ -60,65 +60,7 @@ class Search(plugin.Plugin):
     @plugin.hook_add_command("g")
     def alias_g(self, message, params=None, **kwargs):
         """Alias of google"""
-        self.google(params, **kwargs)
-
-    @plugin.hook_add_command("imdb")
-    @utils.spawn
-    def imdb(self, message, params=None, **kwargs):
-        """Search IMDb (ex: .imdb <query>)"""
-        if params:
-            query = urllib.urlencode({"q": params})
-            url = "http://www.imdb.com/find?s=all&%s" % query
-            response = utils.fetch_url(url)
-            if not response:
-                return
-
-            soup = BeautifulSoup(response.read())
-            results = soup.findAll("td", {"valign": "top"})
-
-            i = 0
-            for result in results:
-                if len(result) > 3 and len(result.contents[2].attrs) > 0:
-                    id = result.contents[2].attrs[0][1]
-                    title = utils.decode_entities(result.contents[2]
-                                                  .contents[0])
-                    year = result.contents[2].nextSibling.strip()[0:6]
-
-                    if not title.startswith("aka") and len(year):
-                        message.dispatch("%s %s: http://www.imdb.com%s" % (
-                                         title, year, id))
-                        i += 1
-                elif i >= 4:
-                    break
-
-            if i == 0:
-                message.dispatch("No results found: '%s'" % params)
-        else:
-            message.dispatch(self.imdb.__doc__)
-
-    @plugin.hook_add_command("twitter")
-    @utils.spawn
-    def twitter(self, message, params=None, **kwargs):
-        """Search Twitter (ex: .twitter <query>)"""
-        if params:
-            query = urllib.urlencode({"q": params, "rpp": 4})
-            url = "http://search.twitter.com/search.json?%s" % query
-            response = utils.fetch_url(url)
-            if not response:
-                return
-
-            json_obj = json.loads(response.read())
-            results = json_obj["results"]
-            if results:
-                for r in results:
-                    message.dispatch("@%s: %s" % (r["from_user"],
-                                     utils.decode_entities(
-                                     r["text"].encode("ascii", "ignore"))))
-
-            else:
-                message.dispatch("No results found: '%s'" % params)
-        else:
-            message.dispatch(self.twitter.__doc__)
+        self.google(message, params, **kwargs)
 
     @plugin.hook_add_command("urban")
     @utils.spawn
@@ -131,21 +73,14 @@ class Search(plugin.Plugin):
             if not response:
                 return
 
-            soup = BeautifulSoup(response.read())
-            results = soup.findAll("div", {"class": "definition"})
+            soup = BeautifulSoup(response.content)
+            meaning = soup.find("div", {"class": "meaning"}).text
+            example = soup.find("div", {"class": "example"}).text
 
-            urban = ""
-            if len(results):
-                urban = " ".join(str(x) for x in soup.findAll(
-                    "div", {"class": "definition"})[0].contents)
-
-            if len(urban) > 0:
-                for i, line in enumerate(urban.split("<br/>")):
-                    if i <= 4:
-                        message.dispatch(utils.decode_entities(line))
-                    else:
-                        message.dispatch("[...] %s" % url)
-                        break
+            if meaning and example:
+                meaning = utils.decode_entities(meaning)
+                example = utils.decode_entities(example)
+                message.dispatch("%s (ex: %s)" % (meaning, example))
             else:
                 message.dispatch("No results found: '%s'" % params)
         else:
@@ -164,33 +99,10 @@ class Search(plugin.Plugin):
             if not response:
                 return
 
-            xml = minidom.parseString(response.read())
+            xml = minidom.parseString(response.content)
             for i in xml.childNodes[0].childNodes[1].childNodes[0].childNodes:
                 title = i._attrs["title"].firstChild.data
                 title = re.sub(" ", "_", title)
                 message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
         else:
             message.dispatch(self.wikipedia.__doc__)
-
-    @plugin.hook_add_command("youtube")
-    @utils.spawn
-    def youtube(self, message, params=None, **kwargs):
-        """Search YouTube (ex: .youtube <query>)"""
-        if params:
-            query = urllib.urlencode({"q": params, "v": 2, "max-results": 4,
-                                      "alt": "jsonc"})
-            url = "http://gdata.youtube.com/feeds/api/videos?%s" % query
-            response = utils.fetch_url(url)
-            if not response:
-                return
-
-            json_obj = json.loads(response.read())
-            results = json_obj["data"]
-            if len(results) > 4:
-                for r in results["items"]:
-                    v = r["player"]["default"].split("&", 1)[0]
-                    message.dispatch("%s: %s" % (r["title"], v))
-            else:
-                message.dispatch("No results found: '%s'" % params)
-        else:
-            message.dispatch(self.youtube.__doc__)
