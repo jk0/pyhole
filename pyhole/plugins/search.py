@@ -74,15 +74,17 @@ class Search(plugin.Plugin):
                 return
 
             soup = BeautifulSoup(response.content)
-            meaning = soup.find("div", {"class": "meaning"}).text
-            example = soup.find("div", {"class": "example"}).text
 
-            if meaning and example:
-                meaning = utils.decode_entities(meaning)
-                example = utils.decode_entities(example)
-                message.dispatch("%s (ex: %s)" % (meaning, example))
-            else:
+            try:
+                meaning = soup.find("div", {"class": "meaning"}).text
+                example = soup.find("div", {"class": "example"}).text
+            except AttributeError:
                 message.dispatch("No results found: '%s'" % params)
+
+            meaning = utils.decode_entities(meaning)
+            example = utils.decode_entities(example)
+
+            message.dispatch("%s (ex: %s)" % (meaning, example))
         else:
             message.dispatch(self.urban.__doc__)
 
@@ -108,6 +110,6 @@ class Search(plugin.Plugin):
             message.dispatch(self.wikipedia.__doc__)
 
     @plugin.hook_add_command("wiki")
-    def alias_g(self, message, params=None, **kwargs):
+    def alias_wiki(self, message, params=None, **kwargs):
         """Alias of wikipedia."""
         self.wikipedia(message, params, **kwargs)
