@@ -71,8 +71,13 @@ class Client(object):
                     r_channel = response["channel"]
                     r_user = response["user"]
 
-                    channel = self.client.server.channels.find(r_channel).name
-                    user = self.client.server.users.find(r_user).name
+                    try:
+                        channel = self.client.server.channels.find(
+                            r_channel).name
+                        user = self.client.server.users.find(r_user).name
+                    except AttributeError:
+                        continue
+
                     msg = response["text"]
 
                     self.log.info("-#%s- <%s> %s" % (channel, user, msg))
