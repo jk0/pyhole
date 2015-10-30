@@ -92,7 +92,7 @@ class Redmine(plugin.Plugin):
         if not response:
             return
 
-        return json.loads(response.read())["issues"]
+        return json.loads(response.content)["issues"]
 
     def _find_user(self, login):
         """Find a specific Redmine user"""
@@ -115,7 +115,7 @@ class Redmine(plugin.Plugin):
         if not response:
             return
 
-        return json.loads(response.read())["users"]
+        return json.loads(response.content)["users"]
 
     def _find_issue(self, message, issue_id):
         """Find and display a Redmine issue"""
@@ -125,7 +125,7 @@ class Redmine(plugin.Plugin):
             return
 
         try:
-            issue = json.loads(response.read())["issue"]
+            issue = json.loads(response.content)["issue"]
         except Exception:
             return
 

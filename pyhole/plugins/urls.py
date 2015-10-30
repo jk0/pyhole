@@ -21,10 +21,10 @@ from pyhole.core import utils
 
 
 class Url(plugin.Plugin):
-    """Provide access to URL data"""
+    """Provide access to URL data."""
 
-    def __init__(self, irc):
-        self.irc = irc
+    def __init__(self, session):
+        self.session = session
         self.name = self.__class__.__name__
         self.url = None
 
@@ -42,7 +42,9 @@ class Url(plugin.Plugin):
     def _watch_for_url(self, message, params=None, **kwargs):
         """Watch and keep track of the latest URL"""
         try:
+            # NOTE(jk0): Slack does some weird things with URLs.
             self.url = message.message.split(" ", 1)[0]
+            self.url = self.url.replace("<", "").replace(">", "")
             host = self.url[7:]
 
             lookup_sites = ("open.spotify.com", "/open.spotify.com",
@@ -55,6 +57,8 @@ class Url(plugin.Plugin):
 
     def _find_title(self, message, url):
         """Find the title of a given URL"""
+        # NOTE(jk0): Slack does some weird things with URLs.
+        url = url.replace("<", "").replace(">", "").split("|")[0]
         if not url.startswith(("http://", "https://")):
             url = "http://" + url
 
@@ -62,7 +66,7 @@ class Url(plugin.Plugin):
         if not response:
             return
 
-        soup = BeautifulSoup(response.read())
+        soup = BeautifulSoup(response.content)
         if soup.head:
             title = utils.decode_entities(soup.head.title.string)
             content_type = response.headers.get("Content-Type").split(";",
