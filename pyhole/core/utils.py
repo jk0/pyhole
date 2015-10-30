@@ -197,61 +197,61 @@ def generate_config():
     example = """# Global Configuration
 
 [Pyhole]
-admins: nick!ident, nick2!ident, slack.username
-command_prefix: .
-reconnect_delay: 60
-rejoin_delay: 5
-debug: False
-plugins: admin, calculator, search, urls
-networks: FreeNode, EFnet, SlackNetwork
+admins = nick!ident, nick2!ident, slack.username
+command_prefix = .
+reconnect_delay = 60
+rejoin_delay = 5
+debug = False
+plugins = admin
+networks = FreeNode, EFnet, SlackNetwork
 
 [Wunderground]
-key: abcd1234
+key = abcd1234
 
 [GoogleMaps]
-key: abcd1234
+key = abcd1234
 
 [Redmine]
-domain: redmine.example.com
-key: abcd1234
+domain = redmine.example.com
+key = abcd1234
 
 [Jira]
-domain: jira.example.com
-username: abcd1234
-password: pass1234
+domain = jira.example.com
+username = abcd1234
+password = pass1234
 
 [Xsa]
-notify: #channel1, #channel2
+notify = #channel1, #channel2
 
 # Network Configuration
 
 [FreeNode]
-server: verne.freenode.net
-username:
-password:
-port: 7000
-ssl: True
-ipv6: True
-bind_to: fe80::1
-nick: mynick
-identify_password: abcd1234
-channels: #mychannel key, #mychannel2
+server = verne.freenode.net
+username =
+password =
+port = 7000
+ssl = True
+ipv6 = True
+bind_to = fe80::1
+nick = mynick
+identify_password = abcd1234
+channels = #mychannel key, #mychannel2
 
 [EFnet]
-server: irc.efnet.net
-username:
-password:
-port: 6667
-ssl: False
-ipv6: False
-bind_to:
-nick: mynick
-identify_password:
-channels: #mychannel key, #mychannel2
+server = irc.efnet.net
+username =
+password =
+port = 6667
+ssl = False
+ipv6 = False
+bind_to =
+nick = mynick
+identify_password =
+channels = #mychannel key, #mychannel2
 
 [SlackNetwork]
-api_token: abcd1234
-nick: mynick
+api_token = abcd1234
+nick = mynick
 """
 
     conf_file = get_conf_file()

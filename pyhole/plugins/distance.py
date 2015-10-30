@@ -19,7 +19,7 @@ from pyhole.core import utils
 
 
 class Distance(plugin.Plugin):
-    """Display distance between two IRC users (using their Weather Zip Code)"""
+    """Display distance between two users by using their weather data."""
 
     @plugin.hook_add_command("distance")
     @utils.spawn
@@ -47,7 +47,7 @@ class Distance(plugin.Plugin):
         dest = None
         origin = None
         for filename in utils.list_files("Wunderground"):
-            nick, ident = filename.split("!")
+            nick = filename.split("!")[0]
             if nick == dest_nick:
                 dest = utils.read_file("Wunderground", filename)
             if nick == origin_nick:
@@ -73,7 +73,7 @@ class Distance(plugin.Plugin):
                 pass
 
         if not msg:
-            msg = "Unable to fetch data from Google Maps"
+            msg = "Unable to fetch data from Google Maps."
 
         message.dispatch(msg)
 
