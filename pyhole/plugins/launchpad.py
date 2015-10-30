@@ -1,4 +1,4 @@
-#   Copyright 2011 Paul Voccio
+#   Copyright 2011-2015 Paul Voccio
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 
 from launchpadlib.launchpad import Launchpad as LP
 
-from pyhole.core import plugin, utils
+from pyhole.core import plugin
+from pyhole.core import utils
 
 
 class Launchpad(plugin.Plugin):
-    """Provide access to the Launchpad API"""
+    """Provide access to the Launchpad API."""
 
-    def __init__(self, irc):
-        self.irc = irc
+    def __init__(self, session):
+        self.session = session
         self.name = self.__class__.__name__
         self.launchpad = LP.login_anonymously("pyhole", "production",
                                               utils.get_directory(self.name))
@@ -51,7 +52,7 @@ class Launchpad(plugin.Plugin):
                             message.dispatch(msg % (len(members.members) - i))
                             break
             except KeyError:
-                msg = "Unable to find user '%s' in Launchpad"
+                msg = "Unable to find user '%s' in Launchpad."
                 message.dispatch(msg % team)
         else:
             message.dispatch(self.lbugs.__doc__)
