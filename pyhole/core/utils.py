@@ -36,7 +36,7 @@ eventlet.monkey_patch()
 
 
 def admin(func):
-    """Administration Decorator"""
+    """Require admin rights."""
     def wrap(self, message, *args, **kwargs):
         if message.source in self.session.admins:
             return func(self, message, *args, **kwargs)
@@ -50,10 +50,27 @@ def admin(func):
     return wrap
 
 
+def require_params(func):
+    """Require parameters."""
+    def wrap(self, message, params, *args, **kwargs):
+        if not params:
+            message.dispatch(wrap.__doc__)
+            return
+
+        return func(self, message, params, *args, **kwargs)
+
+    wrap.__doc__ = func.__doc__
+    wrap.__name__ = func.__name__
+    wrap.__module__ = func.__module__
+
+    return wrap
+
+
 def spawn(func):
     """Greenthread Spawning Decorator"""
     def wrap(self, *args, **kwargs):
         eventlet.spawn_n(func, self, *args, **kwargs)
+
     wrap.__doc__ = func.__doc__
     wrap.__name__ = func.__name__
     wrap.__module__ = func.__module__

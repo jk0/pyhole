@@ -14,10 +14,7 @@
 
 """Pyhole Redmine Plugin"""
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import json
 
 from pyhole.core import plugin
 from pyhole.core import utils
@@ -29,48 +26,42 @@ class Redmine(plugin.Plugin):
     def __init__(self, session):
         self.session = session
         self.name = self.__class__.__name__
-        self.disabled = False
 
-        try:
-            self.redmine = utils.get_config("Redmine")
-            self.redmine_domain = self.redmine.get("domain")
-            self.redmine_key = self.redmine.get("key")
-            self.redmine_url = "https://%s:password@%s" % (
-                               self.redmine_key, self.redmine_domain)
-        except Exception:
-            self.disabled = True
+        self.redmine = utils.get_config("Redmine")
+        self.redmine_domain = self.redmine.get("domain")
+        self.redmine_key = self.redmine.get("key")
+        self.redmine_url = "https://%s:password@%s" % (
+            self.redmine_key, self.redmine_domain)
 
     @plugin.hook_add_command("rbugs")
+    @utils.require_params
     @utils.spawn
     def rbugs(self, message, params=None, **kwargs):
         """Redmine bugs for a user (ex: .rbugs <login>)"""
-        if params and not self.disabled:
-            login = params.split(" ", 1)[0]
-            user_id = self._find_user(login)
+        login = params.split(" ", 1)[0]
+        user_id = self._find_user(login)
 
-            i = 0
-            issues = self._find_issues(user_id)
-            for i, issue in enumerate(issues):
-                if i <= 4:
-                    self._find_issue(message, issue["id"])
-                else:
-                    message.dispatch("[...] truncated last %d bugs" % (
-                                     len(issues) - i))
-                    break
+        i = 0
+        issues = self._find_issues(user_id)
+        for i, issue in enumerate(issues):
+            if i <= 4:
+                self._find_issue(message, issue["id"])
             else:
-                if i <= 0:
-                    message.dispatch("No Redmine bugs found for '%s'" % login)
+                message.dispatch("[...] truncated last %d bugs" % (
+                                 len(issues) - i))
+                break
         else:
-            message.dispatch(self.rbugs.__doc__)
+            if i <= 0:
+                message.dispatch("No Redmine bugs found for '%s'" % login)
 
     @plugin.hook_add_keyword("rm")
+    @utils.require_params
     @utils.spawn
     def keyword_rm(self, message, params=None, **kwargs):
         """Retrieve Redmine bug information (ex: RM12345)"""
-        if params and not self.disabled:
-            params = utils.ensure_int(params)
-            if params:
-                self._find_issue(message, params)
+        params = utils.ensure_int(params)
+        if params:
+            self._find_issue(message, params)
 
     @plugin.hook_add_msg_regex("https?:\/\/redmine\..*/issues")
     def _watch_for_rm_bug_url(self, message, params=None, **kwargs):

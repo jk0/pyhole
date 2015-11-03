@@ -14,7 +14,6 @@
 
 """pyhole - A modular IRC & Slack bot for Python developers."""
 
-
 import sys
 import time
 

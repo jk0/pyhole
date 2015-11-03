@@ -30,51 +30,49 @@ class Launchpad(plugin.Plugin):
                                               utils.get_directory(self.name))
 
     @plugin.hook_add_command("lbugs")
+    @utils.require_params
     @utils.spawn
     def lbugs(self, message, params=None, **kwargs):
         """Launchpad bugs for a team (ex: .lbugs <project> <team>|<user>)"""
-        if params:
-            project, team = params.split(" ", 2)
-            try:
-                members = self.launchpad.people[team]
-                proj = self.launchpad.projects[project]
+        project, team = params.split(" ", 2)
+        try:
+            members = self.launchpad.people[team]
+            proj = self.launchpad.projects[project]
 
-                if len(members.members) < 2:
-                    # Find a single member
-                    self._find_bugs(members, proj)
-                else:
-                    # Find everyone on the team
-                    for i, person in enumerate(members.members):
-                        if i <= 4:
-                            self._find_bugs(message, person, proj, False)
-                        else:
-                            msg = "[...] truncated last %d users"
-                            message.dispatch(msg % (len(members.members) - i))
-                            break
-            except KeyError:
-                msg = "Unable to find user '%s' in Launchpad."
-                message.dispatch(msg % team)
-        else:
-            message.dispatch(self.lbugs.__doc__)
+            if len(members.members) < 2:
+                # Find a single member
+                self._find_bugs(members, proj)
+            else:
+                # Find everyone on the team
+                for i, person in enumerate(members.members):
+                    if i <= 4:
+                        self._find_bugs(message, person, proj, False)
+                    else:
+                        msg = "[...] truncated last %d users"
+                        message.dispatch(msg % (len(members.members) - i))
+                        break
+        except KeyError:
+            msg = "Unable to find user '%s' in Launchpad."
+            message.dispatch(msg % team)
 
     @plugin.hook_add_keyword("lp")
+    @utils.require_params
     @utils.spawn
     def keyword_lp(self, message, params=None, **kwargs):
         """Retrieve Launchpad bug information (ex: LP12345)"""
-        if params:
-            params = utils.ensure_int(params)
-            if not params:
-                return
+        params = utils.ensure_int(params)
+        if not params:
+            return
 
-            try:
-                bug = self.launchpad.bugs[params]
-                task = bug.bug_tasks[len(bug.bug_tasks) - 1]
-                message.dispatch("LP %s [Status: %s, Assignee: %s] %s" % (
-                                 task.title, task.status,
-                                 self._find_name(task.assignee_link),
-                                 bug.web_link))
-            except Exception:
-                return
+        try:
+            bug = self.launchpad.bugs[params]
+            task = bug.bug_tasks[len(bug.bug_tasks) - 1]
+            message.dispatch("LP %s [Status: %s, Assignee: %s] %s" % (
+                             task.title, task.status,
+                             self._find_name(task.assignee_link),
+                             bug.web_link))
+        except Exception:
+            return
 
     @plugin.hook_add_msg_regex("https?:\/\/bugs\.launchpad\.net\/.*\/\+bug")
     def _watch_for_lp_bug_url(self, message, params=None, **kwargs):

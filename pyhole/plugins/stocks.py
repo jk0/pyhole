@@ -14,7 +14,7 @@
 
 """Pyhole Stocks Plugin"""
 
-from yahoo_finance import Share
+import yahoo_finance
 
 from pyhole.core import plugin
 from pyhole.core import utils
@@ -24,25 +24,18 @@ class Stocks(plugin.Plugin):
     """Provide access to current stock values."""
 
     @plugin.hook_add_command("stock")
+    @utils.require_params
     @utils.spawn
     def stocks(self, message, params=None, **kwargs):
         """Display current stock values (ex: .stock rax,yhoo,aapl)"""
-
-        if not params:
-            message.dispatch(self.stocks.__doc__)
-            return
-
-        text = ""
         try:
+            stocks = []
             symbols = params.upper().split(",")
-            for s in symbols:
-                share = Share(s)
-                text = (text + "%s: %s (%s) | " %
-                        (s, share.get_price(), share.get_change()))
-            text = text.rstrip(" ")
-            text = text.rstrip("|")
-        except Exception:
-            text = ("Unable to fetch stocks data. "
-                    "Please ensure the symbols you've provided are valid")
+            for symbol in symbols:
+                share = yahoo_finance.Share(symbol)
+                stocks.append("%s: %s (%s)" % (symbol, share.get_price(),
+                                               share.get_change()))
 
-        message.dispatch(text)
+            message.dispatch(", ".join(stocks))
+        except Exception:
+            message.dispatch("Unable to fetch stock data.")

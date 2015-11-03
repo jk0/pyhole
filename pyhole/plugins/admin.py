@@ -50,58 +50,46 @@ class Admin(plugin.Plugin):
 
     @plugin.hook_add_command("op")
     @utils.admin
+    @utils.require_params
     def op(self, message, params=None, **kwargs):
         """Op a user (ex: .op <channel> <nick>)."""
-        if params:
-            self.session.op_user(params)
-        else:
-            message.dispatch(self.op.__doc__)
+        self.session.op_user(params)
 
     @plugin.hook_add_command("deop")
     @utils.admin
+    @utils.require_params
     def deop(self, message, params=None, **kwargs):
         """De-op a user (ex: .deop <channel> <nick>)."""
-        if params:
-            self.session.deop_user(params)
-        else:
-            message.dispatch(self.deop.__doc__)
+        self.session.deop_user(params)
 
     @plugin.hook_add_command("nick")
     @utils.admin
+    @utils.require_params
     def nick(self, message, params=None, **kwargs):
         """Change nick (ex: .nick <nick>)."""
-        if params:
-            self.session.set_nick(params)
-        else:
-            message.dispatch(self.nick.__doc__)
+        self.session.set_nick(params)
 
     @plugin.hook_add_command("join")
     @utils.admin
+    @utils.require_params
     def join(self, message, params=None, **kwargs):
         """Join a channel (ex: .join #channel [<key>])."""
-        if params:
-            self.session.join_channel(params)
-        else:
-            message.dispatch(self.join.__doc__)
+        self.session.join_channel(params)
 
     @plugin.hook_add_command("part")
     @utils.admin
+    @utils.require_params
     def part(self, message, params=None, **kwargs):
         """Part a channel (ex: .part <channel>)."""
-        if params:
-            self.session.part_channel(params)
-        else:
-            message.dispatch(self.part.__doc__)
+        self.session.part_channel(params)
 
     @plugin.hook_add_command("say")
     @utils.admin
+    @utils.require_params
     def say(self, message, params=None, **kwargs):
         """Send a PRIVMSG (ex: .say <channel>|<nick> message)."""
-        if params:
-            (target, msg) = params.split(" ", 1)
-            self.session.privmsg(target, msg)
-        else:
-            message.dispatch(self.say.__doc__)
+        (target, msg) = params.split(" ", 1)
+        self.session.privmsg(target, msg)
 
 
 def _find_doc_string(params):

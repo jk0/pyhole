@@ -22,6 +22,7 @@ class Distance(plugin.Plugin):
     """Display distance between two users by using their weather data."""
 
     @plugin.hook_add_command("distance")
+    @utils.require_params
     @utils.spawn
     def distance(self, message, params=None, **kwargs):
         """Display distances (ex: .dist <nick|loc> [to <nick|loc>])"""

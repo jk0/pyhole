@@ -27,27 +27,25 @@ class Search(plugin.Plugin):
     """Provide access to search engines"""
 
     @plugin.hook_add_command("google")
+    @utils.require_params
     @utils.spawn
     def google(self, message, params=None, **kwargs):
         """Search Google (ex: .g <query>)"""
-        if params:
-            url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0"
-            response = utils.fetch_url(url, params={"q": params})
-            if response.status_code != 200:
-                return
+        url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0"
+        response = utils.fetch_url(url, params={"q": params})
+        if response.status_code != 200:
+            return
 
-            json_obj = json.loads(response.content)
-            results = json_obj["responseData"]["results"]
-            if results:
-                for r in results:
-                    message.dispatch("%s: %s" % (
-                                     r["titleNoFormatting"]
-                                     .encode("ascii", "ignore"),
-                                     r["unescapedUrl"]))
-            else:
-                message.dispatch("No results found: '%s'" % params)
+        json_obj = json.loads(response.content)
+        results = json_obj["responseData"]["results"]
+        if results:
+            for r in results:
+                message.dispatch("%s: %s" % (
+                                 r["titleNoFormatting"]
+                                 .encode("ascii", "ignore"),
+                                 r["unescapedUrl"]))
         else:
-            message.dispatch(self.google.__doc__)
+            message.dispatch("No results found: '%s'" % params)
 
     @plugin.hook_add_command("g")
     def alias_g(self, message, params=None, **kwargs):
@@ -55,54 +53,50 @@ class Search(plugin.Plugin):
         self.google(message, params, **kwargs)
 
     @plugin.hook_add_command("urban")
+    @utils.require_params
     @utils.spawn
     def urban(self, message, params=None, **kwargs):
         """Search Urban Dictionary (ex: .urban <query>)"""
-        if params:
-            url = "http://www.urbandictionary.com/define.php"
-            response = utils.fetch_url(url, params={"term": params})
-            if response.status_code != 200:
-                return
+        url = "http://www.urbandictionary.com/define.php"
+        response = utils.fetch_url(url, params={"term": params})
+        if response.status_code != 200:
+            return
 
-            soup = BeautifulSoup(response.content)
+        soup = BeautifulSoup(response.content)
 
-            try:
-                meaning = soup.find("div", {"class": "meaning"}).text
-                example = soup.find("div", {"class": "example"}).text
-            except AttributeError:
-                message.dispatch("No results found: '%s'" % params)
+        try:
+            meaning = soup.find("div", {"class": "meaning"}).text
+            example = soup.find("div", {"class": "example"}).text
+        except AttributeError:
+            message.dispatch("No results found: '%s'" % params)
 
-            meaning = utils.decode_entities(meaning)
-            example = utils.decode_entities(example)
+        meaning = utils.decode_entities(meaning)
+        example = utils.decode_entities(example)
 
-            message.dispatch("%s (ex: %s)" % (meaning, example))
-        else:
-            message.dispatch(self.urban.__doc__)
+        message.dispatch("%s (ex: %s)" % (meaning, example))
 
     @plugin.hook_add_command("wikipedia")
+    @utils.require_params
     @utils.spawn
     def wikipedia(self, message, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)"""
-        if params:
-            url = "https://en.wikipedia.org/w/api.php"
-            response = utils.fetch_url(url, params={
-                "action": "query",
-                "generator": "allpages",
-                "gaplimit": 4,
-                "gapfrom": params,
-                "format": "json"
-            })
+        url = "https://en.wikipedia.org/w/api.php"
+        response = utils.fetch_url(url, params={
+            "action": "query",
+            "generator": "allpages",
+            "gaplimit": 4,
+            "gapfrom": params,
+            "format": "json"
+        })
 
-            if response.status_code != 200:
-                return
+        if response.status_code != 200:
+            return
 
-            pages = json.loads(response.content)["query"]["pages"]
-            for page in pages.values():
-                title = page["title"]
-                title = re.sub(" ", "_", title)
-                message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
-        else:
-            message.dispatch(self.wikipedia.__doc__)
+        pages = json.loads(response.content)["query"]["pages"]
+        for page in pages.values():
+            title = page["title"]
+            title = re.sub(" ", "_", title)
+            message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
 
     @plugin.hook_add_command("wiki")
     def alias_wiki(self, message, params=None, **kwargs):

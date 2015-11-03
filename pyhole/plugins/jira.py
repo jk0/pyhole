@@ -26,29 +26,26 @@ class Jira(plugin.Plugin):
     def __init__(self, irc):
         self.irc = irc
         self.name = self.__class__.__name__
-        self.disabled = False
 
-        try:
-            self.jira = utils.get_config("Jira")
-            self.jira_domain = self.jira.get("domain")
-            self.jira_username = self.jira.get("username")
-            self.jira_password = self.jira.get("password")
+        self.jira = utils.get_config("Jira")
+        self.jira_domain = self.jira.get("domain")
+        self.jira_username = self.jira.get("username")
+        self.jira_password = self.jira.get("password")
 
-            self.jira = JIRA(self.jira_url,
-                             basic_auth=(self.jira_username,
-                                         self.jira_password))
-
-        except Exception:
-            self.disabled = True
+        self.jira = JIRA(self.jira_url,
+                         basic_auth=(self.jira_username,
+                                     self.jira_password))
 
     @plugin.hook_add_keyword("jira")
+    @utils.require_params
     @utils.spawn
     def keyword_jira(self, message, params=None, **kwargs):
         """Retrieve Jira ticket information (ex: jira NCP-1444)"""
-        if params and not self.disabled:
-            params = utils.ensure_int(params)
-            if params:
-                self._find_issue(message, params)
+        params = utils.ensure_int(params)
+        if not params:
+            return
+
+        self._find_issue(message, params)
 
     def _find_issue(self, message, issue_id):
         """Find and display a Jira issue"""

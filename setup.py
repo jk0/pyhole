@@ -44,7 +44,7 @@ setuptools.setup(
         "yahoo-finance"
     ],
     setup_requires=[
-        "flake8",
+        "flake8==2.4.1",
         "sphinx"
     ],
     test_suite="pyhole.tests",

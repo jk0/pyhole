@@ -40,36 +40,36 @@ class Kernel(plugin.Plugin):
         message.dispatch(kernel)
 
     @plugin.hook_add_keyword("k")
+    @utils.require_params
     @utils.spawn
     def keyword_k(self, message, params=None, **kwargs):
         """Retrieve kernel.org Bugzilla bug information (ex: K12345)"""
-        if params:
-            params = utils.ensure_int(params)
-            if not params:
-                return
+        params = utils.ensure_int(params)
+        if not params:
+            return
 
-            params = {"id": params}
-            url = "https://bugzilla.kernel.org/show_bug.cgi"
-            response = utils.fetch_url(url, params=params)
-            if response.status_code != 200:
-                return
+        params = {"id": params}
+        url = "https://bugzilla.kernel.org/show_bug.cgi"
+        response = utils.fetch_url(url, params=params)
+        if response.status_code != 200:
+            return
 
-            soup = BeautifulSoup(response.content)
-            desc = utils.decode_entities(soup.head.title.string)
+        soup = BeautifulSoup(response.content)
+        desc = utils.decode_entities(soup.head.title.string)
 
-            try:
-                status = soup.find("span", {"id": "static_bug_status"}).string
-                status = status.capitalize().split("\n")[0]
+        try:
+            status = soup.find("span", {"id": "static_bug_status"}).string
+            status = status.capitalize().split("\n")[0]
 
-                assignee = utils.decode_entities(
-                    soup.findAll("span", {
-                        "class": "vcard"
-                    })[0].contents[0].string)
+            assignee = utils.decode_entities(
+                soup.findAll("span", {
+                    "class": "vcard"
+                })[0].contents[0].string)
 
-                msg = "%s [Status: %s, Assignee: %s] %s"
-                message.dispatch(msg % (desc, status, assignee, url))
-            except TypeError:
-                return
+            msg = "%s [Status: %s, Assignee: %s] %s"
+            message.dispatch(msg % (desc, status, assignee, url))
+        except TypeError:
+            return
 
     @plugin.hook_add_msg_regex(
         "https?:\/\/bugzilla\.kernel\.org\/show\_bug\.cgi\?id\=")
