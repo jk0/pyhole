@@ -64,28 +64,33 @@ class Client(object):
         self.client.rtm_connect()
 
         while True:
-            for response in self.client.rtm_read():
-                self.log.debug(response)
+            try:
+                for response in self.client.rtm_read():
+                    self.log.debug(response)
 
-                if all(x in response for x in ("text", "channel", "user")):
-                    r_channel = response["channel"]
-                    r_user = response["user"]
+                    if all(x in response for x in ("text", "channel", "user")):
+                        r_channel = response["channel"]
+                        r_user = response["user"]
 
-                    try:
-                        channel = self.client.server.channels.find(
-                            r_channel).name
-                        user = self.client.server.users.find(r_user).name
-                    except AttributeError:
-                        continue
+                        try:
+                            channel = self.client.server.channels.find(
+                                r_channel).name
+                            user = self.client.server.users.find(r_user).name
+                        except AttributeError:
+                            continue
 
-                    msg = response["text"]
+                        msg = response["text"]
 
-                    self.log.info("-#%s- <%s> %s" % (channel, user, msg))
+                        self.log.info("-#%s- <%s> %s" % (channel, user, msg))
 
-                    _msg = message.Reply(self, msg, user, channel)
-                    plugin.poll_messages(self, _msg)
+                        _msg = message.Reply(self, msg, user, channel)
+                        plugin.poll_messages(self, _msg)
 
-            time.sleep(.1)
+                time.sleep(.1)
+            except Exception:
+                # NOTE(jk0): Disconnected? Try to read from the existing client
+                # object again.
+                continue
 
     def reply(self, target, msg):
         """Reply to a channel."""

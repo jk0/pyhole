@@ -21,7 +21,7 @@ from pyhole.core import utils
 
 
 class Wunderground(plugin.Plugin):
-    """Provide access to current weather data"""
+    """Provide access to current weather data."""
 
     @plugin.hook_add_command("weather")
     @utils.spawn
@@ -35,7 +35,7 @@ class Wunderground(plugin.Plugin):
             if location.startswith("set "):
                 location = location[4:]
                 utils.write_file(self.name, message.source, location)
-                message.dispatch("Location information saved")
+                message.dispatch("Location information saved.")
         else:
             location = utils.read_file(self.name, message.source)
             if not location:
@@ -45,10 +45,10 @@ class Wunderground(plugin.Plugin):
         try:
             w = pywunderground.request(api_key, ["conditions"], location)
         except Exception:
-            message.dispatch("Unable to fetch weather data")
+            message.dispatch("Unable to fetch Wunderground data.")
             return
 
-        if w.get("current_observation"):
+        if "current_observation" in w:
             w = w["current_observation"]
 
             city = w["display_location"]["full"]
@@ -61,13 +61,12 @@ class Wunderground(plugin.Plugin):
             zip_code = "" if zip_code == "00000" else " %s" % zip_code
             humidity = "N/A%" if len(humidity) > 3 else humidity
 
-            result = ("%s%s: %s   Humidity: %s   Wind: %s   %s") % (city,
-                                                                    zip_code,
-                                                                    temp,
-                                                                    humidity,
-                                                                    wind,
-                                                                    condition)
-
+            result = "%s%s: %s   Humidity: %s   Wind: %s   %s" % (city,
+                                                                  zip_code,
+                                                                  temp,
+                                                                  humidity,
+                                                                  wind,
+                                                                  condition)
             message.dispatch(result)
         else:
             message.dispatch("Location not found: '%s'" % location)

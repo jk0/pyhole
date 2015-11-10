@@ -14,6 +14,8 @@
 
 """Pyhole Distance to User Plugin"""
 
+import pywunderground
+
 from pyhole.core import plugin
 from pyhole.core import utils
 
@@ -62,6 +64,9 @@ class Distance(plugin.Plugin):
             # They passed in a location
             origin = origin_nick
 
+        origin = _resolve_pws(origin)
+        dest = _resolve_pws(dest)
+
         resp = utils.fetch_url("https://maps.googleapis.com/maps/api"
                                "/directions/json?origin=%s&destination=%s"
                                "&key=%s" % (origin, dest, key))
@@ -78,7 +83,20 @@ class Distance(plugin.Plugin):
 
         message.dispatch(msg)
 
-    @plugin.hook_add_command("dist")
-    def alias_dist(self, message, params=None, **kwargs):
+    @plugin.hook_add_command("d")
+    def alias_d(self, message, params=None, **kwargs):
         """Alias of distance."""
         self.distance(message, params, **kwargs)
+
+
+def _resolve_pws(location):
+    """Look up the location of a PWS."""
+    if location.lower().startswith("pws:"):
+        wunderground = utils.get_config("Wunderground")
+        api_key = wunderground.get("key")
+
+        w = pywunderground.request(api_key, ["conditions"], location)
+
+        return w["current_observation"]["display_location"]["zip"]
+
+    return location
