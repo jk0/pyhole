@@ -88,8 +88,8 @@ class Client(object):
 
                 time.sleep(.1)
             except Exception:
-                # NOTE(jk0): Disconnected? Try to read from the existing client
-                # object again.
+                # NOTE(jk0): Disconnected? Try to reconnect.
+                self.client.rtm_connect()
                 continue
 
     def reply(self, target, msg):
