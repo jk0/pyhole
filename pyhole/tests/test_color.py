@@ -1,4 +1,4 @@
-#   Copyright 2014 Philip Schwartz
+#   Copyright 2014-2015 Philip Schwartz
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,7 +17,8 @@
 import re
 import unittest
 
-from pyhole.core import color, colormap
+from pyhole.core import color
+from pyhole.core import colormap
 
 
 class MockColors(colormap.ColorMap):

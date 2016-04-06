@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2011-2015 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@
 
 import unittest
 
-from pyhole.core import config, utils
+from pyhole.core import config
+from pyhole.core import utils
 
 
 class TestConfig(unittest.TestCase):

@@ -49,7 +49,6 @@ class Jira(plugin.Plugin):
 
     def _find_issue(self, message, issue_id):
         """Find and display a Jira issue"""
-
         try:
             issue = self.jira.issue(issue_id)
         except Exception:

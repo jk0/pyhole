@@ -26,7 +26,8 @@ import traceback
 
 from BeautifulSoup import BeautifulStoneSoup
 from functools import wraps
-from multiprocessing import Process, Queue
+from multiprocessing import Process
+from multiprocessing import Queue
 
 import config
 import version
@@ -222,20 +223,20 @@ debug = False
 plugins = admin
 networks = FreeNode, EFnet, SlackNetwork
 
-[Wunderground]
-key = abcd1234
-
 [GoogleMaps]
-key = abcd1234
-
-[Redmine]
-domain = redmine.example.com
 key = abcd1234
 
 [Jira]
 domain = jira.example.com
 username = abcd1234
 password = pass1234
+
+[Redmine]
+domain = redmine.example.com
+key = abcd1234
+
+[Wunderground]
+key = abcd1234
 
 [XSA]
 notify = #channel1, #channel2
