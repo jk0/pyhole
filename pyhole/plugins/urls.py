@@ -1,4 +1,4 @@
-#   Copyright 2011-2015 Josh Kearney
+#   Copyright 2011-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -31,33 +31,33 @@ class Url(plugin.Plugin):
     @plugin.hook_add_command("title")
     @utils.spawn
     def title(self, message, params=None, **kwargs):
-        """Display the title of the a URL (ex: .title <url>)"""
+        """Display the title of the a URL (ex: .title [<url>])"""
         if params:
             self._find_title(message, params.split(" ", 1)[0])
         else:
             if self.url:
                 self._find_title(message, self.url)
 
-    @plugin.hook_add_msg_regex("https?:\/\/|www\.")
-    def _watch_for_url(self, message, params=None, **kwargs):
-        """Watch and keep track of the latest URL"""
+    @plugin.hook_add_msg_regex("(https?://|www.)[^\> ]+")
+    def _watch_for_url(self, message, match, **kwargs):
+        """Watch and keep track of the latest URL."""
         try:
             # NOTE(jk0): Slack does some weird things with URLs.
-            self.url = message.message.split(" ", 1)[0]
-            self.url = self.url.replace("<", "").replace(">", "")
-            host = self.url[7:]
+            self.url = match.group(0).split("|", 1)[0]
 
-            lookup_sites = ("open.spotify.com", "/open.spotify.com",
-                            "www.youtube.com", "/www.youtube.com",
-                            "youtu.be", "/youtu.be")
+            try:
+                host = self.url.split("://", 1)[1]
+            except IndexError:
+                host = self.url
 
+            lookup_sites = ("open.spotify.com", "www.youtube.com", "youtu.be")
             if host.startswith(lookup_sites):
                 self._find_title(message, self.url)
         except TypeError:
             return
 
     def _find_title(self, message, url):
-        """Find the title of a given URL"""
+        """Find the title of a given URL."""
         # NOTE(jk0): Slack does some weird things with URLs.
         url = url.replace("<", "").replace(">", "").split("|")[0]
         if not url.startswith(("http://", "https://")):
@@ -70,12 +70,7 @@ class Url(plugin.Plugin):
         soup = BeautifulSoup(response.content)
         if soup.head:
             title = utils.decode_entities(soup.head.title.string)
-            content_type = response.headers.get("Content-Type").split(";",
-                                                                      1)[0]
-            content_size = response.headers.get("Content-Length")
-            content_size = content_size + " bytes" if content_size else "N/A"
-
-            message.dispatch("%s (%s, %s)" % (title, content_type,
-                             content_size))
+            content_type = response.headers.get("Content-Type")
+            message.dispatch("%s (%s)" % (title, content_type))
         else:
-            message.dispatch("No title found for %s" % url)
+            message.dispatch("No title found: %s" % url)

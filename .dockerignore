@@ -1,7 +1,9 @@
-*.py[cod]
 *.egg*
+*.py[cod]
+.dockerignore
 build
 dist
+Dockerfile
 docs/_build/
 sdist
 venv

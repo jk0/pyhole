@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#   Copyright 2011 Josh Kearney
+#   Copyright 2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,4 +14,5 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-git shortlog -se | cut -c8-
+docker stop pyhole
+docker rm pyhole
