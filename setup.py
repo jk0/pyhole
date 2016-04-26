@@ -36,7 +36,6 @@ setuptools.setup(
         "BeautifulSoup==3.2.0",
         "Eventlet",
         "irc",
-        "jira",
         "launchpadlib",
         "pywunderground",
         "requests",

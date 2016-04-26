@@ -227,6 +227,7 @@ networks = FreeNode, EFnet, SlackNetwork
 key = abcd1234
 
 [Jira]
+auth_server = auth.jira.example.com
 domain = jira.example.com
 username = abcd1234
 password = pass1234

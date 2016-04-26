@@ -1,4 +1,4 @@
-#   Copyright 2015 Jason Meridth
+#   Copyright 2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,51 +14,64 @@
 
 """Pyhole Jira Plugin"""
 
-from jira import JIRA
+import json
+import requests
 
 from pyhole.core import plugin
 from pyhole.core import utils
 
 
-class Jira(plugin.Plugin):
-    """Provide access to the Jira API"""
+class JiraClient(object):
+    def __init__(self):
+        jira = utils.get_config("Jira")
 
-    def __init__(self, irc):
-        self.irc = irc
+        self.auth_server = jira.get("auth_server")
+        self.domain = jira.get("domain")
+        self.username = jira.get("username")
+        self.password = jira.get("password")
+
+        self.session = requests.Session()
+        self.session.auth = (self.username, self.password)
+
+    def get(self, issue_id):
+        url = "%s/rest/api/latest/issue/%s" % (self.auth_server, issue_id)
+
+        return self.session.get(url)
+
+
+class Jira(plugin.Plugin):
+    """Provide access to the Jira API."""
+
+    def __init__(self, session):
+        self.session = session
         self.name = self.__class__.__name__
 
-        self.jira = utils.get_config("Jira")
-        self.jira_domain = self.jira.get("domain")
-        self.jira_username = self.jira.get("username")
-        self.jira_password = self.jira.get("password")
+        self.client = JiraClient()
 
-        self.jira = JIRA(self.jira_url,
-                         basic_auth=(self.jira_username,
-                                     self.jira_password))
-
-    @plugin.hook_add_keyword("jira")
-    @utils.require_params
+    @plugin.hook_add_command("jira")
     @utils.spawn
-    def keyword_jira(self, message, params=None, **kwargs):
-        """Retrieve Jira ticket information (ex: jira NCP-1444)"""
-        params = utils.ensure_int(params)
-        if not params:
+    def jira(self, message, params=None, **kwargs):
+        """Retrieve Jira ticket information (ex: .jira ABC-1234)."""
+        if params:
+            try:
+                issue_id = params.split(" ", 1)[0]
+                self._find_issue(message, issue_id)
+            except KeyError:
+                message.dispatch("Jira issue not found: %s" % issue_id)
+        else:
+            message.dispatch(self.jira.__doc__)
             return
-
-        self._find_issue(message, params)
 
     def _find_issue(self, message, issue_id):
-        """Find and display a Jira issue"""
-        try:
-            issue = self.jira.issue(issue_id)
-        except Exception:
-            return
+        """Find and display a Jira issue."""
+        issue = json.loads(self.client.get(issue_id).content)
 
-        msg = "JIRA %s #%s: %s [S: %s, P: %s, L: %s, A: %s]" % (
-            issue.fields.tracker.name, issue.id, issue.fields.summary,
-            issue.fields.status.name, issue.fields.priority.name,
-            ",".join(issue.fields.labels),
-            issue.get("fields", {}).get("assignee", "N/A"))
-        url = "https://%s/browse/%s" % (self.jira_url, issue.key)
-
-        message.dispatch("%s %s" % (msg, url))
+        msg = "%s: %s [Status: %s, Priority: %s, Assignee: %s] %s"
+        message.dispatch(msg % (
+            issue_id,
+            issue["fields"]["summary"],
+            issue["fields"]["status"]["name"],
+            issue["fields"]["priority"]["name"],
+            issue["fields"]["assignee"]["displayName"],
+            "%s/jira/browse/%s" % (self.client.domain, issue_id)
+        ))
