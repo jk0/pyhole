@@ -1,0 +1,77 @@
+#   Copyright 2016 Josh Kearney
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+"""Pyhole Jira Plugin"""
+
+import json
+import requests
+
+from pyhole.core import plugin
+from pyhole.core import utils
+
+
+class JiraClient(object):
+    def __init__(self):
+        jira = utils.get_config("Jira")
+
+        self.auth_server = jira.get("auth_server")
+        self.domain = jira.get("domain")
+        self.username = jira.get("username")
+        self.password = jira.get("password")
+
+        self.session = requests.Session()
+        self.session.auth = (self.username, self.password)
+
+    def get(self, issue_id):
+        url = "%s/rest/api/latest/issue/%s" % (self.auth_server, issue_id)
+
+        return self.session.get(url)
+
+
+class Jira(plugin.Plugin):
+    """Provide access to the Jira API."""
+
+    def __init__(self, session):
+        self.session = session
+        self.name = self.__class__.__name__
+
+        self.client = JiraClient()
+
+    @plugin.hook_add_command("jira")
+    @utils.spawn
+    def jira(self, message, params=None, **kwargs):
+        """Retrieve Jira ticket information (ex: .jira ABC-1234)."""
+        if params:
+            try:
+                issue_id = params.split(" ", 1)[0]
+                self._find_issue(message, issue_id)
+            except KeyError:
+                message.dispatch("JIRA issue not found: %s" % issue_id)
+        else:
+            message.dispatch(self.jira.__doc__)
+            return
+
+    def _find_issue(self, message, issue_id):
+        """Find and display a Jira issue."""
+        issue = json.loads(self.client.get(issue_id).content)
+
+        msg = "%s: %s [Status: %s, Priority: %s, Assignee: %s] %s"
+        message.dispatch(msg % (
+            issue_id,
+            issue["fields"]["summary"],
+            issue["fields"]["status"]["name"],
+            issue["fields"]["priority"]["name"],
+            issue["fields"]["assignee"]["displayName"],
+            "%s/jira/browse/%s" % (self.client.domain, issue_id)
+        ))
