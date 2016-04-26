@@ -19,7 +19,12 @@ from pyhole.core import utils
 
 
 class OnCall(plugin.Plugin):
-    """Provide help with on-call duties."""
+    """Manage on-call duties."""
+
+    def __init__(self, session):
+        self.session = session
+        self.name = self.__class__.__name__
+        self.level = "GREEN"
 
     @plugin.hook_add_command("note")
     def note(self, message, params=None, **kwargs):
@@ -37,4 +42,19 @@ class OnCall(plugin.Plugin):
             pass
         else:
             message.dispatch(self.status.__doc__)
+            return
+
+    @plugin.hook_add_command("threat")
+    def threat(self, message, params=None, **kwargs):
+        """Set the current threat level (ex: .threat <level>)."""
+        levels = ("RED", "ORANGE", "YELLOW", "BLUE", "GREEN")
+
+        if params:
+            self.level = params.split(" ", 1)[0].upper()
+            if self.level in levels:
+                message.dispatch("Threat Level: %s" % self.level)
+            else:
+                message.dispatch("Available Levels: %s" % ", ".join(levels))
+        else:
+            message.dispatch("Threat Level: %s" % self.level)
             return
