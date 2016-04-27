@@ -15,7 +15,6 @@
 """Pyhole Jira Plugin"""
 
 import json
-import requests
 
 from pyhole.core import plugin
 from pyhole.core import utils
@@ -30,13 +29,10 @@ class JiraClient(object):
         self.username = jira.get("username")
         self.password = jira.get("password")
 
-        self.session = requests.Session()
-        self.session.auth = (self.username, self.password)
-
     def get(self, issue_id):
         url = "%s/rest/api/latest/issue/%s" % (self.auth_server, issue_id)
 
-        return self.session.get(url)
+        return utils.fetch_url(url, auth=(self.username, self.password))
 
 
 class Jira(plugin.Plugin):
