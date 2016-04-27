@@ -16,8 +16,6 @@
 
 import re
 
-from BeautifulSoup import BeautifulSoup
-
 from pyhole.core import plugin
 from pyhole.core import utils
 

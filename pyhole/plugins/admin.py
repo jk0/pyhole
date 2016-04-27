@@ -30,7 +30,7 @@ class Admin(plugin.Plugin):
             if doc:
                 message.dispatch(doc)
             else:
-                message.dispatch("No help available for '%s'" % params)
+                message.dispatch("No help available: %s" % params)
         else:
             active_commands = plugin.active_commands()
             active_keywords = plugin.active_keywords()
