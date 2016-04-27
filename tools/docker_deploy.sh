@@ -14,5 +14,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+set -x
+
+clear
+
+git pull origin master
+
+docker build -t pyhole .
 docker stop pyhole
 docker rm pyhole
+docker run -d -v /mnt/pyhole:/root/.pyhole -v /etc/hosts:/etc/hosts:ro --name pyhole pyhole
