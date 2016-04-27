@@ -14,4 +14,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-docker run -d -v /mnt/pyhole:/root/.pyhole --name pyhole pyhole
+docker run -d -v /mnt/pyhole:/root/.pyhole -v /etc/hosts:/etc/hosts:ro --name pyhole pyhole
