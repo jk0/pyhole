@@ -25,3 +25,4 @@ docker stop pyhole
 docker rm pyhole
 docker run -d -v /mnt/pyhole:/root/.pyhole -v /etc/hosts:/etc/hosts:ro --name pyhole pyhole
 docker ps
+docker logs pyhole
