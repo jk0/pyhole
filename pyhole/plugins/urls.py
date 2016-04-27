@@ -33,28 +33,33 @@ class Url(plugin.Plugin):
     def title(self, message, params=None, **kwargs):
         """Display the title of the a URL (ex: .title [<url>])"""
         if params:
-            self._find_title(message, params.split(" ", 1)[0])
-        else:
-            if self.url:
-                self._find_title(message, self.url)
+            self.url = params.split(" ", 1)[0]
+
+        if not self._matches_host(self.url):
+            self._find_title(message, self.url)
 
     @plugin.hook_add_msg_regex("(https?://|www.)[^\> ]+")
-    def _watch_for_url(self, message, match, **kwargs):
+    def regex_match_url(self, message, match, **kwargs):
         """Watch and keep track of the latest URL."""
         try:
             # NOTE(jk0): Slack does some weird things with URLs.
             self.url = match.group(0).split("|", 1)[0]
 
-            try:
-                host = self.url.split("://", 1)[1]
-            except IndexError:
-                host = self.url
-
-            lookup_sites = ("open.spotify.com", "www.youtube.com", "youtu.be")
-            if host.startswith(lookup_sites):
+            if self._matches_host(self.url):
                 self._find_title(message, self.url)
         except TypeError:
             return
+
+    def _matches_host(self, url):
+        """Watch for certain websites."""
+        try:
+            host = url.split("/")[2]
+        except IndexError:
+            host = url
+
+        lookup_sites = ("open.spotify.com", "www.youtube.com", "youtu.be")
+        if host.startswith(lookup_sites):
+            return True
 
     def _find_title(self, message, url):
         """Find the title of a given URL."""
@@ -63,9 +68,10 @@ class Url(plugin.Plugin):
         if not url.startswith(("http://", "https://")):
             url = "http://" + url
 
-        response = utils.fetch_url(url)
-        if response.status_code != 200:
-                return
+        try:
+            response = utils.fetch_url(url)
+        except Exception:
+            return
 
         soup = BeautifulSoup(response.content)
         if soup.head:

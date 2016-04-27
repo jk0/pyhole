@@ -285,4 +285,8 @@ nick = mynick
 
 def fetch_url(url, **kwargs):
     """Fetch a URL."""
-    return requests.get(url, **kwargs)
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "pyhole/%s" % version.version()
+    })
+    return session.get(url, **kwargs)
