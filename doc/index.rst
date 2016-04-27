@@ -1,5 +1,5 @@
 ..
-   Copyright 2011 Josh Kearney
+   Copyright 2011-2016 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -18,21 +18,18 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Pyhole Documentation
-====================
+# Pyhole Documentation
 
-A modular IRC bot for Python developers.
+A modular IRC & Slack bot.
 
-Install Pyhole
---------------
+## Install Pyhole
 
 .. toctree::
    :maxdepth: 2
 
    installation
 
-Getting Involved
-----------------
+## Getting Involved
 
 .. toctree::
    :maxdepth: 2
@@ -41,8 +38,7 @@ Getting Involved
    writing
    github
 
-The Code
---------
+## The Code
 
 .. toctree::
    :maxdepth: 2
@@ -51,10 +47,8 @@ The Code
    plugins
    tests
 
-Other
------
+## Other
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

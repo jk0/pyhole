@@ -45,7 +45,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pyhole'
-copyright = u'2015, Josh Kearney'
+copyright = u'2016, Josh Kearney'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

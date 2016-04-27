@@ -1,5 +1,5 @@
 ..
-   Copyright 2011-2015 Josh Kearney
+   Copyright 2011-2016 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,24 +13,17 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-Installation
-============
+# Installation
 
-From Source
-^^^^^^^^^^^
+Source
+^^^^^^
 
-::
+Please refer to the README.
 
-    git clone git://github.com/jk0/pyhole.git
-    cd pyhole
-    virtualenv venv
-    . venv/bin/activate
-    python setup.py flake8
-    python setup.py test
-    python setup.py develop
-    pyhole
-    vim ~/.pyhole/pyhole.conf
-    pyhole
+Docker
+^^^^^^
+
+Please refer to the README.
 
 Python Package
 ^^^^^^^^^^^^^^

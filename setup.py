@@ -22,7 +22,7 @@ setuptools.setup(
     version=version.version(),
     author="Josh Kearney",
     author_email="josh@jk0.org",
-    description="A modular IRC & Slack bot for Python developers.",
+    description="A modular IRC & Slack bot.",
     url="https://github.com/jk0/pyhole",
     classifiers=[
         "Intended Audience :: Developers",

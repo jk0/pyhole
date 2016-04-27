@@ -1,5 +1,5 @@
 ..
-   Copyright 2011-2015 Josh Kearney
+   Copyright 2011-2016 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,12 +13,11 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-Writing Plugins
-===============
+# Writing Pyhole Plugins
 
 The best way to learn how plugins work is by looking at real examples. You
-can find them in the *plugins* directory. Below you'll find a demo that can be
-used as a template::
+can find them in the *pyhole.plugins* directory. Below you'll find a demo
+that can be used as a template::
 
     #   Copyright <Year> <Your Name>
     #
@@ -36,31 +35,27 @@ used as a template::
 
     """Pyhole Example Plugin"""
 
-    from pyhole import plugin
+    from pyhole.core import plugin
+    from pyhole.core import utils
 
 
     class Example(plugin.Plugin):
         """An example plugin."""
 
         @plugin.hook_add_command("test")
-        def test(self, params=None, **kwargs):
+        @utils.require_params
+        def test(self, message, params=None, **kwargs):
             """An example command (ex: .test foo)."""
-            if params:
-                message.dispatch(params)
-            else:
-                message.dispatch(self.test.__doc__)
+            message.dispatch(params)
 
         @plugin.hook_add_keyword("t")
-        def keyword_t(self, params=None, **kwargs):
+        @utils.require_params
+        def keyword_t(self, message, params=None, **kwargs):
             """An example keyword (ex: T12345)."""
             if params:
                 message.dispatch(params)
 
-        @plugin.hook_add_msg_regex("https?:\/\/")
-        def _watch_for_url(self, params=None, **kwargs):
+        @plugin.hook_add_msg_regex("(https?://|www.)[^\> ]+")
+        def regex_match_url(self, message, match, **kwargs):
             """An example regex match."""
-            try:
-                url = kwargs["full_message"].split(" ", 1)[0]
-                message.dispatch(url)
-            except TypeError:
-                return
+            message.dispatch(match.group(0))

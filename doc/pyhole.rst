@@ -1,5 +1,5 @@
 ..
-   Copyright 2011 Josh Kearney
+   Copyright 2011-2016 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,45 +13,54 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-Pyhole Modules
-==============
+# Pyhole Core Modules
 
-:mod:`pyhole.core.config`
--------------------------
+## :mod:`pyhole.core.config`
 .. automodule:: pyhole.core.config
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.core.irc`
-----------------------
+## :mod:`pyhole.core.irc`
 .. automodule:: pyhole.core.irc
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.core.plugin`
--------------------------
+## :mod:`pyhole.core.plugin`
 .. automodule:: pyhole.core.plugin
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.core.slack`
-------------------------
+## :mod:`pyhole.core.process`
+.. automodule:: pyhole.core.process
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+## :mod:`pyhole.core.slack`
 .. automodule:: pyhole.core.slack
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.core.utils`
-------------------------
+## :mod:`pyhole.core.utils`
 .. automodule:: pyhole.core.utils
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
+
+## :mod:`pyhole.core.version`
+.. automodule:: pyhole.core.version
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

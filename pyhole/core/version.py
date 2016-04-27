@@ -20,11 +20,11 @@ import os
 import sys
 
 
-__VERSION__ = "0.7.10"
+__VERSION__ = "0.7.11"
 
 
 def current_git_hash():
-    """Return the current git hash"""
+    """Return the current git hash."""
     git_file = ".git/refs/heads/master"
     git_path = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
                                 os.pardir, os.pardir, git_file))
@@ -43,7 +43,7 @@ def current_git_hash():
 
 
 def version_string():
-    """Return the full version"""
+    """Return the full version."""
     git_hash = current_git_hash()
     if git_hash:
         return "pyhole v%s (%s) - https://github.com/jk0/pyhole" % (
@@ -53,11 +53,11 @@ def version_string():
 
 
 def version_hash():
-    """Return the current version with git hash"""
+    """Return the current version with git hash."""
     git_hash = current_git_hash()
     return "%s-%s" % (__VERSION__, git_hash)
 
 
 def version():
-    """Return the current version"""
+    """Return the current version."""
     return __VERSION__

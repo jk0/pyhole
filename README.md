@@ -1,9 +1,9 @@
-# pyhole - A modular IRC & Slack bot for Python developers.
+# pyhole - A modular IRC & Slack bot.
 
 ## Installation
 
 ````
-git clone git://github.com/jk0/pyhole.git && cd pyhole
+git clone https://github.com/jk0/pyhole.git && cd pyhole
 ````
 
 ### Source

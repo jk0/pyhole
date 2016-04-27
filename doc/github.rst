@@ -1,5 +1,5 @@
 ..
-   Copyright 2012-2015 Josh Kearney
+   Copyright 2011-2016 Josh Kearney
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,8 +13,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-Submitting Code
-===============
+# Submitting Code
 
 Follow the procedure below when submitting code.
 
@@ -24,16 +23,17 @@ Standard GitHub Workflow
 Start off my forking [#]_ `pyhole <https://github.com/jk0/pyhole>`_ to your account on GitHub.
 From here you can make your changes::
 
-    git clone git://github.com/<GitHub ID>/pyhole.git
-    cd pyhole
+    git clone https://github.com/jk0/pyhole.git && cd pyhole
 
     ...make changes...
 
+    python setup.py flake8
     python setup.py test
+
     git commit -a -m "Detailed commit message."
     git push origin HEAD
 
 When done, open a Pull Request [#]_ on GitHub.
 
-.. [#] http://help.github.com/fork-a-repo/
-.. [#] http://help.github.com/send-pull-requests/
+.. [#] https://help.github.com/articles/fork-a-repo/
+.. [#] https://help.github.com/articles/using-pull-requests/
