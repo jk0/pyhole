@@ -52,8 +52,8 @@ class Jira(plugin.Plugin):
             try:
                 issue_id = params.split(" ", 1)[0]
                 self._find_issue(message, issue_id)
-            except KeyError:
-                message.dispatch("Jira issue not found: %s" % issue_id)
+            except Exception:
+                message.dispatch("Issue not found: %s" % issue_id)
         else:
             message.dispatch(self.jira.__doc__)
             return
