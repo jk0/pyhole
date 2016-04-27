@@ -13,30 +13,35 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-# Pyhole Unit Tests
+Pyhole Unit Tests
+=================
 
-## :mod:`pyhole.tests.test_config`
+:mod:`pyhole.tests.test_config`
+-------------------------------
 .. automodule:: pyhole.tests.test_config
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.tests.test_log`
+:mod:`pyhole.tests.test_log`
+----------------------------
 .. automodule:: pyhole.tests.test_log
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.tests.test_utils`
+:mod:`pyhole.tests.test_utils`
+------------------------------
 .. automodule:: pyhole.tests.test_utils
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.tests.test_version`
+:mod:`pyhole.tests.test_version`
+--------------------------------
 .. automodule:: pyhole.tests.test_version
     :noindex:
     :members:

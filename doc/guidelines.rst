@@ -13,12 +13,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-# Coding Guidelines
+Coding Guidelines
+=================
 
 When contributing to the pyhole project, please be sure to read over the
 following information.
 
-## Python Style
+Python Style
+------------
 
 General
 ^^^^^^^
@@ -60,7 +62,8 @@ Docstrings
     Second paragraph goes like this. Ending quotes are on their own line.
     """
 
-## Testing
+Testing
+-------
 
 Every new piece of code must be covered by a unit test. One must also ensure
 that all tests pass before submitting code. Testing examples can be found in

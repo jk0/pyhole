@@ -18,18 +18,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-# Pyhole Documentation
+Pyhole Documentation
+====================
 
 A modular IRC & Slack bot.
 
-## Install Pyhole
+Install Pyhole
+--------------
 
 .. toctree::
    :maxdepth: 2
 
    installation
 
-## Getting Involved
+Getting Involved
+----------------
 
 .. toctree::
    :maxdepth: 2
@@ -38,7 +41,8 @@ A modular IRC & Slack bot.
    writing
    github
 
-## The Code
+The Code
+--------
 
 .. toctree::
    :maxdepth: 2
@@ -47,7 +51,8 @@ A modular IRC & Slack bot.
    plugins
    tests
 
-## Other
+Other
+-----
 
 * :ref:`genindex`
 * :ref:`modindex`

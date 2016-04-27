@@ -13,93 +13,107 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-# Pyhole Core Plugins
+Pyhole Core Plugins
+===================
 
-## :mod:`pyhole.plugins.admin`
+:mod:`pyhole.plugins.admin`
+---------------------------
 .. automodule:: pyhole.plugins.admin
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.allergies`
+:mod:`pyhole.plugins.allergies`
+-------------------------------
 .. automodule:: pyhole.plugins.allergies
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.boxoffice`
+:mod:`pyhole.plugins.boxoffice`
+-------------------------------
 .. automodule:: pyhole.plugins.boxoffice
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.distance`
+:mod:`pyhole.plugins.distance`
+------------------------------
 .. automodule:: pyhole.plugins.distance
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.jira`
+:mod:`pyhole.plugins.jira`
+--------------------------
 .. automodule:: pyhole.plugins.jira
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.kernel`
+:mod:`pyhole.plugins.kernel`
+----------------------------
 .. automodule:: pyhole.plugins.kernel
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.launchpad`
+:mod:`pyhole.plugins.launchpad`
+-------------------------------
 .. automodule:: pyhole.plugins.launchpad
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.oncall`
+:mod:`pyhole.plugins.oncall`
+----------------------------
 .. automodule:: pyhole.plugins.oncall
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.redmine`
+:mod:`pyhole.plugins.redmine`
+-----------------------------
 .. automodule:: pyhole.plugins.redmine
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.search`
+:mod:`pyhole.plugins.search`
+----------------------------
 .. automodule:: pyhole.plugins.search
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.urls`
+:mod:`pyhole.plugins.urls`
+--------------------------
 .. automodule:: pyhole.plugins.urls
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.wunderground`
+:mod:`pyhole.plugins.wunderground`
+----------------------------------
 .. automodule:: pyhole.plugins.wunderground
     :noindex:
     :members:
     :undoc-members:
     :show-inheritance:
 
-## :mod:`pyhole.plugins.xsa`
+:mod:`pyhole.plugins.xsa`
+-------------------------
 .. automodule:: pyhole.plugins.xsa
     :noindex:
     :members:
