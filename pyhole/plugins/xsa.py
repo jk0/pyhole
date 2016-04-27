@@ -1,4 +1,4 @@
-#   Copyright 2015 Rick Harris
+#   Copyright 2015-2016 Rick Harris
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -27,9 +27,10 @@ class Xsa(plugin.Plugin):
     XSA_URL = "http://xenbits.xen.org/xsa/"
 
     @plugin.hook_add_keyword("xsa")
+    @utils.require_params
     @utils.spawn
     def keyword_xsa(self, message, params=None, **kwargs):
-        """Retrieve XSA information (ex: xsa123 or xsa-123)"""
+        """Retrieve XSA information (ex: xsa123 or xsa-123)."""
         # abs is needed in case we get 'xsa-123', that would be -123
         xsa_num = abs(utils.ensure_int(params))
         xsa_id = "XSA-%d" % xsa_num

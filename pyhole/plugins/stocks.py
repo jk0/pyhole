@@ -1,4 +1,4 @@
-#   Copyright 2015 Jason Meridth
+#   Copyright 2015-2016 Jason Meridth
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ class Stocks(plugin.Plugin):
     @utils.require_params
     @utils.spawn
     def stocks(self, message, params=None, **kwargs):
-        """Display current stock values (ex: .stock rax,yhoo,aapl)"""
+        """Display current stock values (ex: .stock rax,yhoo,aapl)."""
         try:
             stocks = []
             symbols = params.upper().split(",")

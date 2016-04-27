@@ -27,22 +27,18 @@ class OnCall(plugin.Plugin):
         self.level = "GREEN"
 
     @plugin.hook_add_command("note")
+    @utils.require_params
+    @utils.spawn
     def note(self, message, params=None, **kwargs):
         """Manage notes during an outage (ex: .note <message>)."""
-        if params:
-            pass
-        else:
-            message.dispatch(self.note.__doc__)
-            return
+        return
 
     @plugin.hook_add_command("status")
+    @utils.require_params
+    @utils.spawn
     def status(self, message, params=None, **kwargs):
         """Manage status of a service (ex: .status <service> [<status>])."""
-        if params:
-            pass
-        else:
-            message.dispatch(self.status.__doc__)
-            return
+        return
 
     @plugin.hook_add_command("threat")
     def threat(self, message, params=None, **kwargs):

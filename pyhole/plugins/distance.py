@@ -1,4 +1,4 @@
-#   Copyright 2015 Rick Harris
+#   Copyright 2015-2016 Rick Harris
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ class Distance(plugin.Plugin):
     @utils.require_params
     @utils.spawn
     def distance(self, message, params=None, **kwargs):
-        """Display distances (ex: .dist <nick|loc> [to <nick|loc>])"""
+        """Display distances (ex: .dist <nick|loc> [to <nick|loc>])."""
         maps_api = utils.get_config("GoogleMaps")
         try:
             key = maps_api.get("key")
         except Exception:
-            message.dispatch("No Google Maps API key set")
+            message.dispatch("No Google Maps API key set.")
             return
 
         parts = params.split(" to ")
@@ -82,11 +82,6 @@ class Distance(plugin.Plugin):
             msg = "Unable to fetch data from Google Maps."
 
         message.dispatch(msg)
-
-    @plugin.hook_add_command("d")
-    def alias_d(self, message, params=None, **kwargs):
-        """Alias of distance."""
-        self.distance(message, params, **kwargs)
 
 
 def _resolve_pws(location):

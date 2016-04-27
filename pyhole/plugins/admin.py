@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ from pyhole.core import utils
 
 
 class Admin(plugin.Plugin):
-    """Provide administration functionality"""
+    """Administer your bot."""
 
     @plugin.hook_add_command("help")
     def help(self, message, params=None, **kwargs):
-        """Learn how to use active commands (ex: .help <command>)."""
+        """Learn how to use plugins (ex: .help <command>)."""
 
         if params:
             doc = _find_doc_string(params)
@@ -32,9 +32,21 @@ class Admin(plugin.Plugin):
             else:
                 message.dispatch("No help available for '%s'" % params)
         else:
+            active_commands = plugin.active_commands()
+            active_keywords = plugin.active_keywords()
+            active_patterns = plugin.active_msg_regexs()
+            active_pollers = plugin.active_polls()
+
             message.dispatch(self.help.__doc__)
-            message.dispatch("Active Commands: %s" % plugin.active_commands())
-            message.dispatch("Active Keywords: %s" % plugin.active_keywords())
+
+            if len(active_commands) > 0:
+                message.dispatch("Active Commands: %s" % active_commands)
+            if len(active_keywords) > 0:
+                message.dispatch("Active Keywords: %s" % active_keywords)
+            if len(active_patterns) > 0:
+                message.dispatch("Active Patterns: %s" % active_patterns)
+            if len(active_pollers) > 0:
+                message.dispatch("Active Pollers: %s" % active_pollers)
 
     @plugin.hook_add_command("version")
     def version(self, message, params=None, **kwargs):

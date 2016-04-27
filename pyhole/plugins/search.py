@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ from pyhole.core import utils
 
 
 class Search(plugin.Plugin):
-    """Provide access to search engines"""
+    """Provide access to search engines."""
 
     @plugin.hook_add_command("google")
     @utils.require_params
     @utils.spawn
     def google(self, message, params=None, **kwargs):
-        """Search Google (ex: .g <query>)"""
+        """Search Google (ex: .google <query>)."""
         url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0"
         response = utils.fetch_url(url, params={"q": params})
         if response.status_code != 200:
@@ -47,16 +47,11 @@ class Search(plugin.Plugin):
         else:
             message.dispatch("No results found: '%s'" % params)
 
-    @plugin.hook_add_command("g")
-    def alias_g(self, message, params=None, **kwargs):
-        """Alias of google."""
-        self.google(message, params, **kwargs)
-
     @plugin.hook_add_command("urban")
     @utils.require_params
     @utils.spawn
     def urban(self, message, params=None, **kwargs):
-        """Search Urban Dictionary (ex: .urban <query>)"""
+        """Search Urban Dictionary (ex: .urban <query>)."""
         url = "http://www.urbandictionary.com/define.php"
         response = utils.fetch_url(url, params={"term": params})
         if response.status_code != 200:
@@ -79,7 +74,7 @@ class Search(plugin.Plugin):
     @utils.require_params
     @utils.spawn
     def wikipedia(self, message, params=None, **kwargs):
-        """Search Wikipedia (ex: .wikipedia <query>)"""
+        """Search Wikipedia (ex: .wikipedia <query>)."""
         url = "https://en.wikipedia.org/w/api.php"
         response = utils.fetch_url(url, params={
             "action": "query",
@@ -97,8 +92,3 @@ class Search(plugin.Plugin):
             title = page["title"]
             title = re.sub(" ", "_", title)
             message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
-
-    @plugin.hook_add_command("wiki")
-    def alias_wiki(self, message, params=None, **kwargs):
-        """Alias of wikipedia."""
-        self.wikipedia(message, params, **kwargs)

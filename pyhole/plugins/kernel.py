@@ -1,4 +1,4 @@
-#   Copyright 2011-2015 Josh Kearney
+#   Copyright 2011-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -32,51 +32,9 @@ class Kernel(plugin.Plugin):
         url = "https://www.kernel.org/kdist/finger_banner"
         response = utils.fetch_url(url)
         if response.status_code != 200:
-                return
+            return
 
         r = re.compile("(.* mainline .*)")
         m = r.search(response.content)
         kernel = m.group(1).replace("  ", "")
         message.dispatch(kernel)
-
-    @plugin.hook_add_keyword("k")
-    @utils.require_params
-    @utils.spawn
-    def keyword_k(self, message, params=None, **kwargs):
-        """Retrieve kernel.org Bugzilla bug information (ex: K12345)"""
-        params = utils.ensure_int(params)
-        if not params:
-            return
-
-        params = {"id": params}
-        url = "https://bugzilla.kernel.org/show_bug.cgi"
-        response = utils.fetch_url(url, params=params)
-        if response.status_code != 200:
-            return
-
-        soup = BeautifulSoup(response.content)
-        desc = utils.decode_entities(soup.head.title.string)
-
-        try:
-            status = soup.find("span", {"id": "static_bug_status"}).string
-            status = status.capitalize().split("\n")[0]
-
-            assignee = utils.decode_entities(
-                soup.findAll("span", {
-                    "class": "vcard"
-                })[0].contents[0].string)
-
-            msg = "%s [Status: %s, Assignee: %s] %s"
-            message.dispatch(msg % (desc, status, assignee, url))
-        except TypeError:
-            return
-
-    @plugin.hook_add_msg_regex(
-        "https?:\/\/bugzilla\.kernel\.org\/show\_bug\.cgi\?id\=")
-    def _watch_for_k_bug_url(self, message, params=None, **kwargs):
-        """Watch for kernel.org Bugzilla bug URLs"""
-        try:
-            bug_id = message.message.split("id=", 1)[1].split(" ", 1)[0]
-            self.keyword_k(message, bug_id)
-        except TypeError:
-            return

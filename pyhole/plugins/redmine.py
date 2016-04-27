@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from pyhole.core import utils
 
 
 class Redmine(plugin.Plugin):
-    """Provide access to the Redmine API"""
+    """Provide access to the Redmine API."""
 
     def __init__(self, session):
         self.session = session
@@ -37,7 +37,7 @@ class Redmine(plugin.Plugin):
     @utils.require_params
     @utils.spawn
     def rbugs(self, message, params=None, **kwargs):
-        """Redmine bugs for a user (ex: .rbugs <login>)"""
+        """Redmine bugs for a user (ex: .rbugs <login>)."""
         login = params.split(" ", 1)[0]
         user_id = self._find_user(login)
 
@@ -52,20 +52,20 @@ class Redmine(plugin.Plugin):
                 break
         else:
             if i <= 0:
-                message.dispatch("No Redmine bugs found for '%s'" % login)
+                message.dispatch("No Redmine bugs found: '%s'" % login)
 
     @plugin.hook_add_keyword("rm")
     @utils.require_params
     @utils.spawn
     def keyword_rm(self, message, params=None, **kwargs):
-        """Retrieve Redmine bug information (ex: RM12345)"""
+        """Retrieve Redmine bug information (ex: RM12345)."""
         params = utils.ensure_int(params)
         if params:
             self._find_issue(message, params)
 
     @plugin.hook_add_msg_regex("https?:\/\/redmine\..*/issues")
-    def _watch_for_rm_bug_url(self, message, params=None, **kwargs):
-        """Watch for Redmine bug URLs"""
+    def regex_match_rm_bug_url(self, message, params=None, **kwargs):
+        """Watch for Redmine bug URLs."""
         try:
             line = message.message.split("/")
             for i, word in enumerate(line):
@@ -76,7 +76,7 @@ class Redmine(plugin.Plugin):
             return
 
     def _find_issues(self, user_id):
-        """Find all issues for a Redmine user"""
+        """Find all issues for a Redmine user."""
         url = "%s/issues.json?assigned_to_id=%s" % (
               self.redmine_url, user_id)
         response = utils.fetch_url(url)
@@ -86,7 +86,7 @@ class Redmine(plugin.Plugin):
         return json.loads(response.content)["issues"]
 
     def _find_user(self, login):
-        """Find a specific Redmine user"""
+        """Find a specific Redmine user."""
         for user in self._find_users():
             if login == user["login"]:
                 return user["id"]
@@ -96,7 +96,7 @@ class Redmine(plugin.Plugin):
                 return user["id"]
 
     def _find_users(self, offset=None):
-        """Find all Redmine users"""
+        """Find all Redmine users."""
         if offset:
             url = "%s/users.json?limit=100&offset=%d" % (
                   self.redmine_url, offset)
@@ -109,7 +109,7 @@ class Redmine(plugin.Plugin):
         return json.loads(response.content)["users"]
 
     def _find_issue(self, message, issue_id):
-        """Find and display a Redmine issue"""
+        """Find and display a Redmine issue."""
         url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
         response = utils.fetch_url(url)
         if response.status_code != 200:

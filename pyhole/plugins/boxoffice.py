@@ -46,8 +46,3 @@ class Boxoffice(plugin.Plugin):
                 pass
             msg = "%s %s%s" % (score.rjust(3), title.ljust(40), take.rjust(10))
             message.dispatch(msg)
-
-    @plugin.hook_add_command("bo")
-    def alias_bo(self, message, params=None, **kwargs):
-        """Alias of boxoffice."""
-        self.boxoffice(message, params, **kwargs)

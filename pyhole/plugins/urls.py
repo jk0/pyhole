@@ -29,13 +29,12 @@ class Url(plugin.Plugin):
         self.url = None
 
     @plugin.hook_add_command("title")
-    @utils.spawn
     def title(self, message, params=None, **kwargs):
         """Display the title of the a URL (ex: .title [<url>])"""
         if params:
             self.url = params.split(" ", 1)[0]
 
-        if not self._matches_host(self.url):
+        if not _matches_host(self.url):
             self._find_title(message, self.url)
 
     @plugin.hook_add_msg_regex("(https?://|www.)[^\> ]+")
@@ -45,22 +44,12 @@ class Url(plugin.Plugin):
             # NOTE(jk0): Slack does some weird things with URLs.
             self.url = match.group(0).split("|", 1)[0]
 
-            if self._matches_host(self.url):
+            if _matches_host(self.url):
                 self._find_title(message, self.url)
         except TypeError:
             return
 
-    def _matches_host(self, url):
-        """Watch for certain websites."""
-        try:
-            host = url.split("/")[2]
-        except IndexError:
-            host = url
-
-        lookup_sites = ("open.spotify.com", "www.youtube.com", "youtu.be")
-        if host.startswith(lookup_sites):
-            return True
-
+    @utils.spawn
     def _find_title(self, message, url):
         """Find the title of a given URL."""
         # NOTE(jk0): Slack does some weird things with URLs.
@@ -80,3 +69,15 @@ class Url(plugin.Plugin):
             message.dispatch("%s (%s)" % (title, content_type))
         else:
             message.dispatch("No title found: %s" % url)
+
+
+def _matches_host(url):
+    """Watch for certain websites."""
+    try:
+        host = url.split("/")[2]
+    except IndexError:
+        host = url
+
+    lookup_sites = ("open.spotify.com", "www.youtube.com", "youtu.be")
+    if host.startswith(lookup_sites):
+        return True

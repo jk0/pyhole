@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ class Wunderground(plugin.Plugin):
 
     @plugin.hook_add_command("weather")
     @utils.spawn
-    def weather(self, message, params=None, **kwargs):
-        """Display current weather report (ex: .w [set] [<location>])"""
+    def wunderground(self, message, params=None, **kwargs):
+        """Display current weather report (ex: .w [set] [<location>])."""
         wunderground = utils.get_config("Wunderground")
         api_key = wunderground.get("key")
 
@@ -73,5 +73,5 @@ class Wunderground(plugin.Plugin):
 
     @plugin.hook_add_command("w")
     def alias_w(self, message, params=None, **kwargs):
-        """Alias of weather."""
-        self.weather(message, params, **kwargs)
+        """Alias of wunderground."""
+        self.wunderground(message, params, **kwargs)
