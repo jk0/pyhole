@@ -59,6 +59,15 @@ class Jira(plugin.Plugin):
             message.dispatch(self.jira.__doc__)
             return
 
+    @plugin.hook_add_msg_regex("([A-Z]{2}-[0-9]{4,5})")
+    def regex_match_issue(self, message, match, **kwargs):
+        """Watch for Jira issues."""
+        try:
+            issue_id = match.group(0)
+            self._find_issue(message, issue_id)
+        except Exception:
+            return
+
     def _find_issue(self, message, issue_id):
         """Find and display a Jira issue."""
         issue = json.loads(self.client.get(issue_id).content)

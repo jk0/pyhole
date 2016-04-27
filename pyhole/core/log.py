@@ -16,12 +16,18 @@
 
 import logging
 import logging.handlers
+import requests
 
 import utils
 
 
 def setup_logger(name="Pyhole"):
     """Log handler"""
+    # NOTE(jk0): Disable unnecessary requests logging.
+    requests.packages.urllib3.disable_warnings()
+    requests_log = logging.getLogger("requests")
+    requests_log.setLevel(logging.WARNING)
+
     debug_option = utils.get_option("debug")
     debug_config = utils.get_config().get("debug", type="bool")
     debug = debug_option or debug_config
