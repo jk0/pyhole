@@ -54,11 +54,13 @@ class Reply(Message):
         """Dispatch message as a reply."""
         if self.session.addressed:
             self.session.reply(self.target, "%s: %s" % (self.source, msg))
-            self.session.log.info("-#%s- <%s> %s: %s" % (self.target,
-                                                        self.session.nick,
-                                                        source, msg))
+            self.session.log.info("-#%s- <%s> %s: %s" % (
+                self.target,
+                self.session.nick,
+                source, msg))
         else:
             self.session.reply(self.target, msg)
-            self.session.log.info("-#%s- <%s> %s" % (self.target,
-                                                    self.session.nick,
-                                                    msg))
+            self.session.log.info("-#%s- <%s> %s" % (
+                self.target,
+                self.session.nick,
+                msg))
