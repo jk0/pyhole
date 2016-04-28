@@ -42,7 +42,7 @@ class OnCall(plugin.Plugin):
 
     @plugin.hook_add_command("threat")
     def threat(self, message, params=None, **kwargs):
-        """Set the current threat level (ex: .threat <level>)."""
+        """Set the current threat level (ex: .threat [<level>])."""
         levels = ("RED", "ORANGE", "YELLOW", "BLUE", "GREEN")
 
         if params:
