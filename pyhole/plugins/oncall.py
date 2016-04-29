@@ -57,7 +57,7 @@ class OnCall(plugin.Plugin):
             message.dispatch(policy["name"])
 
             for level in policy["on_call"]:
-                message.dispatch("  - Level %s: %s <%s>" % (
+                message.dispatch("- Level %s: %s <%s>" % (
                     level["level"],
                     level["user"]["name"],
                     level["user"]["email"]))
