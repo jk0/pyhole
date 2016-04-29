@@ -50,7 +50,7 @@ class OnCall(plugin.Plugin):
             "Content-Type": "application/json"
         }
 
-        reaponse_json = utils.fetch_url(url, headers=headers,
+        response_json = utils.fetch_url(url, headers=headers,
                                         params={"query": params})
 
         for policy in response_json["escalation_policies"]:
