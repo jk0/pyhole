@@ -16,6 +16,7 @@
 
 from pyhole.core import plugin
 from pyhole.core import utils
+import requests
 
 
 class OnCall(plugin.Plugin):
@@ -25,6 +26,9 @@ class OnCall(plugin.Plugin):
         self.session = session
         self.name = self.__class__.__name__
         self.level = "GREEN"
+        pagerduty = utils.get_config("PagerDuty")
+        self.subdomain = pagerduty.get("subdomain")
+        self.apikey = pagerduty.get("apikey")
 
     @plugin.hook_add_command("note")
     @utils.require_params
@@ -54,3 +58,31 @@ class OnCall(plugin.Plugin):
         else:
             message.dispatch("Threat Level: %s" % self.level)
             return
+
+    @plugin.hook_add_command("oncall")
+    def whois(self, message, params=None, **kwargs):
+        """Show who is oncall for one/all schedules"""
+        url = 'https://{0}.pagerduty.com/api/v1/escalation_policies/on_call'.\
+            format(self.subdomain)
+        headers = {
+            'Authorization': 'Token token={0}'.format(self.apikey),
+            'Content-Type': 'application/json',
+        }
+
+        if params:
+            filters = {
+                'query': params,
+            }
+        else:
+            filters = self.default_filter
+
+
+        r = requests.get(url, headers=headers, params=filters)
+        for ep in r.json()['escalation_policies']:
+            print ep['name']
+            msg = '%s:\n' % ep['name']
+            for level in ep['on_call']:
+                msg += 'Level %s: %s %s\n' % (level['level'],
+                                            level['user']['name'],
+                                            level['user']['email'])
+            message.dispatch(msg)
