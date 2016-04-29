@@ -72,9 +72,9 @@ Pyhole Core Plugins
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.plugins.oncall`
+:mod:`pyhole.plugins.ops`
 ----------------------------
-.. automodule:: pyhole.plugins.oncall
+.. automodule:: pyhole.plugins.ops
     :noindex:
     :members:
     :undoc-members:

@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole On-Call Plugin"""
+"""Pyhole Operations Plugin"""
 
 import time
 
@@ -20,8 +20,8 @@ from pyhole.core import plugin
 from pyhole.core import utils
 
 
-class OnCall(plugin.Plugin):
-    """Manage on-call duties."""
+class Ops(plugin.Plugin):
+    """Manage operational responsibilities."""
 
     def __init__(self, session):
         self.session = session
