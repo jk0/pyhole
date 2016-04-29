@@ -51,7 +51,7 @@ class OnCall(plugin.Plugin):
         }
 
         response_json = utils.fetch_url(url, headers=headers,
-                                        params={"query": params})
+                                        params={"query": params}).json()
 
         for policy in response_json["escalation_policies"]:
             message.dispatch(policy["name"])
