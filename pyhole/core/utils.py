@@ -232,6 +232,10 @@ domain = jira.example.com
 username = abcd1234
 password = pass1234
 
+[PagerDuty]
+subdomain = https://subdomain.pagerduty.com
+key = abcd1234
+
 [Redmine]
 domain = redmine.example.com
 key = abcd1234
