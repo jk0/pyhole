@@ -109,7 +109,7 @@ class Client(irclib.SimpleIRCClient):
     def join_channel(self, params):
         """Join a channel."""
         channel = params.split(" ", 1)
-        self.reply("Joining %s" % channel[0])
+        self.log.info("Joining %s" % channel[0])
         if irclib.is_channel(channel[0]):
             self.channels.append(channel[0])
             if len(channel) > 1:
@@ -120,7 +120,7 @@ class Client(irclib.SimpleIRCClient):
     def part_channel(self, params):
         """Part a channel."""
         self.channels.remove(params)
-        self.reply("Parting %s" % params)
+        self.log.info("Parting %s" % params)
         self.connection.part(params)
 
     def on_nicknameinuse(self, connection, _event):
