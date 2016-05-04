@@ -57,14 +57,18 @@ class Jira(plugin.Plugin):
     @utils.spawn
     def _find_issue(self, message, issue_id):
         """Find and display a Jira issue."""
-        issue = json.loads(self.client.get(issue_id).content)
+        issue = json.loads(self.client.get(issue_id).content)["fields"]
+
+        assignee = issue.get("assignee")
+        if assignee:
+            assignee = assignee.get("displayName")
 
         msg = "%s: %s [Status: %s, Priority: %s, Assignee: %s] %s"
         message.dispatch(msg % (
             issue_id,
-            issue["fields"]["summary"],
-            issue["fields"]["status"]["name"],
-            issue["fields"]["priority"]["name"],
-            issue["fields"]["assignee"]["displayName"],
+            issue["summary"],
+            issue["status"]["name"],
+            issue["priority"]["name"],
+            assignee,
             "%s/jira/browse/%s" % (self.client.domain, issue_id)
         ))
