@@ -21,7 +21,7 @@ from pyhole.core import utils
 
 
 class Wunderground(plugin.Plugin):
-    """Provide access to current weather data."""
+    """Provide access to Wunderground data."""
 
     @plugin.hook_add_command("weather")
     @utils.spawn
@@ -39,7 +39,7 @@ class Wunderground(plugin.Plugin):
         else:
             location = utils.read_file(self.name, message.source)
             if not location:
-                message.dispatch(self.weather.__doc__)
+                message.dispatch(self.wunderground.__doc__)
                 return
 
         try:
