@@ -45,7 +45,7 @@ class Jira(plugin.Plugin):
 
         self.client = JiraClient()
 
-    @plugin.hook_add_msg_regex("([A-Z]{2}-[0-9]{4,5})")
+    @plugin.hook_add_msg_regex("([A-Z]{2}-[0-9]{3,5})")
     def regex_match_issue(self, message, match, **kwargs):
         """Retrieve Jira ticket information (ex: AB-1234)."""
         try:
