@@ -26,27 +26,6 @@ from pyhole.core import utils
 class Search(plugin.Plugin):
     """Provide access to search engines."""
 
-    @plugin.hook_add_command("google")
-    @utils.require_params
-    @utils.spawn
-    def google(self, message, params=None, **kwargs):
-        """Search Google (ex: .google <query>)."""
-        url = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0"
-        response = utils.fetch_url(url, params={"q": params})
-        if response.status_code != 200:
-            return
-
-        json_obj = json.loads(response.content)
-        results = json_obj["responseData"]["results"]
-        if results:
-            for r in results:
-                message.dispatch("%s: %s" % (
-                                 r["titleNoFormatting"]
-                                 .encode("ascii", "ignore"),
-                                 r["unescapedUrl"]))
-        else:
-            message.dispatch("No results found: '%s'" % params)
-
     @plugin.hook_add_command("urban")
     @utils.require_params
     @utils.spawn
