@@ -14,8 +14,6 @@
 
 """Pyhole Jira Plugin"""
 
-import json
-
 from pyhole.core import plugin
 from pyhole.core import utils
 
@@ -57,7 +55,7 @@ class Jira(plugin.Plugin):
     @utils.spawn
     def _find_issue(self, message, issue_id):
         """Find and display a Jira issue."""
-        issue = json.loads(self.client.get(issue_id).content)["fields"]
+        issue = self.client.get(issue_id).json()["fields"]
 
         assignee = issue.get("assignee")
         if assignee:

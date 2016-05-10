@@ -14,8 +14,6 @@
 
 """Pyhole Redmine Plugin"""
 
-import json
-
 from pyhole.core import plugin
 from pyhole.core import utils
 
@@ -83,7 +81,7 @@ class Redmine(plugin.Plugin):
         if response.status_code != 200:
                 return
 
-        return json.loads(response.content)["issues"]
+        return response.json()["issues"]
 
     def _find_user(self, login):
         """Find a specific Redmine user."""
@@ -106,7 +104,7 @@ class Redmine(plugin.Plugin):
         if response.status_code != 200:
                 return
 
-        return json.loads(response.content)["users"]
+        return response.json()["users"]
 
     def _find_issue(self, message, issue_id):
         """Find and display a Redmine issue."""
@@ -116,7 +114,7 @@ class Redmine(plugin.Plugin):
                 return
 
         try:
-            issue = json.loads(response.content)["issue"]
+            issue = response.json()["issue"]
         except Exception:
             return
 

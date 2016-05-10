@@ -14,9 +14,6 @@
 
 """Pyhole Search Plugin"""
 
-import json
-import re
-
 from BeautifulSoup import BeautifulSoup
 
 from pyhole.core import plugin
@@ -66,8 +63,8 @@ class Search(plugin.Plugin):
         if response.status_code != 200:
             return
 
-        pages = json.loads(response.content)["query"]["pages"]
+        pages = response.json()["query"]["pages"]
         for page in pages.values():
             title = page["title"]
-            title = re.sub(" ", "_", title)
+            title = title.replace(" ", "_")
             message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
