@@ -14,4 +14,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 COPY . ${cwd}
 RUN python setup.py install
 
+EXPOSE 5000
+
 CMD pyhole
