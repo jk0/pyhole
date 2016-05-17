@@ -16,6 +16,7 @@
 
 import flask
 import uuid
+import sys
 
 import utils
 import version
@@ -30,6 +31,7 @@ def index():
     return version.version_string(), 200
 
 
+# BEGIN PASTE API
 @APP.route("/pastes/<paste_id>", methods=["GET"])
 def get_paste(paste_id):
     """Fetch and return a paste."""
@@ -38,7 +40,7 @@ def get_paste(paste_id):
     if not paste:
         flask.abort(404)
 
-    return paste, 200
+    return flask.Response(paste, status=200, mimetype="text/plain")
 
 
 @APP.route("/pastes", methods=["POST"])
@@ -57,8 +59,13 @@ def create_paste():
     utils.write_file("pastes", file_name, data)
 
     return flask.redirect("%s/%s" % (flask.request.url, file_name))
+# END PASTE API
 
 
 @utils.subprocess
 def run():
-    APP.run(host="0.0.0.0")
+    """Run the flask process."""
+    try:
+        APP.run(host="0.0.0.0")
+    except KeyboardInterrupt:
+        sys.exit(0)
