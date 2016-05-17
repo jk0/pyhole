@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,11 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""pyhole - A modular IRC & Slack bot for Python developers."""
+"""pyhole - A modular IRC & Slack bot."""
 
 import sys
 import time
 
+from pyhole.core import api
 from pyhole.core import log
 from pyhole.core import process
 from pyhole.core import utils
@@ -28,7 +29,7 @@ CONFIG = utils.get_config()
 
 
 def Main():
-    """Main IRC loop."""
+    """Main loop."""
     networks = CONFIG.get("networks", type="list")
     log.setup_logger()
     LOG.info("Starting %s" % version.version_string())
@@ -41,6 +42,8 @@ def Main():
         procs.append(proc)
 
     try:
+        api.run()
+
         while True:
             time.sleep(1)
             for proc in procs:
@@ -48,7 +51,7 @@ def Main():
                     procs.remove(proc)
 
             if not procs:
-                LOG.info("No longer connected to any networks, shutting down")
+                LOG.info("No longer connected to any networks; shutting down.")
                 sys.exit(0)
     except KeyboardInterrupt:
-        LOG.info("Caught KeyboardInterrupt, shutting down")
+        LOG.info("Caught KeyboardInterrupt; shutting down.")
