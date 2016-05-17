@@ -66,6 +66,6 @@ def create_paste():
 def run():
     """Run the flask process."""
     try:
-        APP.run()
+        APP.run(host="0.0.0.0")
     except KeyboardInterrupt:
         sys.exit(0)
