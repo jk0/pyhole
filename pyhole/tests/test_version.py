@@ -27,7 +27,7 @@ class TestVersion(unittest.TestCase):
         self.assertTrue(version.version_string().startswith("pyhole v"))
 
     def test_version_hash(self):
-        self.assertEqual(len(version.version_hash()), 12)
+        self.assertEqual(len(version.version_hash()), 11)
 
     def test_version(self):
-        self.assertEqual(len(version.version()), 6)
+        self.assertEqual(len(version.version()), 5)
