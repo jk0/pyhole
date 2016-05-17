@@ -55,7 +55,7 @@ def require_params(func):
     """Require parameters."""
     def wrap(self, message, params, *args, **kwargs):
         if not params:
-            message.dispatch(wrap.__doc__)
+            message.dispatch("Parameters are required")
             return
 
         return func(self, message, params, *args, **kwargs)
@@ -234,7 +234,9 @@ password = pass1234
 
 [PagerDuty]
 subdomain = https://subdomain.pagerduty.com
-key = abcd1234
+api_key = abcd1234
+integration_key = efgh5678
+
 
 [Redmine]
 domain = redmine.example.com
@@ -288,9 +290,29 @@ nick = mynick
 
 
 def fetch_url(url, **kwargs):
-    """Fetch a URL."""
+    """GET a URL."""
+    return get_url(url, **kwargs);
+
+def get_url(url, **kwargs):
+    """GET a URL."""
     session = requests.Session()
     session.headers.update({
         "User-Agent": "pyhole/%s" % version.version()
     })
     return session.get(url, **kwargs)
+
+def post_url(url, **kwargs):
+    """POST to a URL."""
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "pyhole/%s" % version.version()
+    })
+    return session.post(url, **kwargs)
+
+def put_url(url, **kwargs):
+    """PUT to a URL."""
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": "pyhole/%s" % version.version()
+    })
+    return session.put(url, **kwargs)
