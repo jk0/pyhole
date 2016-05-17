@@ -17,6 +17,7 @@
 from __future__ import with_statement
 
 import eventlet
+import multiprocessing
 import optparse
 import os
 import re
@@ -25,9 +26,6 @@ import sys
 import traceback
 
 from BeautifulSoup import BeautifulStoneSoup
-from functools import wraps
-from multiprocessing import Process
-from multiprocessing import Queue
 
 import config
 import version
@@ -68,7 +66,7 @@ def require_params(func):
 
 
 def spawn(func):
-    """Greenthread Spawning Decorator"""
+    """Greenthread-spawning decorator."""
     def wrap(self, *args, **kwargs):
         eventlet.spawn_n(func, self, *args, **kwargs)
 
@@ -80,7 +78,7 @@ def spawn(func):
 
 
 def subprocess(func):
-    """Decorator running function in subprocess."""
+    """Subprocess-spawning decorator."""
     def _subprocess(q, *args, **kwargs):
         try:
             ret = func(*args, **kwargs)
@@ -93,10 +91,10 @@ def subprocess(func):
 
         q.put((ret, error))
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        q = Queue()
-        p = Process(target=_subprocess, args=[q] + list(args), kwargs=kwargs)
+    def wrap(*args, **kwargs):
+        q = multiprocessing.Queue()
+        p = multiprocessing.Process(target=_subprocess,
+                                    args=[q] + list(args), kwargs=kwargs)
         p.start()
         p.join()
         ret, error = q.get()
@@ -108,11 +106,15 @@ def subprocess(func):
 
         return ret
 
-    return wrapper
+    wrap.__doc__ = func.__doc__
+    wrap.__name__ = func.__name__
+    wrap.__module__ = func.__module__
+
+    return wrap
 
 
 def decode_entities(html):
-    """Strip HTML entities from a string and make it printable"""
+    """Strip HTML entities from a string and make it printable."""
     html = re.sub("\n", "", html)
     html = re.sub(" +", " ", html)
     html = " ".join(str(x).strip() for x in BeautifulStoneSoup(html,
@@ -123,7 +125,7 @@ def decode_entities(html):
 
 
 def ensure_int(param):
-    """Ensure the given param is an int"""
+    """Ensure the given param is an int."""
     try:
         param = re.sub("\W", "", param)
 
@@ -133,7 +135,7 @@ def ensure_int(param):
 
 
 def build_options():
-    """Generate command line options"""
+    """Generate command line options."""
     parser = optparse.OptionParser(version=version.version_string())
     parser.add_option("-c", "--config", default=get_conf_file_path(),
                       help="specify the path to a configuration file")
@@ -151,7 +153,7 @@ def get_option(option):
 
 
 def get_home_directory():
-    """Return the home directory"""
+    """Return the home directory."""
     home_dir = os.getenv("HOME") + "/.pyhole/"
     if not os.path.exists(home_dir):
         os.makedirs(home_dir)
@@ -160,7 +162,7 @@ def get_home_directory():
 
 
 def get_directory(new_dir):
-    """Return a directory"""
+    """Return a directory."""
     home_dir = get_home_directory()
     new_dir = home_dir + new_dir
 
@@ -171,29 +173,29 @@ def get_directory(new_dir):
 
 
 def get_conf_file_path():
-    """Return the path to the conf file"""
+    """Return the path to the conf file."""
     return get_home_directory() + "pyhole.conf"
 
 
 def get_conf_file():
-    """Return the path to the conf file"""
+    """Return the path to the conf file."""
     return get_option("config") or get_conf_file_path()
 
 
 def get_config(section="Pyhole"):
-    """Return the default config object"""
+    """Return the default config object."""
     return config.Config(get_conf_file(), section)
 
 
 def write_file(directory, file_name, data):
-    """Write data to file"""
+    """Write data to file."""
     directory = get_directory(directory)
     with open(directory + file_name, "w") as open_file:
         open_file.write(str(data).strip())
 
 
 def read_file(directory, file_name):
-    """Read and return the data in file"""
+    """Read and return the data in file."""
     directory = get_directory(directory)
     try:
         with open(directory + file_name, "r") as open_file:
@@ -205,13 +207,13 @@ def read_file(directory, file_name):
 
 
 def list_files(directory):
+    """List files in a directory."""
     directory = get_directory(directory)
-
     return os.listdir(directory)
 
 
 def generate_config():
-    """Generate an example config"""
+    """Generate an example config file."""
     example = """# Global Configuration
 
 [Pyhole]
