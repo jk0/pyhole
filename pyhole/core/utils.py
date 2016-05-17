@@ -248,6 +248,16 @@ key = abcd1234
 [XSA]
 notify = #channel1, #channel2
 
+[Launchpad]
+auth_delay = 15
+target = production
+app_name = pyhole
+version = devel
+delay_between = 2
+contact = ircnick
+service_root = url
+
+
 # Network Configuration
 
 [FreeNode]
