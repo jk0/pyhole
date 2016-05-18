@@ -133,14 +133,12 @@ def get_paste(paste_id, raw=None):
 
     if raw:
         return flask.Response(paste, status=200, mimetype="text/plain")
-
-    response = flask.render_template_string(
-        TEMPLATE,
-        paste_id=paste_id,
-        paste=cgi.escape(paste),
-        version=version.version_string())
-
-    return response
+    else:
+        return flask.render_template_string(
+            TEMPLATE,
+            paste_id=paste_id,
+            paste=cgi.escape(paste),
+            version=version.version_string())
 
 
 @APP.route("/pastes", methods=["POST"])
