@@ -44,8 +44,8 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(utils.ensure_int("a"), None)
 
     def test_build_options(self):
-        options, _args = utils.build_options()
-        self.assertTrue(isinstance(options, object))
+        parsed_args = utils.build_options()
+        self.assertTrue(isinstance(parsed_args, object))
 
     def test_get_option(self):
         conf_file = utils.get_option("config")

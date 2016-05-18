@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 from __future__ import with_statement
 
+import argparse
 import eventlet
 import multiprocessing
-import optparse
 import os
 import re
 import requests
@@ -136,20 +136,20 @@ def ensure_int(param):
 
 def build_options():
     """Generate command line options."""
-    parser = optparse.OptionParser(version=version.version_string())
-    parser.add_option("-c", "--config", default=get_conf_file_path(),
-                      help="specify the path to a configuration file")
-    parser.add_option("-d", "--debug", action="store_true",
-                      help="show debugging output")
+    parser = argparse.ArgumentParser(version=version.version_string())
+    parser.add_argument("-c", "--config", default=get_conf_file_path(),
+                        help="specify the path to a configuration file")
+    parser.add_argument("-d", "--debug", action="store_true",
+                        help="show debugging output")
 
-    return parser.parse_args()
+    return parser.parse_known_args()[0]
 
 
 def get_option(option):
     """Retrive an option from the command line."""
-    options, _args = build_options()
+    parsed_args = build_options()
 
-    return vars(options).get(option)
+    return vars(parsed_args).get(option)
 
 
 def get_home_directory():
