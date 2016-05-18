@@ -15,6 +15,7 @@
 """RESTful API Endpoint"""
 
 import flask
+import os
 import uuid
 import sys
 
@@ -65,7 +66,15 @@ def create_paste():
 @utils.subprocess
 def run():
     """Run the flask process."""
+    config = utils.get_config()
+
+    ssl_crt = config.get("api_ssl_crt", default="")
+    ssl_key = config.get("api_ssl_key", default="")
+
     try:
-        APP.run(host="0.0.0.0", ssl_context="adhoc")
+        if os.path.exists(ssl_crt) and os.path.exists(ssl_key):
+            APP.run(host="0.0.0.0", ssl_context=(ssl_crt, ssl_key))
+        else:
+            APP.run(host="0.0.0.0")
     except KeyboardInterrupt:
         sys.exit(0)

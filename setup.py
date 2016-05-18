@@ -38,7 +38,6 @@ setuptools.setup(
         "flask",
         "irc",
         "launchpadlib",
-        "pyopenssl",
         "pywunderground",
         "requests",
         "slackclient",

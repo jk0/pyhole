@@ -222,6 +222,9 @@ command_prefix = .
 reconnect_delay = 60
 rejoin_delay = 5
 debug = False
+api_enabled = False
+# api_ssl_crt = /home/ubuntu/.pyhole/ssl.crt
+# api_ssl_key = /home/ubuntu/.pyhole/ssl.key
 plugins = admin
 networks = FreeNode, EFnet, SlackNetwork
 

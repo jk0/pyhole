@@ -42,7 +42,8 @@ def Main():
         procs.append(proc)
 
     try:
-        api.run()
+        if CONFIG.get("api_enabled", type="bool"):
+            api.run()
 
         while True:
             time.sleep(1)
