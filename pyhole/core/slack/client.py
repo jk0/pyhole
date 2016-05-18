@@ -65,6 +65,8 @@ class Client(object):
 
         while True:
             try:
+                time.sleep(1)
+
                 for response in self.client.rtm_read():
                     self.log.debug(response)
 
@@ -85,8 +87,6 @@ class Client(object):
 
                         _msg = message.Reply(self, msg, user, channel)
                         plugin.poll_messages(self, _msg)
-
-                time.sleep(.1)
             except Exception:
                 # NOTE(jk0): Disconnected? Try to reconnect.
                 self.client.rtm_connect()
