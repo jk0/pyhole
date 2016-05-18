@@ -67,16 +67,16 @@ class Client(object):
         while True:
             try:
                 for response in self.client.rtm_read():
-                    if count == 0:
-                        # NOTE(jk0): rtm_read() often times comes back with old
-                        # messages after reconnecting. Let's attempt to ignore
-                        # them here.
-                        count += 1
-                        break
-
                     self.log.debug(response)
 
                     if all(x in response for x in ("text", "channel", "user")):
+                        if count == 0:
+                            # NOTE(jk0): rtm_read() often times comes back with
+                            # old messages after reconnecting. Let's attempt to
+                            # ignore them here.
+                            count += 1
+                            break
+
                         r_channel = response["channel"]
                         r_user = response["user"]
 
