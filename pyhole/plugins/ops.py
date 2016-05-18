@@ -14,10 +14,8 @@
 
 """Pyhole Operations Plugin"""
 
-import datetime
 import json
 import requests
-import time
 
 from pyhole.core import plugin
 from pyhole.core import utils
@@ -47,7 +45,10 @@ class Ops(plugin.Plugin):
     def oncall(self, message, params=None, **kwargs):
         """Show who is on call (ex: .oncall [<group>])."""
         url = "%s/api/v1/escalation_policies/on_call" % self.subdomain
-        request = utils.get_url(url, headers=self.api_headers, params={"query": params})
+        request = utils.get_url(
+            url,
+            headers=self.api_headers,
+            params={"query": params})
 
         if request.status_code == requests.codes.ok:
             response_json = request.json()
@@ -56,11 +57,12 @@ class Ops(plugin.Plugin):
 
                 for level in policy["on_call"]:
                     message.dispatch("- Level %s: %s <%s>" % (
-                        level["level"],
-                        level["user"]["name"],
-                        level["user"]["email"]))
+                                     level["level"],
+                                     level["user"]["name"],
+                                     level["user"]["email"]))
         else:
-            message.dispatch("Could not get on call list: status code %d" % request.status_code)
+            message.dispatch("Could not get on call list: status code %d" %
+                             request.status_code)
 
     @plugin.hook_add_command("create_incident")
     @utils.require_params
@@ -71,16 +73,18 @@ class Ops(plugin.Plugin):
         data = {"service_key": self.integration_key,
                 "event_type": "trigger",
                 "description": params,
-                "incident_key": self.datetime_now_string(),
+                "incident_key": utils.datetime_now_string(),
                 "details": {"triggered by": message.source}}
 
         request = utils.post_url(url, data=json.dumps(data))
         response_json = request.json()
         if request.status_code == requests.codes.ok:
             self.set_incident_key(response_json["incident_key"])
-            message.dispatch("Created incident with incident_key %s" % self.get_incident_key())
+            message.dispatch("Created incident with incident_key %s" %
+                             self.get_incident_key())
         else:
-            message.dispatch("Error while creating incident: status code %d" % request.status_code)
+            message.dispatch("Error while creating incident: status code %d" %
+                             request.status_code)
             message.dispatch(response_json["message"])
 
     @plugin.hook_add_command("resolve_incident")
@@ -95,17 +99,22 @@ class Ops(plugin.Plugin):
         url = "%s/api/v1/incidents/%s/resolve" % (self.subdomain, incident_id)
         user = self.find_user_like(message.source)
         if user is None:
-            message.dispatch("Could not find PagerDuty user matching: %s" % message.source)
+            message.dispatch("Could not find PagerDuty user matching: %s" %
+                             message.source)
             return
 
         data = {"requester_id": user["id"]}
 
-        request = utils.put_url(url, headers=self.api_headers, data=json.dumps(data))
+        request = utils.put_url(
+            url,
+            headers=self.api_headers,
+            data=json.dumps(data))
         if request.status_code == requests.codes.ok:
             self.reset_current_incident()
             message.dispatch("Resolved incident successfully")
         else:
-            message.dispatch("Could not resolve incident: status code %d" % request.status_code)
+            message.dispatch("Could not resolve incident: status code %d" %
+                             request.status_code)
             message.dispatch(request.text)
 
     @plugin.hook_add_command("note")
@@ -115,23 +124,29 @@ class Ops(plugin.Plugin):
         """Create a note for the current incident (ex: .note <message>)."""
         number = self.get_incident_number()
         if number is None:
-            message.dispatch("Could not get incident number for current incident")
+            msg = "Could not get incident number for current incident"
+            message.dispatch(msg)
             return
 
         url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, number)
         user = self.find_user_like(message.source)
         if user is None:
-            message.dispatch("Could not find PagerDuty user matching: %s" % message.source)
+            message.dispatch("Could not find PagerDuty user matching: %s" %
+                             message.source)
             return
 
         data = {"note": {"content": params},
                 "requester_id": user["id"]}
 
-        request = utils.post_url(url, headers=self.api_headers, data=json.dumps(data))
+        request = utils.post_url(
+            url,
+            headers=self.api_headers,
+            data=json.dumps(data))
         if request.status_code == 201:
             message.dispatch("Noted.")
         else:
-            message.dispatch("Could not create note: status code %d" % request.status_code)
+            message.dispatch("Could not create note: status code %d" %
+                             request.status_code)
             message.dispatch(request.text)
 
     @plugin.hook_add_command("notes")
@@ -140,7 +155,8 @@ class Ops(plugin.Plugin):
         """List all notes in current incident"""
         number = self.get_incident_number()
         if number is None:
-            message.dispatch("Could not get incident number for current incident")
+            msg = "Could not get incident number for current incident"
+            message.dispatch(msg)
             return
 
         url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, number)
@@ -151,18 +167,24 @@ class Ops(plugin.Plugin):
             message.dispatch("There are %d notes" % len(notes))
 
             for note in notes:
-                message.dispatch("%s %s - %s" % (note["created_at"], note["user"]["name"], note["content"]))
+                message.dispatch("%s %s - %s" % (
+                    note["created_at"],
+                    note["user"]["name"],
+                    note["content"]))
         else:
-            message.dispatch("Could not get notes, status code %d" % request.status_code)
-            
+            message.dispatch("Could not get notes, status code %d" %
+                             request.status_code)
+
     @plugin.hook_add_command("set_incident_key")
     @utils.require_params
     @utils.spawn
     def set_key(self, message, params=None, **kwargs):
+        """Set the current incident key"""
         self.set_incident_key(params)
         message.dispatch("Set key to %s" % params)
 
     def get_users(self):
+        """Get PagerDuty users and fill the cache"""
         url = "%s/api/v1/users" % self.subdomain
         request = utils.get_url(url, headers=self.api_headers)
         if request.status_code == requests.codes.ok:
@@ -171,8 +193,8 @@ class Ops(plugin.Plugin):
         else:
             return None
 
-    # returns the first user that matches the query (name/email)
     def find_user_like(self, query):
+        """Finds a PagerDuty user matching the query (name/email)"""
         # if cache is empty, fill it
         if self.user_cache is None:
             self.user_cache = self.get_users()
@@ -181,8 +203,7 @@ class Ops(plugin.Plugin):
         if self.user_cache is not None:
             # search the names first
             for user in self.user_cache:
-                if "Alex Newman" in user["name"]:
-                #if query in user["name"]:
+                if query in user["name"]:
                     return user
             # then search the emails
             for user in self.user_cache:
@@ -191,6 +212,7 @@ class Ops(plugin.Plugin):
         return None
 
     def reset_current_incident(self):
+        """Resets the current incident state"""
         self.current_incident = {
             "key": None,
             "number": None,
@@ -224,10 +246,14 @@ class Ops(plugin.Plugin):
         self.current_incident["id"] = new_id
 
     def find_incident_number(self):
+        """Finds incident number from the current incident key"""
         key = self.get_incident_key()
         if key is not None:
             url = "%s/api/v1/incidents" % self.subdomain
-            request = utils.get_url(url, headers=self.api_headers, params={"incident_key": key, "sort_by": "created_on:desc"})
+            request = utils.get_url(
+                url,
+                headers=self.api_headers,
+                params={"incident_key": key, "sort_by": "created_on:desc"})
             if request.status_code == requests.codes.ok:
                 response_json = request.json()
                 incidents = response_json["incidents"]
@@ -237,6 +263,7 @@ class Ops(plugin.Plugin):
         return None
 
     def find_incident_id(self):
+        """Finds incident id from the current incident number"""
         number = self.get_incident_number()
         if number is not None:
             url = "%s/api/v1/incidents/%s" % (self.subdomain, number)
@@ -245,6 +272,3 @@ class Ops(plugin.Plugin):
                 response_json = request.json()
                 return response_json["id"]
         return None
-
-    def datetime_now_string(self):
-        return datetime.datetime.utcnow().isoformat()

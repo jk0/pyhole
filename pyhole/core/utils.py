@@ -16,6 +16,7 @@
 
 from __future__ import with_statement
 
+import datetime
 import eventlet
 import multiprocessing
 import optparse
@@ -291,9 +292,14 @@ nick = mynick
     print "Done"
 
 
+def datetime_now_string():
+    return datetime.datetime.utcnow().isoformat()
+
+
 def fetch_url(url, **kwargs):
     """GET a URL."""
-    return get_url(url, **kwargs);
+    return get_url(url, **kwargs)
+
 
 def get_url(url, **kwargs):
     """GET a URL."""
@@ -303,6 +309,7 @@ def get_url(url, **kwargs):
     })
     return session.get(url, **kwargs)
 
+
 def post_url(url, **kwargs):
     """POST to a URL."""
     session = requests.Session()
@@ -310,6 +317,7 @@ def post_url(url, **kwargs):
         "User-Agent": "pyhole/%s" % version.version()
     })
     return session.post(url, **kwargs)
+
 
 def put_url(url, **kwargs):
     """PUT to a URL."""
