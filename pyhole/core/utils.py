@@ -115,8 +115,6 @@ def subprocess(func):
 
 def decode_entities(html):
     """Strip HTML entities from a string and make it printable."""
-    html = re.sub("\n", "", html)
-    html = re.sub(" +", " ", html)
     html = " ".join(str(x).strip() for x in BeautifulStoneSoup(html,
                     convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
                     text=True))
@@ -150,6 +148,13 @@ def get_option(option):
     parsed_args = build_options()
 
     return vars(parsed_args).get(option)
+
+
+def debug_enabled():
+    """Return whether or not debug mode is enabled."""
+    debug_option = get_option("debug")
+    debug_config = get_config().get("debug", type="bool")
+    return debug_option or debug_config
 
 
 def get_home_directory():

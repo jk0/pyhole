@@ -1,4 +1,4 @@
-#   Copyright 2015 Josh Kearney
+#   Copyright 2015-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -97,6 +97,7 @@ class Client(object):
                 time.sleep(1)
             except Exception:
                 # NOTE(jk0): Disconnected? Try to reconnect.
+                # https://github.com/slackhq/python-slackclient/issues/36
                 self.client.rtm_connect()
                 continue
 

@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2011-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -28,9 +28,7 @@ def setup_logger(name="Pyhole"):
     requests_log = logging.getLogger("requests")
     requests_log.setLevel(logging.WARNING)
 
-    debug_option = utils.get_option("debug")
-    debug_config = utils.get_config().get("debug", type="bool")
-    debug = debug_option or debug_config
+    debug = utils.debug_enabled()
 
     log_dir = utils.get_directory("logs")
     log_level = logging.DEBUG if debug else logging.INFO
