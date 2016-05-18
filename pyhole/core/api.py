@@ -34,7 +34,7 @@ def index():
     return version.version_string(), 200
 
 
-### BEGIN PASTE API ###
+# BEGIN PASTE API #
 PASTE_TEMPLATE = """{% set lines = paste.split('\n') %}<html>
 <head>
 <title>{{ paste_id }} | pyhole</title>
@@ -161,7 +161,7 @@ def create_paste():
     utils.write_file("pastes", file_name, paste)
 
     return flask.redirect("%s/%s" % (flask.request.url, file_name))
-### END PASTE API ###
+# END PASTE API #
 
 
 @utils.subprocess
