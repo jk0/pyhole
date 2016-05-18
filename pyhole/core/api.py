@@ -17,14 +17,25 @@
 import cgi
 import flask
 import os
-import uuid
 import sys
+import time
+import uuid
 
 import utils
 import version
 
 
-TEMPLATE = """{% set lines = paste.split('\n') %}<html>
+APP = flask.Flask("pyhole")
+
+
+@APP.route("/", methods=["GET"])
+def index():
+    """Handle index requests."""
+    return version.version_string(), 200
+
+
+### BEGIN PASTE API ###
+PASTE_TEMPLATE = """{% set lines = paste.split('\n') %}<html>
 <head>
 <title>{{ paste_id }} | pyhole</title>
 <style type="text/css">
@@ -100,7 +111,7 @@ pre {
 <body>
 <div id="paste">
 <div id="header">
-<p>{{ paste_id }}</p>
+<p>{{ st_mtime }} / {{ st_size }} bytes</p>
 <a href="/pastes/{{ paste_id }}/raw">Raw</a>
 </div>
 <pre id="lines">{% for line in lines %}
@@ -112,20 +123,15 @@ pre {
 </html>
 """
 
-APP = flask.Flask("pyhole")
 
-
-@APP.route("/", methods=["GET"])
-def index():
-    """Handle index requests."""
-    return version.version_string(), 200
-
-
-# BEGIN PASTE API
 @APP.route("/pastes/<paste_id>", methods=["GET"])
 @APP.route("/pastes/<paste_id>/<raw>", methods=["GET"])
 def get_paste(paste_id, raw=None):
     """Fetch and return a paste."""
+    stats = os.stat(utils.get_directory("pastes") + paste_id)
+    st_mtime = time.ctime(stats.st_mtime)
+    st_size = stats.st_size
+
     paste = utils.read_file("pastes", paste_id)
 
     if not paste:
@@ -133,12 +139,14 @@ def get_paste(paste_id, raw=None):
 
     if raw:
         return flask.Response(paste, status=200, mimetype="text/plain")
-    else:
-        return flask.render_template_string(
-            TEMPLATE,
-            paste_id=paste_id,
-            paste=cgi.escape(paste),
-            version=version.version_string())
+
+    return flask.render_template_string(
+        PASTE_TEMPLATE,
+        paste_id=paste_id,
+        paste=cgi.escape(paste),
+        st_mtime=st_mtime,
+        st_size=st_size,
+        version=version.version_string())
 
 
 @APP.route("/pastes", methods=["POST"])
@@ -153,7 +161,7 @@ def create_paste():
     utils.write_file("pastes", file_name, paste)
 
     return flask.redirect("%s/%s" % (flask.request.url, file_name))
-# END PASTE API
+### END PASTE API ###
 
 
 @utils.subprocess
