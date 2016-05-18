@@ -63,11 +63,17 @@ class Client(object):
         self.client = slackclient.SlackClient(self.api_token)
         self.client.rtm_connect()
 
+        count = 0
         while True:
             try:
-                time.sleep(1)
-
                 for response in self.client.rtm_read():
+                    if count == 0:
+                        # NOTE(jk0): rtm_read() often times comes back with old
+                        # messages after reconnecting. Let's attempt to ignore
+                        # them here.
+                        count += 1
+                        break
+
                     self.log.debug(response)
 
                     if all(x in response for x in ("text", "channel", "user")):
@@ -87,6 +93,8 @@ class Client(object):
 
                         _msg = message.Reply(self, msg, user, channel)
                         plugin.poll_messages(self, _msg)
+
+                time.sleep(1)
             except Exception:
                 # NOTE(jk0): Disconnected? Try to reconnect.
                 self.client.rtm_connect()
