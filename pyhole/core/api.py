@@ -169,14 +169,18 @@ def run():
     """Run the flask process."""
     config = utils.get_config()
 
+    kwargs = {
+        "host": "0.0.0.0",
+        "threaded": True,
+    }
+
     ssl_crt = config.get("api_ssl_crt", default="")
     ssl_key = config.get("api_ssl_key", default="")
 
+    if os.path.exists(ssl_crt) and os.path.exists(ssl_key):
+        kwargs["ssl_context"] = (ssl_crt, ssl_key)
+
     try:
-        if os.path.exists(ssl_crt) and os.path.exists(ssl_key):
-            APP.run(host="0.0.0.0", threaded=True,
-                    ssl_context=(ssl_crt, ssl_key))
-        else:
-            APP.run(host="0.0.0.0", threaded=True)
+        APP.run(**kwargs)
     except KeyboardInterrupt:
         sys.exit(0)

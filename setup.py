@@ -38,6 +38,7 @@ setuptools.setup(
         "flask",
         "irc",
         "launchpadlib",
+        "pastee-client",
         "pywunderground",
         "requests",
         "slackclient",
