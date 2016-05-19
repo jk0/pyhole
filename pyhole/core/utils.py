@@ -52,7 +52,7 @@ def require_params(func):
     """Require parameters."""
     def wrap(self, message, params, *args, **kwargs):
         if not params:
-            message.dispatch("Parameters are required")
+            message.dispatch("Parameters are required.")
             return
 
         return func(self, message, params, *args, **kwargs)
@@ -291,7 +291,7 @@ nick = mynick
 
 
 def datetime_now_string():
-    """ISO 8601 formatted string of the current datetime"""
+    """ISO 8601 formatted string of the current datetime."""
     return datetime.datetime.utcnow().isoformat()
 
 
