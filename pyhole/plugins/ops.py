@@ -15,9 +15,9 @@
 """Pyhole Operations Plugin"""
 
 import json
-import requests
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -45,13 +45,13 @@ class Ops(plugin.Plugin):
     def oncall(self, message, params=None, **kwargs):
         """Show who is on call (ex: .oncall [<group>])."""
         url = "%s/api/v1/escalation_policies/on_call" % self.subdomain
-        request = utils.get_url(
+        req = request.get(
             url,
             headers=self.api_headers,
             params={"query": params})
 
-        if request.status_code == requests.codes.ok:
-            response_json = request.json()
+        if request.ok(req):
+            response_json = req.json()
             for policy in response_json["escalation_policies"]:
                 message.dispatch(policy["name"])
 
@@ -62,7 +62,7 @@ class Ops(plugin.Plugin):
                                      level["user"]["email"]))
         else:
             message.dispatch("Could not get on call list: status code %d" %
-                             request.status_code)
+                             req.status_code)
 
     @plugin.hook_add_command("create_incident")
     @utils.require_params
@@ -76,15 +76,15 @@ class Ops(plugin.Plugin):
                 "incident_key": utils.datetime_now_string(),
                 "details": {"triggered by": message.source}}
 
-        request = utils.post_url(url, data=json.dumps(data))
-        response_json = request.json()
-        if request.status_code == requests.codes.ok:
+        req = request.post(url, json=data)
+        response_json = req.json()
+        if request.ok(req):
             self.set_incident_key(response_json["incident_key"])
             message.dispatch("Created incident with incident_key %s" %
                              self.get_incident_key())
         else:
             message.dispatch("Error while creating incident: status code %d" %
-                             request.status_code)
+                             req.status_code)
             message.dispatch(response_json["message"])
 
     @plugin.hook_add_command("resolve_incident")
@@ -105,17 +105,17 @@ class Ops(plugin.Plugin):
 
         data = {"requester_id": user["id"]}
 
-        request = utils.put_url(
+        req = request.put(
             url,
             headers=self.api_headers,
-            data=json.dumps(data))
-        if request.status_code == requests.codes.ok:
+            json=data)
+        if request.ok(req):
             self.reset_current_incident()
             message.dispatch("Resolved incident successfully")
         else:
             message.dispatch("Could not resolve incident: status code %d" %
-                             request.status_code)
-            message.dispatch(request.text)
+                             req.status_code)
+            message.dispatch(req.text)
 
     @plugin.hook_add_command("note")
     @utils.require_params
@@ -138,16 +138,16 @@ class Ops(plugin.Plugin):
         data = {"note": {"content": params},
                 "requester_id": user["id"]}
 
-        request = utils.post_url(
+        req = request.post(
             url,
             headers=self.api_headers,
-            data=json.dumps(data))
-        if request.status_code == 201:
+            json=data)
+        if request.ok(req):
             message.dispatch("Noted.")
         else:
             message.dispatch("Could not create note: status code %d" %
-                             request.status_code)
-            message.dispatch(request.text)
+                             req.status_code)
+            message.dispatch(req.text)
 
     @plugin.hook_add_command("notes")
     @utils.spawn
@@ -160,9 +160,9 @@ class Ops(plugin.Plugin):
             return
 
         url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, number)
-        request = utils.get_url(url, headers=self.api_headers)
-        if request.status_code == requests.codes.ok:
-            response_json = request.json()
+        req = request.get(url, headers=self.api_headers)
+        if request.ok(req):
+            response_json = req.json()
             notes = response_json["notes"]
             message.dispatch("There are %d notes" % len(notes))
 
@@ -173,7 +173,7 @@ class Ops(plugin.Plugin):
                     note["content"]))
         else:
             message.dispatch("Could not get notes, status code %d" %
-                             request.status_code)
+                             req.status_code)
 
     @plugin.hook_add_command("set_incident_key")
     @utils.require_params
@@ -186,9 +186,9 @@ class Ops(plugin.Plugin):
     def get_users(self):
         """Get PagerDuty users and fill the cache"""
         url = "%s/api/v1/users" % self.subdomain
-        request = utils.get_url(url, headers=self.api_headers)
-        if request.status_code == requests.codes.ok:
-            response_json = request.json()
+        req = request.get(url, headers=self.api_headers)
+        if request.ok(req):
+            response_json = req.json()
             return response_json["users"]
         else:
             return None
@@ -250,12 +250,12 @@ class Ops(plugin.Plugin):
         key = self.get_incident_key()
         if key is not None:
             url = "%s/api/v1/incidents" % self.subdomain
-            request = utils.get_url(
+            req = request.get(
                 url,
                 headers=self.api_headers,
                 params={"incident_key": key, "sort_by": "created_on:desc"})
-            if request.status_code == requests.codes.ok:
-                response_json = request.json()
+            if request.ok(req):
+                response_json = req.json()
                 incidents = response_json["incidents"]
                 if len(incidents) > 0:
                     number = incidents[0]["incident_number"]
@@ -267,8 +267,8 @@ class Ops(plugin.Plugin):
         number = self.get_incident_number()
         if number is not None:
             url = "%s/api/v1/incidents/%s" % (self.subdomain, number)
-            request = utils.get_url(url, headers=self.api_headers)
-            if request.status_code == requests.codes.ok:
-                response_json = request.json()
+            req = request.get(url, headers=self.api_headers)
+            if request.ok(req):
+                response_json = req.json()
                 return response_json["id"]
         return None
