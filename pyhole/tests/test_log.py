@@ -1,4 +1,4 @@
-#   Copyright 2011-2015 Josh Kearney
+#   Copyright 2011-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -24,8 +24,17 @@ from pyhole.core import utils
 class TestLog(unittest.TestCase):
     def test_logger(self):
         test_log_dir = utils.get_home_directory() + "logs/"
-        log.setup_logger(name="test")
+
+        try:
+            # NOTE(jk0): If the configuration file doesn't exist, the config
+            # class will generate it and raise a SystemExit.
+            log.setup_logger(name="test")
+        except SystemExit:
+            log.setup_logger(name="test")
+
         test_log = log.get_logger("TEST")
+
         self.assertEqual("TEST", test_log.name)
         self.assertEqual(test_log.level, 0)
+
         os.unlink(test_log_dir + "test.log")

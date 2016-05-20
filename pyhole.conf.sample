@@ -1,4 +1,5 @@
 # Global Configuration
+
 [Pyhole]
 admins = nick!ident, nick2!ident, slack.username
 command_prefix = .
