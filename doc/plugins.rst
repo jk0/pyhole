@@ -73,7 +73,7 @@ Pyhole Core Plugins
     :show-inheritance:
 
 :mod:`pyhole.plugins.ops`
-----------------------------
+-------------------------
 .. automodule:: pyhole.plugins.ops
     :noindex:
     :members:
@@ -91,6 +91,14 @@ Pyhole Core Plugins
 :mod:`pyhole.plugins.search`
 ----------------------------
 .. automodule:: pyhole.plugins.search
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.plugins.stocks`
+----------------------------
+.. automodule:: pyhole.plugins.stocks
     :noindex:
     :members:
     :undoc-members:

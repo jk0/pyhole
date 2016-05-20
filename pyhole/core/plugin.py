@@ -20,11 +20,11 @@ import re
 import sys
 import time
 
-import log
+import logger
 import utils
 
 
-LOG = log.get_logger()
+LOG = logger.get_logger()
 
 _plugin_instances = []
 _plugin_hooks = {}

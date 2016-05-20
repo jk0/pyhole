@@ -21,15 +21,11 @@ import time
 import irc.client as irclib
 from irc import connection
 
-from pyhole.core import log
+from pyhole.core import logger
 from pyhole.core import plugin
 from pyhole.core import utils
 from pyhole.core import version
 from pyhole.core.irc import message
-
-
-CONFIG = utils.get_config()
-LOG = log.get_logger()
 
 
 class Client(irclib.SimpleIRCClient):
@@ -37,30 +33,32 @@ class Client(irclib.SimpleIRCClient):
 
     def __init__(self, network):
         irclib.SimpleIRCClient.__init__(self)
-        log.setup_logger(str(network))
-        self.network_config = utils.get_config(network)
-        self.log = log.get_logger(str(network))
+
+        pyhole_config = utils.get_config()
+        network_config = utils.get_config(network)
+
+        self.log = logger.get_logger(str(network))
         self.version = version.version_string()
         self.source = None
         self.target = None
         self.addressed = False
 
-        self.admins = CONFIG.get("admins", type="list")
-        self.command_prefix = CONFIG.get("command_prefix")
-        self.reconnect_delay = CONFIG.get("reconnect_delay", type="int")
-        self.rejoin_delay = CONFIG.get("rejoin_delay", type="int")
+        self.admins = pyhole_config.get("admins", type="list")
+        self.command_prefix = pyhole_config.get("command_prefix")
+        self.reconnect_delay = pyhole_config.get("reconnect_delay", type="int")
+        self.rejoin_delay = pyhole_config.get("rejoin_delay", type="int")
 
-        self.server = self.network_config.get("server")
-        self.password = self.network_config.get("password", default=None)
-        self.port = self.network_config.get("port", type="int", default=6667)
-        self.ssl = self.network_config.get("ssl", type="bool", default=False)
-        self.ipv6 = self.network_config.get("ipv6", type="bool", default=False)
-        self.bind_to = self.network_config.get("bind_to", default=None)
-        self.nick = self.network_config.get("nick")
-        self.username = self.network_config.get("username", default=None)
-        self.identify_password = self.network_config.get("identify_password",
-                                                         default=None)
-        self.channels = self.network_config.get("channels", type="list")
+        self.server = network_config.get("server")
+        self.password = network_config.get("password", default=None)
+        self.port = network_config.get("port", type="int", default=6667)
+        self.ssl = network_config.get("ssl", type="bool", default=False)
+        self.ipv6 = network_config.get("ipv6", type="bool", default=False)
+        self.bind_to = network_config.get("bind_to", default=None)
+        self.nick = network_config.get("nick")
+        self.username = network_config.get("username", default=None)
+        self.identify_password = network_config.get("identify_password",
+                                                    default=None)
+        self.channels = network_config.get("channels", type="list")
 
         self.load_plugins()
 
@@ -109,7 +107,7 @@ class Client(irclib.SimpleIRCClient):
     def join_channel(self, params):
         """Join a channel."""
         channel = params.split(" ", 1)
-        self.reply("Joining %s" % channel[0])
+        self.log.info("Joining %s" % channel[0])
         if irclib.is_channel(channel[0]):
             self.channels.append(channel[0])
             if len(channel) > 1:
@@ -120,7 +118,7 @@ class Client(irclib.SimpleIRCClient):
     def part_channel(self, params):
         """Part a channel."""
         self.channels.remove(params)
-        self.reply("Parting %s" % params)
+        self.log.info("Parting %s" % params)
         self.connection.part(params)
 
     def on_nicknameinuse(self, connection, _event):

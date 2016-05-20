@@ -22,8 +22,7 @@ from pyhole.core import utils
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
-        home_dir = utils.get_home_directory()
-        self.config = config.Config(home_dir + "pyhole.conf", "Pyhole")
+        self.config = config.Config("pyhole.conf.sample", "Pyhole")
 
     def test_missing_parameter(self):
         self.assertRaises(SystemExit, self.config.get, "foo")

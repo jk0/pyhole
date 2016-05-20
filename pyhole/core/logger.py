@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2011-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -21,16 +21,14 @@ import requests
 import utils
 
 
-def setup_logger(name="Pyhole"):
-    """Log handler"""
+def setup_logger(name):
+    """Setup the logger."""
     # NOTE(jk0): Disable unnecessary requests logging.
     requests.packages.urllib3.disable_warnings()
     requests_log = logging.getLogger("requests")
     requests_log.setLevel(logging.WARNING)
 
-    debug_option = utils.get_option("debug")
-    debug_config = utils.get_config().get("debug", type="bool")
-    debug = debug_option or debug_config
+    debug = utils.debug_enabled()
 
     log_dir = utils.get_directory("logs")
     log_level = logging.DEBUG if debug else logging.INFO
@@ -50,4 +48,5 @@ def setup_logger(name="Pyhole"):
 
 
 def get_logger(name="Pyhole"):
+    setup_logger(name)
     return logging.getLogger(name)

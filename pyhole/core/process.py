@@ -18,20 +18,19 @@ import multiprocessing
 import sys
 import time
 
-from pyhole.core import log
+from pyhole.core import logger
 from pyhole.core import utils
-
-
-LOG = log.get_logger()
-CONFIG = utils.get_config()
 
 
 class Process(multiprocessing.Process):
     """A network connection process."""
     def __init__(self, network):
         super(Process, self).__init__()
+        self.log = logger.get_logger()
+        self.config = utils.get_config()
+
         self.network = network
-        self.reconnect_delay = CONFIG.get("reconnect_delay", type="int")
+        self.reconnect_delay = self.config.get("reconnect_delay", type="int")
 
     def run(self):
         """A network connection."""
@@ -45,8 +44,8 @@ class Process(multiprocessing.Process):
 
                 connection = client.Client(self.network)
             except Exception, exc:
-                LOG.exception(exc)
-                LOG.error("Retrying in %d seconds" % self.reconnect_delay)
+                self.log.exception(exc)
+                self.log.error("Retrying in %d seconds" % self.reconnect_delay)
 
                 time.sleep(self.reconnect_delay)
 
@@ -57,8 +56,8 @@ class Process(multiprocessing.Process):
             except KeyboardInterrupt:
                 sys.exit(0)
             except Exception, ex:
-                LOG.exception(ex)
-                LOG.error("Retrying in %d seconds" % self.reconnect_delay)
+                self.log.exception(ex)
+                self.log.error("Retrying in %d seconds" % self.reconnect_delay)
 
                 time.sleep(self.reconnect_delay)
 

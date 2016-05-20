@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 from __future__ import with_statement
 
+import argparse
 import datetime
 import eventlet
 import multiprocessing
-import optparse
 import os
 import re
 import requests
+import shutil
 import sys
 import traceback
 
@@ -116,8 +117,6 @@ def subprocess(func):
 
 def decode_entities(html):
     """Strip HTML entities from a string and make it printable."""
-    html = re.sub("\n", "", html)
-    html = re.sub(" +", " ", html)
     html = " ".join(str(x).strip() for x in BeautifulStoneSoup(html,
                     convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
                     text=True))
@@ -137,20 +136,27 @@ def ensure_int(param):
 
 def build_options():
     """Generate command line options."""
-    parser = optparse.OptionParser(version=version.version_string())
-    parser.add_option("-c", "--config", default=get_conf_file_path(),
-                      help="specify the path to a configuration file")
-    parser.add_option("-d", "--debug", action="store_true",
-                      help="show debugging output")
+    parser = argparse.ArgumentParser(version=version.version_string())
+    parser.add_argument("-c", "--config", default=get_conf_file_path(),
+                        help="specify the path to a configuration file")
+    parser.add_argument("-d", "--debug", action="store_true",
+                        help="show debugging output")
 
-    return parser.parse_args()
+    return parser.parse_known_args()[0]
 
 
 def get_option(option):
     """Retrive an option from the command line."""
-    options, _args = build_options()
+    parsed_args = build_options()
 
-    return vars(options).get(option)
+    return vars(parsed_args).get(option)
+
+
+def debug_enabled():
+    """Return whether or not debug mode is enabled."""
+    debug_option = get_option("debug")
+    debug_config = get_config().get("debug", type="bool")
+    return debug_option or debug_config
 
 
 def get_home_directory():
@@ -213,83 +219,20 @@ def list_files(directory):
     return os.listdir(directory)
 
 
-def generate_config():
-    """Generate an example config file."""
-    example = """# Global Configuration
-
-[Pyhole]
-admins = nick!ident, nick2!ident, slack.username
-command_prefix = .
-reconnect_delay = 60
-rejoin_delay = 5
-debug = False
-plugins = admin
-networks = FreeNode, EFnet, SlackNetwork
-
-[GoogleMaps]
-key = abcd1234
-
-[Jira]
-auth_server = auth.jira.example.com
-domain = jira.example.com
-username = abcd1234
-password = pass1234
-
-[PagerDuty]
-subdomain = https://subdomain.pagerduty.com
-api_key = abcd1234
-integration_key = efgh5678
-
-
-[Redmine]
-domain = redmine.example.com
-key = abcd1234
-
-[Wunderground]
-key = abcd1234
-
-[XSA]
-notify = #channel1, #channel2
-
-# Network Configuration
-
-[FreeNode]
-server = verne.freenode.net
-username =
-password =
-port = 7000
-ssl = True
-ipv6 = True
-bind_to = fe80::1
-nick = mynick
-identify_password = abcd1234
-channels = #mychannel key, #mychannel2
-
-[EFnet]
-server = irc.efnet.net
-username =
-password =
-port = 6667
-ssl = False
-ipv6 = False
-bind_to =
-nick = mynick
-identify_password =
-channels = #mychannel key, #mychannel2
-
-[SlackNetwork]
-api_token = abcd1234
-nick = mynick
-"""
-
+def prepare_config():
+    """Prepare a sample configuration file."""
     conf_file = get_conf_file()
     if os.path.exists(conf_file):
         return
 
-    print "Generating..."
-    with open(conf_file, "w") as open_file:
-        open_file.write(example)
-    print "Done"
+    try:
+        print "Copying sample configuration file to: %s" % conf_file
+        shutil.copyfile("pyhole.conf.sample", conf_file)
+        print "Done. Please edit before running again."
+    except IOError:
+        # NOTE(jk0): Could not locate sample configuration file. This should
+        # only happen when Read the Docs generates the documentation.
+        pass
 
 
 def datetime_now_string():
