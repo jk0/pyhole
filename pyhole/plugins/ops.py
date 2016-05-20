@@ -64,58 +64,21 @@ class Ops(plugin.Plugin):
             message.dispatch("Could not get on call list: status code %d" %
                              req.status_code)
 
-    @plugin.hook_add_command("create_incident")
+    @plugin.hook_add_command("incident")
     @utils.require_params
     @utils.spawn
-    def create_incident(self, message, params=None, **kwargs):
-        """Create a PagerDuty incident (ex: .create_incident <message>)."""
-        url = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
-        data = {"service_key": self.integration_key,
-                "event_type": "trigger",
-                "description": params,
-                "incident_key": utils.datetime_now_string(),
-                "details": {"triggered by": message.source}}
-
-        req = request.post(url, json=data)
-        response_json = req.json()
-        if request.ok(req):
-            self.set_incident_key(response_json["incident_key"])
-            message.dispatch("Created incident with incident_key %s" %
-                             self.get_incident_key())
-        else:
-            message.dispatch("Error while creating incident: status code %d" %
-                             req.status_code)
-            message.dispatch(response_json["message"])
-
-    @plugin.hook_add_command("resolve_incident")
-    @utils.spawn
-    def resolve_incident(self, message, params=None, **kwargs):
-        """Close the current PagerDuty incident (ex: .resolve_incident)."""
-        incident_id = self.get_incident_id()
-        if incident_id is None:
-            message.dispatch("Could not find incident id for current incident")
-            return
-
-        url = "%s/api/v1/incidents/%s/resolve" % (self.subdomain, incident_id)
-        user = self.find_user_like(message.source)
-        if user is None:
-            message.dispatch("Could not find PagerDuty user matching: %s" %
-                             message.source)
-            return
-
-        data = {"requester_id": user["id"]}
-
-        req = request.put(
-            url,
-            headers=self.api_headers,
-            json=data)
-        if request.ok(req):
-            self.reset_current_incident()
-            message.dispatch("Resolved incident successfully")
-        else:
-            message.dispatch("Could not resolve incident: status code %d" %
-                             req.status_code)
-            message.dispatch(req.text)
+    def incident(self, message, params=None, **kwargs):
+        """Incident management. Commands: create, resolve, setkey"""
+        param_split = params.split(' ')
+        command = param_split.pop(0)
+        if command == "create":
+            description = ' '.join(param_split)
+            self.create_incident(message, description)
+        elif command == "resolve":
+            self.resolve_incident(message)
+        elif command == "setkey":
+            key = ' '.join(param_split)
+            self.set_key(message, key)
 
     @plugin.hook_add_command("note")
     @utils.require_params
@@ -167,21 +130,65 @@ class Ops(plugin.Plugin):
             message.dispatch("There are %d notes" % len(notes))
 
             for note in notes:
-                message.dispatch("%s %s - %s" % (
-                    note["created_at"],
-                    note["user"]["name"],
-                    note["content"]))
+                message.dispatch("%s %s - %s" % (note["created_at"],
+                                                 note["user"]["name"],
+                                                 note["content"]))
         else:
             message.dispatch("Could not get notes, status code %d" %
                              req.status_code)
 
-    @plugin.hook_add_command("set_incident_key")
-    @utils.require_params
-    @utils.spawn
-    def set_key(self, message, params=None, **kwargs):
+    def create_incident(self, message, description):
+        """Create a PagerDuty incident with specified description."""
+        url = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
+        data = {"service_key": self.integration_key,
+                "event_type": "trigger",
+                "description": description,
+                "incident_key": utils.datetime_now_string(),
+                "details": {"triggered by": message.source}}
+
+        req = request.post(url, json=data)
+        response_json = req.json()
+        if request.ok(req):
+            self.set_incident_key(response_json["incident_key"])
+            message.dispatch("Created incident with incident_key %s" %
+                             self.get_incident_key())
+        else:
+            message.dispatch("Error while creating incident: status code %d" %
+                             req.status_code)
+            message.dispatch(response_json["message"])
+
+    def resolve_incident(self, message):
+        """Close the current PagerDuty incident."""
+        incident_id = self.get_incident_id()
+        if incident_id is None:
+            message.dispatch("Could not find incident id for current incident")
+            return
+
+        url = "%s/api/v1/incidents/%s/resolve" % (self.subdomain, incident_id)
+        user = self.find_user_like(message.source)
+        if user is None:
+            message.dispatch("Could not find PagerDuty user matching: %s" %
+                             message.source)
+            return
+
+        data = {"requester_id": user["id"]}
+
+        req = request.put(
+            url,
+            headers=self.api_headers,
+            json=data)
+        if request.ok(req):
+            self.reset_current_incident()
+            message.dispatch("Resolved incident successfully")
+        else:
+            message.dispatch("Could not resolve incident: status code %d" %
+                             req.status_code)
+            message.dispatch(req.text)
+
+    def set_key(self, message, key):
         """Set the current incident key"""
-        self.set_incident_key(params)
-        message.dispatch("Set key to %s" % params)
+        self.set_incident_key(key)
+        message.dispatch("Set key to %s" % key)
 
     def get_users(self):
         """Get PagerDuty users and fill the cache"""
