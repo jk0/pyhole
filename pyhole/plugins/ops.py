@@ -137,14 +137,15 @@ class Ops(plugin.Plugin):
 
     def create_incident(self, message, description):
         """Create a PagerDuty incident with specified description."""
-        url = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
+        # would have been called url, but flake8 complains that line is 81 long
+        u = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
         data = {"service_key": self.integration_key,
                 "event_type": "trigger",
                 "description": description,
                 "incident_key": utils.datetime_now_string(),
                 "details": {"triggered by": message.source}}
 
-        req = request.post(url, json=data)
+        req = request.post(u, json=data)
         response_json = req.json()
         if request.ok(req):
             self.set_incident_key(response_json["incident_key"])
