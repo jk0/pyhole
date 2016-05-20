@@ -1,0 +1,13 @@
+language: python
+matrix: 
+  include: 
+  - os: linux
+    dist: xenial
+    python: "2.7"
+  - os: osx
+    python: "2.7"
+install: 
+- "python setup.py -q install"
+script: 
+- "python setup.py flake8"
+- "python setup.py test"
