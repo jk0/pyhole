@@ -96,6 +96,14 @@ Pyhole Core Plugins
     :undoc-members:
     :show-inheritance:
 
+:mod:`pyhole.plugins.stocks`
+----------------------------
+.. automodule:: pyhole.plugins.stocks
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`pyhole.plugins.urls`
 --------------------------
 .. automodule:: pyhole.plugins.urls

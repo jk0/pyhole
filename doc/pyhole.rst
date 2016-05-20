@@ -16,6 +16,14 @@
 Pyhole Core Modules
 ===================
 
+:mod:`pyhole.core.api`
+-------------------------
+.. automodule:: pyhole.core.api
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`pyhole.core.config`
 -------------------------
 .. automodule:: pyhole.core.config
@@ -27,6 +35,14 @@ Pyhole Core Modules
 :mod:`pyhole.core.irc`
 ----------------------
 .. automodule:: pyhole.core.irc
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.core.log`
+-------------------------
+.. automodule:: pyhole.core.log
     :noindex:
     :members:
     :undoc-members:
