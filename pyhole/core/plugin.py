@@ -20,11 +20,11 @@ import re
 import sys
 import time
 
-import log
+import logger
 import utils
 
 
-LOG = log.get_logger()
+LOG = logger.get_logger()
 
 _plugin_instances = []
 _plugin_hooks = {}
@@ -177,7 +177,7 @@ def load_plugins(*args, **kwargs):
         try:
             __import__("pyhole.plugins", globals(), locals(), [plugin_name])
         except Exception, exc:
-            LOG.exception(exc);
+            LOG.exception(exc)
 
     _init_plugins(*args, **kwargs)
 

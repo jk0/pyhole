@@ -55,7 +55,10 @@ class Jira(plugin.Plugin):
     @utils.spawn
     def _find_issue(self, message, issue_id):
         """Find and display a Jira issue."""
-        issue = self.client.get(issue_id).json()["fields"]
+        try:
+            issue = self.client.get(issue_id).json()["fields"]
+        except KeyError:
+            return
 
         assignee = issue.get("assignee")
         if assignee:

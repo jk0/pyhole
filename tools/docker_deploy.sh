@@ -23,6 +23,6 @@ git pull origin master
 docker build -t pyhole .
 docker stop pyhole
 docker rm pyhole
-docker run -d -v /mnt/pyhole:/root/.pyhole -v /etc/hosts:/etc/hosts:ro --name pyhole pyhole
+docker run -d -p 443:5000 -v /mnt/pyhole:/root/.pyhole -v /etc/hosts:/etc/hosts:ro --name pyhole pyhole
 docker ps
 docker logs -f pyhole

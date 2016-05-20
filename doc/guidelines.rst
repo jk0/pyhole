@@ -47,8 +47,8 @@ Imports
 
     from BeautifulSoup import BeautifulSoup
 
-    from pyhole import plugin
-    from pyhole import utils
+    from pyhole.core import plugin
+    from pyhole.core import utils
 
 Docstrings
 ^^^^^^^^^^

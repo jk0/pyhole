@@ -1,4 +1,4 @@
-#   Copyright 2015 Josh Kearney
+#   Copyright 2015-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,34 +17,31 @@
 import slackclient
 import time
 
-from pyhole.core import log
+from pyhole.core import logger
 from pyhole.core import plugin
 from pyhole.core import utils
 from pyhole.core import version
 from pyhole.core.slack import message
 
 
-CONFIG = utils.get_config()
-LOG = log.get_logger()
-
-
 class Client(object):
     """A Slack Connection"""
 
     def __init__(self, network):
-        log.setup_logger(str(network))
-        self.network_config = utils.get_config(network)
+        pyhole_config = utils.get_config()
+        network_config = utils.get_config(network)
 
         self.addressed = False
         self.client = None
-        self.log = log.get_logger(str(network))
+
+        self.log = logger.get_logger(str(network))
         self.version = version.version_string()
 
-        self.admins = CONFIG.get("admins", type="list")
-        self.command_prefix = CONFIG.get("command_prefix")
+        self.admins = pyhole_config.get("admins", type="list")
+        self.command_prefix = pyhole_config.get("command_prefix")
 
-        self.api_token = self.network_config.get("api_token")
-        self.nick = self.network_config.get("nick")
+        self.api_token = network_config.get("api_token")
+        self.nick = network_config.get("nick")
 
         self.load_plugins()
 
@@ -63,12 +60,20 @@ class Client(object):
         self.client = slackclient.SlackClient(self.api_token)
         self.client.rtm_connect()
 
+        count = 0
         while True:
             try:
                 for response in self.client.rtm_read():
                     self.log.debug(response)
 
                     if all(x in response for x in ("text", "channel", "user")):
+                        if count == 0:
+                            # NOTE(jk0): rtm_read() often times comes back with
+                            # old messages after reconnecting. Let's attempt to
+                            # ignore them here.
+                            count += 1
+                            break
+
                         r_channel = response["channel"]
                         r_user = response["user"]
 
@@ -86,9 +91,10 @@ class Client(object):
                         _msg = message.Reply(self, msg, user, channel)
                         plugin.poll_messages(self, _msg)
 
-                time.sleep(.1)
+                time.sleep(1)
             except Exception:
                 # NOTE(jk0): Disconnected? Try to reconnect.
+                # https://github.com/slackhq/python-slackclient/issues/36
                 self.client.rtm_connect()
                 continue
 

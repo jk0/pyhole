@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2011-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -32,38 +32,36 @@ LOG_DATEFMT = "%H:%M:%S"
 
 class TimedRotatingCompressedFileHandler(logging.handlers.TimedRotatingFileHandler):
     def doRollover(self):
+        # CamelCase because superclass is like that
         result = super(TimedRotatingCompressedFileHandler, self).doRollover()
-        archive_old_logs()
-
+        self.archive_old_logs()
         return result
 
+    def archive_old_logs(self):
+        # Compress uncompressed logs
+        matcher = "*.log.*[!b][!z][!2]"
+        files = glob.glob(os.path.join(LOG_DIR, matcher))
+        for file_path in files:
+            filename = os.path.basename(file_path)
+            compressed_filename = filename + ".bz2"
+            compressed_file_path = os.path.join(LOG_ARCHIVE_DIR, compressed_filename)
 
-def archive_old_logs():
-    # Compress uncompressed logs
-    matcher = "*.log.*[!b][!z][!2]"
-    files = glob.glob(os.path.join(LOG_DIR, matcher))
-    for file_path in files:
-        filename = os.path.basename(file_path)
-        compressed_filename = filename + ".bz2"
-        compressed_file_path = os.path.join(LOG_ARCHIVE_DIR, compressed_filename)
+            with open(file_path, 'rb') as input:
+                with bz2.BZ2File(compressed_file_path, 'wb', compresslevel = 9) as output:
+                    shutil.copyfileobj(input, output)
 
-        with open(file_path, 'rb') as input:
-            with bz2.BZ2File(compressed_file_path, 'wb', compresslevel = 9) as output:
-                shutil.copyfileobj(input, output)
-
-        os.remove(file_path)
+            os.remove(file_path)
 
 
-def setup_logger(name="Pyhole"):
-    """Log handler"""
+
+def setup_logger(name):
+    """Setup the logger."""
     # NOTE(jk0): Disable unnecessary requests logging.
     requests.packages.urllib3.disable_warnings()
     requests_log = logging.getLogger("requests")
     requests_log.setLevel(logging.WARNING)
 
-    debug_option = utils.get_option("debug")
-    debug_config = utils.get_config().get("debug", type="bool")
-    debug = debug_option or debug_config
+    debug = utils.debug_enabled()
 
     log_level = logging.DEBUG if debug else logging.INFO
 
@@ -78,8 +76,9 @@ def setup_logger(name="Pyhole"):
     log.setFormatter(formatter)
     logging.getLogger(name).addHandler(log)
 
-    archive_old_logs()
+    log.archive_old_logs()
 
 
 def get_logger(name="Pyhole"):
+    setup_logger(name)
     return logging.getLogger(name)

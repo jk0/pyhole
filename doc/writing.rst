@@ -13,7 +13,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-# Writing Pyhole Plugins
+Writing Pyhole Plugins
+======================
 
 The best way to learn how plugins work is by looking at real examples. You
 can find them in the *pyhole.plugins* directory. Below you'll find a demo

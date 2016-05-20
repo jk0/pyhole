@@ -19,6 +19,10 @@ import unittest
 
 from pyhole.core import utils
 
+# NOTE(jk0): Un-eventlet.monkey_patch() the threading module.
+import threading
+reload(threading)
+
 
 class TestUtils(unittest.TestCase):
     def setUp(self):
@@ -44,8 +48,8 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(utils.ensure_int("a"), None)
 
     def test_build_options(self):
-        options, _args = utils.build_options()
-        self.assertTrue(isinstance(options, object))
+        parsed_args = utils.build_options()
+        self.assertTrue(isinstance(parsed_args, object))
 
     def test_get_option(self):
         conf_file = utils.get_option("config")
