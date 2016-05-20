@@ -177,8 +177,7 @@ def load_plugins(*args, **kwargs):
         try:
             __import__("pyhole.plugins", globals(), locals(), [plugin_name])
         except Exception, exc:
-            LOG.error(exc)
-            raise
+            LOG.exception(exc);
 
     _init_plugins(*args, **kwargs)
 
