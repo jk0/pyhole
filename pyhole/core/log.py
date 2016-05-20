@@ -33,21 +33,25 @@ LOG_DATEFMT = "%H:%M:%S"
 class TimedRotatingCompressedFileHandler(logging.handlers.TimedRotatingFileHandler):
     def doRollover(self):
         result = super(TimedRotatingCompressedFileHandler, self).doRollover()
-
-        # Compress uncompressed logs
-        matcher = "*.log.*[!b][!z][!2]"
-        files = glob.glob(os.path.join(LOG_DIR, matcher))
-        for filename in files:
-            compressed_name = filename + ".bz2"
-            with open(filename, 'rb') as input:
-                with bz2.BZ2File(compressed_name, 'wb', compresslevel = 9) as output:
-                    shutil.copyfileobj(input, output)
-
-            basename = os.path.basename(filename)
-            shutil.move(filename, os.path.join(LOG_ARCHIVE_DIR, basename))
-            os.remove(filename)
+        archive_old_logs()
 
         return result
+
+
+def archive_old_logs():
+    # Compress uncompressed logs
+    matcher = "*.log.*[!b][!z][!2]"
+    files = glob.glob(os.path.join(LOG_DIR, matcher))
+    for file_path in files:
+        filename = os.path.basename(file_path)
+        compressed_filename = filename + ".bz2"
+        compressed_file_path = os.path.join(LOG_ARCHIVE_DIR, compressed_filename)
+
+        with open(file_path, 'rb') as input:
+            with bz2.BZ2File(compressed_file_path, 'wb', compresslevel = 9) as output:
+                shutil.copyfileobj(input, output)
+
+        os.remove(file_path)
 
 
 def setup_logger(name="Pyhole"):
@@ -73,6 +77,8 @@ def setup_logger(name="Pyhole"):
     formatter = logging.Formatter(LOG_FORMAT, LOG_DATEFMT)
     log.setFormatter(formatter)
     logging.getLogger(name).addHandler(log)
+
+    archive_old_logs()
 
 
 def get_logger(name="Pyhole"):
