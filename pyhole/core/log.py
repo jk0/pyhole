@@ -35,7 +35,7 @@ class TimedRotatingCompressedFileHandler(logging.handlers.TimedRotatingFileHandl
         result = super(TimedRotatingCompressedFileHandler, self).doRollover()
 
         # Compress uncompressed logs
-        matcher = "*.log.*[!g][!z]"
+        matcher = "*.log.*[!b][!z][!2]"
         files = glob.glob(os.path.join(LOG_DIR, matcher))
         for filename in files:
             compressed_name = filename + ".bz2"
