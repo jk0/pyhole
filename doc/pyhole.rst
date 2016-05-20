@@ -32,9 +32,17 @@ Pyhole Core Modules
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.core.irc`
-----------------------
-.. automodule:: pyhole.core.irc
+:mod:`pyhole.core.irc.client`
+-----------------------------
+.. automodule:: pyhole.core.irc.client
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.core.irc.message`
+------------------------------
+.. automodule:: pyhole.core.irc.message
     :noindex:
     :members:
     :undoc-members:
@@ -64,9 +72,17 @@ Pyhole Core Modules
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.core.slack`
-------------------------
-.. automodule:: pyhole.core.slack
+:mod:`pyhole.core.slack.client`
+-------------------------------
+.. automodule:: pyhole.core.slack.client
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`pyhole.core.slack.message`
+--------------------------------
+.. automodule:: pyhole.core.slack.message
     :noindex:
     :members:
     :undoc-members:
