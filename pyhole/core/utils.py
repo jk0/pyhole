@@ -14,8 +14,6 @@
 
 """Pyhole Utility Library"""
 
-from __future__ import with_statement
-
 import argparse
 import eventlet
 import multiprocessing

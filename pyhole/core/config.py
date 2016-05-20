@@ -14,8 +14,6 @@
 
 """Pyhole Configuration Library"""
 
-from __future__ import with_statement
-
 import ConfigParser
 import os
 import sys

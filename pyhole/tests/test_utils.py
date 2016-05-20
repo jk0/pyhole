@@ -19,6 +19,10 @@ import unittest
 
 from pyhole.core import utils
 
+# NOTE(jk0): Un-eventlet.monkey_patch() the threading module.
+import threading
+reload(threading)
+
 
 class TestUtils(unittest.TestCase):
     def setUp(self):
