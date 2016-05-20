@@ -14,11 +14,40 @@
 
 """Pyhole Logging"""
 
+import bz2
+import glob
 import logging
 import logging.handlers
+import os
 import requests
+import shutil
 
 import utils
+
+
+LOG_DIR = utils.get_directory("logs")
+LOG_ARCHIVE_DIR = utils.get_directory(os.path.join("logs", "archive"))
+LOG_FORMAT = "%(asctime)s [%(name)s] %(message)s"
+LOG_DATEFMT = "%H:%M:%S"
+
+class TimedRotatingCompressedFileHandler(logging.handlers.TimedRotatingFileHandler):
+    def doRollover(self):
+        result = super(TimedRotatingCompressedFileHandler, self).doRollover()
+
+        # Compress uncompressed logs
+        matcher = "*.log.*[!g][!z]"
+        files = glob.glob(os.path.join(LOG_DIR, matcher))
+        for filename in files:
+            compressed_name = filename + ".bz2"
+            with open(filename, 'rb') as input:
+                with bz2.BZ2File(compressed_name, 'wb', compresslevel = 9) as output:
+                    shutil.copyfileobj(input, output)
+
+            basename = os.path.basename(filename)
+            shutil.move(filename, os.path.join(LOG_ARCHIVE_DIR, basename))
+            os.remove(filename)
+
+        return result
 
 
 def setup_logger(name="Pyhole"):
@@ -32,19 +61,16 @@ def setup_logger(name="Pyhole"):
     debug_config = utils.get_config().get("debug", type="bool")
     debug = debug_option or debug_config
 
-    log_dir = utils.get_directory("logs")
     log_level = logging.DEBUG if debug else logging.INFO
-    log_format = "%(asctime)s [%(name)s] %(message)s"
-    log_datefmt = "%H:%M:%S"
 
-    logging.basicConfig(level=log_level, format=log_format,
-                        datefmt=log_datefmt)
+    logging.basicConfig(level=log_level,
+                        format=LOG_FORMAT,
+                        datefmt=LOG_DATEFMT)
 
-    log_file = "%s/%s.log"
-    log = logging.handlers.TimedRotatingFileHandler(log_file % (log_dir,
-                                                    name.lower()), "midnight")
+    log_file = os.path.join(LOG_DIR, name.lower() + ".log")
+    log = TimedRotatingCompressedFileHandler(log_file, "midnight")
     log.setLevel(log_level)
-    formatter = logging.Formatter(log_format, log_datefmt)
+    formatter = logging.Formatter(LOG_FORMAT, LOG_DATEFMT)
     log.setFormatter(formatter)
     logging.getLogger(name).addHandler(log)
 
