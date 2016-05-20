@@ -24,27 +24,26 @@ from pyhole.core import version
 from pyhole.core.slack import message
 
 
-CONFIG = utils.get_config()
-LOG = log.get_logger()
-
-
 class Client(object):
     """A Slack Connection"""
 
     def __init__(self, network):
         log.setup_logger(str(network))
-        self.network_config = utils.get_config(network)
+
+        pyhole_config = utils.get_config()
+        network_config = utils.get_config(network)
 
         self.addressed = False
         self.client = None
+
         self.log = log.get_logger(str(network))
         self.version = version.version_string()
 
-        self.admins = CONFIG.get("admins", type="list")
-        self.command_prefix = CONFIG.get("command_prefix")
+        self.admins = pyhole_config.get("admins", type="list")
+        self.command_prefix = pyhole_config.get("command_prefix")
 
-        self.api_token = self.network_config.get("api_token")
-        self.nick = self.network_config.get("nick")
+        self.api_token = network_config.get("api_token")
+        self.nick = network_config.get("nick")
 
         self.load_plugins()
 
