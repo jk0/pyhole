@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/jk0/pyhole.svg?branch=master)](https://travis-ci.org/jk0/pyhole)
-
 # pyhole - A modular IRC & Slack bot.
+
+[![Build Status](https://travis-ci.org/jk0/pyhole.svg?branch=master)](https://travis-ci.org/jk0/pyhole)
 
 ## Installation
 

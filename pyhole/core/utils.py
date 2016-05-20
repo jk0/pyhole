@@ -22,6 +22,7 @@ import multiprocessing
 import os
 import re
 import requests
+import shutil
 import sys
 import traceback
 
@@ -217,84 +218,15 @@ def list_files(directory):
     return os.listdir(directory)
 
 
-def generate_config():
-    """Generate an example config file."""
-    example = """# Global Configuration
-
-[Pyhole]
-admins = nick!ident, nick2!ident, slack.username
-command_prefix = .
-reconnect_delay = 60
-rejoin_delay = 5
-debug = False
-api_enabled = False
-# api_ssl_crt = /home/ubuntu/.pyhole/ssl.crt
-# api_ssl_key = /home/ubuntu/.pyhole/ssl.key
-plugins = admin
-networks = FreeNode, EFnet, SlackNetwork
-
-[GoogleMaps]
-key = abcd1234
-
-[Jira]
-auth_server = auth.jira.example.com
-domain = jira.example.com
-username = abcd1234
-password = pass1234
-
-[PagerDuty]
-subdomain = https://subdomain.pagerduty.com
-key = abcd1234
-
-[Redmine]
-domain = redmine.example.com
-key = abcd1234
-
-[Wunderground]
-key = abcd1234
-
-[XSA]
-notify = #channel1, #channel2
-
-# Network Configuration
-
-[FreeNode]
-server = verne.freenode.net
-username =
-password =
-port = 7000
-ssl = True
-ipv6 = True
-bind_to = fe80::1
-nick = mynick
-identify_password = abcd1234
-channels = #mychannel key, #mychannel2
-
-[EFnet]
-server = irc.efnet.net
-username =
-password =
-port = 6667
-ssl = False
-ipv6 = False
-bind_to =
-nick = mynick
-identify_password =
-channels = #mychannel key, #mychannel2
-
-[SlackNetwork]
-api_token = abcd1234
-nick = mynick
-"""
-
+def prepare_config():
+    """Prepare a sample configuration file."""
     conf_file = get_conf_file()
     if os.path.exists(conf_file):
         return
 
-    print "Generating..."
-    with open(conf_file, "w") as open_file:
-        open_file.write(example)
-    print "Done"
+    print "Copying sample configuration file to: %s" % conf_file
+    shutil.copyfile("pyhole.conf.sample", conf_file)
+    print "Done. Please edit before running again."
 
 
 def fetch_url(url, **kwargs):

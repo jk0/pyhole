@@ -36,7 +36,7 @@ class Config(object):
                 self.config_parser.readfp(conf_file)
         except IOError:
             print "Unable to load configuration file: %s" % self.config
-            utils.generate_config()
+            utils.prepare_config()
             sys.exit(1)
 
     def __str__(self):
