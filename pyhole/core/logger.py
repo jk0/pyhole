@@ -30,7 +30,8 @@ LOG_ARCHIVE_DIR = utils.get_directory(os.path.join("logs", "archive"))
 LOG_FORMAT = "%(asctime)s [%(name)s] %(message)s"
 LOG_DATEFMT = "%H:%M:%S"
 
-class TimedRotatingCompressedFileHandler(logging.handlers.TimedRotatingFileHandler):
+
+class TimedRotatingCompressedFileHandler(TimedRotatingFileHandler):
     def doRollover(self):
         # CamelCase because superclass is like that
         result = super(TimedRotatingCompressedFileHandler, self).doRollover()
@@ -44,14 +45,16 @@ class TimedRotatingCompressedFileHandler(logging.handlers.TimedRotatingFileHandl
         for file_path in files:
             filename = os.path.basename(file_path)
             compressed_filename = filename + ".bz2"
-            compressed_file_path = os.path.join(LOG_ARCHIVE_DIR, compressed_filename)
+            compressed_file_path = os.path.join(LOG_ARCHIVE_DIR,
+                                                compressed_filename)
 
             with open(file_path, 'rb') as input:
-                with bz2.BZ2File(compressed_file_path, 'wb', compresslevel = 9) as output:
+                with bz2.BZ2File(compressed_file_path,
+                                 'wb',
+                                 compresslevel=9) as output:
                     shutil.copyfileobj(input, output)
 
             os.remove(file_path)
-
 
 
 def setup_logger(name):
