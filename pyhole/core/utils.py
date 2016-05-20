@@ -224,9 +224,14 @@ def prepare_config():
     if os.path.exists(conf_file):
         return
 
-    print "Copying sample configuration file to: %s" % conf_file
-    shutil.copyfile(os.path.abspath("pyhole.conf.sample"), conf_file)
-    print "Done. Please edit before running again."
+    try:
+        print "Copying sample configuration file to: %s" % conf_file
+        shutil.copyfile("pyhole.conf.sample", conf_file)
+        print "Done. Please edit before running again."
+    except IOError:
+        # NOTE(jk0): Could not locate sample configuration file. This should
+        # only happen when Read the Docs generates the documentation.
+        pass
 
 
 def fetch_url(url, **kwargs):
