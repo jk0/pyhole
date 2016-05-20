@@ -21,7 +21,7 @@ import time
 import irc.client as irclib
 from irc import connection
 
-from pyhole.core import log
+from pyhole.core import logger
 from pyhole.core import plugin
 from pyhole.core import utils
 from pyhole.core import version
@@ -33,12 +33,11 @@ class Client(irclib.SimpleIRCClient):
 
     def __init__(self, network):
         irclib.SimpleIRCClient.__init__(self)
-        log.setup_logger(str(network))
 
         pyhole_config = utils.get_config()
         network_config = utils.get_config(network)
 
-        self.log = log.get_logger(str(network))
+        self.log = logger.get_logger(str(network))
         self.version = version.version_string()
         self.source = None
         self.target = None

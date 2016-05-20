@@ -17,7 +17,7 @@
 import slackclient
 import time
 
-from pyhole.core import log
+from pyhole.core import logger
 from pyhole.core import plugin
 from pyhole.core import utils
 from pyhole.core import version
@@ -28,15 +28,13 @@ class Client(object):
     """A Slack Connection"""
 
     def __init__(self, network):
-        log.setup_logger(str(network))
-
         pyhole_config = utils.get_config()
         network_config = utils.get_config(network)
 
         self.addressed = False
         self.client = None
 
-        self.log = log.get_logger(str(network))
+        self.log = logger.get_logger(str(network))
         self.version = version.version_string()
 
         self.admins = pyhole_config.get("admins", type="list")

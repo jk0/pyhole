@@ -18,7 +18,7 @@ import multiprocessing
 import sys
 import time
 
-from pyhole.core import log
+from pyhole.core import logger
 from pyhole.core import utils
 
 
@@ -26,7 +26,7 @@ class Process(multiprocessing.Process):
     """A network connection process."""
     def __init__(self, network):
         super(Process, self).__init__()
-        self.log = log.get_logger()
+        self.log = logger.get_logger()
         self.config = utils.get_config()
 
         self.network = network

@@ -18,22 +18,20 @@ import sys
 import time
 
 from pyhole.core import api
-from pyhole.core import log
+from pyhole.core import logger
 from pyhole.core import process
 from pyhole.core import utils
 from pyhole.core import version
 
 
-LOG = log.get_logger()
-CONFIG = utils.get_config()
-
-
 def Main():
     """Main loop."""
-    networks = CONFIG.get("networks", type="list")
-    log.setup_logger()
-    LOG.info("Starting %s" % version.version_string())
-    LOG.info("Connecting to networks: %s" % ", ".join(networks))
+    config = utils.get_config()
+    log = logger.get_logger()
+
+    networks = config.get("networks", type="list")
+    log.info("Starting %s..." % version.version_string())
+    log.info("Connecting to networks: %s" % ", ".join(networks))
 
     procs = []
     for network in networks:
@@ -42,7 +40,7 @@ def Main():
         procs.append(proc)
 
     try:
-        if CONFIG.get("api_enabled", type="bool"):
+        if config.get("api_enabled", type="bool"):
             api.run()
 
         while True:
@@ -52,7 +50,7 @@ def Main():
                     procs.remove(proc)
 
             if not procs:
-                LOG.info("No longer connected to any networks; shutting down.")
+                log.info("No longer connected to any networks; shutting down.")
                 sys.exit(0)
     except KeyboardInterrupt:
-        LOG.info("Caught KeyboardInterrupt; shutting down.")
+        log.info("Caught KeyboardInterrupt; shutting down.")
