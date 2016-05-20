@@ -31,7 +31,9 @@ from BeautifulSoup import BeautifulStoneSoup
 import config
 import version
 
+
 eventlet.monkey_patch()
+
 
 def admin(func):
     """Require admin rights."""
