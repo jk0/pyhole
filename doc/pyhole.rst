@@ -17,7 +17,7 @@ Pyhole Core Modules
 ===================
 
 :mod:`pyhole.core.api`
--------------------------
+----------------------
 .. automodule:: pyhole.core.api
     :noindex:
     :members:
@@ -41,7 +41,7 @@ Pyhole Core Modules
     :show-inheritance:
 
 :mod:`pyhole.core.log`
--------------------------
+----------------------
 .. automodule:: pyhole.core.log
     :noindex:
     :members:

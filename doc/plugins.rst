@@ -73,7 +73,7 @@ Pyhole Core Plugins
     :show-inheritance:
 
 :mod:`pyhole.plugins.ops`
-----------------------------
+-------------------------
 .. automodule:: pyhole.plugins.ops
     :noindex:
     :members:
