@@ -19,7 +19,6 @@ import os
 import re
 import sys
 import time
-import traceback
 
 import log
 import utils
@@ -178,8 +177,7 @@ def load_plugins(*args, **kwargs):
         try:
             __import__("pyhole.plugins", globals(), locals(), [plugin_name])
         except Exception, exc:
-            LOG.error(exc)
-            traceback.print_exc()
+            LOG.exception(exc);
 
     _init_plugins(*args, **kwargs)
 
