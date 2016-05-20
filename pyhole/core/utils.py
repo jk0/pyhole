@@ -15,6 +15,7 @@
 """Pyhole Utility Library"""
 
 import argparse
+import datetime
 import eventlet
 import multiprocessing
 import os
@@ -52,7 +53,7 @@ def require_params(func):
     """Require parameters."""
     def wrap(self, message, params, *args, **kwargs):
         if not params:
-            message.dispatch(wrap.__doc__)
+            message.dispatch("Parameters are required.")
             return
 
         return func(self, message, params, *args, **kwargs)
@@ -232,10 +233,6 @@ def prepare_config():
         pass
 
 
-def fetch_url(url, **kwargs):
-    """Fetch a URL."""
-    session = requests.Session()
-    session.headers.update({
-        "User-Agent": "pyhole/%s" % version.version()
-    })
-    return session.get(url, **kwargs)
+def datetime_now_string():
+    """ISO 8601 formatted string of the current datetime."""
+    return datetime.datetime.utcnow().isoformat()
