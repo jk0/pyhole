@@ -31,10 +31,10 @@ LOG_FORMAT = "%(asctime)s [%(name)s] %(message)s"
 LOG_DATEFMT = "%H:%M:%S"
 
 
-class TimedRotatingCompressedFileHandler(TimedRotatingFileHandler):
+class PyholeFileHandler(logging.handlers.TimedRotatingFileHandler):
     def doRollover(self):
         # CamelCase because superclass is like that
-        result = super(TimedRotatingCompressedFileHandler, self).doRollover()
+        result = super(PyholeFileHandler, self).doRollover()
         self.archive_old_logs()
         return result
 
@@ -73,7 +73,7 @@ def setup_logger(name):
                         datefmt=LOG_DATEFMT)
 
     log_file = os.path.join(LOG_DIR, name.lower() + ".log")
-    log = TimedRotatingCompressedFileHandler(log_file, "midnight")
+    log = PyholeFileHandler(log_file, "midnight")
     log.setLevel(log_level)
     formatter = logging.Formatter(LOG_FORMAT, LOG_DATEFMT)
     log.setFormatter(formatter)
