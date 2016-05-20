@@ -225,7 +225,7 @@ def prepare_config():
         return
 
     print "Copying sample configuration file to: %s" % conf_file
-    shutil.copyfile(os.getcwd("pyhole.conf.sample"), conf_file)
+    shutil.copyfile(os.path.abspath("pyhole.conf.sample"), conf_file)
     print "Done. Please edit before running again."
 
 
