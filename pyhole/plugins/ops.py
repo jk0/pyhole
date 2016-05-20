@@ -14,8 +14,6 @@
 
 """Pyhole Operations Plugin"""
 
-import json
-
 from pyhole.core import plugin
 from pyhole.core import request
 from pyhole.core import utils
