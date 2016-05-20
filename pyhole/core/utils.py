@@ -238,35 +238,3 @@ def prepare_config():
 def datetime_now_string():
     """ISO 8601 formatted string of the current datetime."""
     return datetime.datetime.utcnow().isoformat()
-
-
-def fetch_url(url, **kwargs):
-    """GET a URL."""
-    return get_url(url, **kwargs)
-
-
-def get_url(url, **kwargs):
-    """GET a URL."""
-    session = requests.Session()
-    session.headers.update({
-        "User-Agent": "pyhole/%s" % version.version()
-    })
-    return session.get(url, **kwargs)
-
-
-def post_url(url, **kwargs):
-    """POST to a URL."""
-    session = requests.Session()
-    session.headers.update({
-        "User-Agent": "pyhole/%s" % version.version()
-    })
-    return session.post(url, **kwargs)
-
-
-def put_url(url, **kwargs):
-    """PUT to a URL."""
-    session = requests.Session()
-    session.headers.update({
-        "User-Agent": "pyhole/%s" % version.version()
-    })
-    return session.put(url, **kwargs)
