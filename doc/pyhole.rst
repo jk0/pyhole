@@ -72,6 +72,14 @@ Pyhole Core Modules
     :undoc-members:
     :show-inheritance:
 
+:mod:`pyhole.core.request`
+--------------------------
+.. automodule:: pyhole.core.request
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`pyhole.core.slack.client`
 -------------------------------
 .. automodule:: pyhole.core.slack.client

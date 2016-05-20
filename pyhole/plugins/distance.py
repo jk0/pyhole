@@ -17,6 +17,7 @@
 import pywunderground
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -67,9 +68,9 @@ class Distance(plugin.Plugin):
         origin = _resolve_pws(origin)
         dest = _resolve_pws(dest)
 
-        resp = utils.fetch_url("https://maps.googleapis.com/maps/api"
-                               "/directions/json?origin=%s&destination=%s"
-                               "&key=%s" % (origin, dest, key))
+        resp = request.get("https://maps.googleapis.com/maps/api"
+                           "/directions/json?origin=%s&destination=%s"
+                           "&key=%s" % (origin, dest, key))
 
         msg = None
         if resp.status_code == 200:

@@ -17,6 +17,7 @@
 import re
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -28,7 +29,7 @@ class Kernel(plugin.Plugin):
     def kernel(self, message, params=None, **kwargs):
         """Retrieve the current kernel version (ex: .kernel)"""
         url = "https://www.kernel.org/kdist/finger_banner"
-        response = utils.fetch_url(url)
+        response = request.get(url)
         if response.status_code != 200:
             return
 

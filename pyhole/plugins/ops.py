@@ -43,10 +43,8 @@ class Ops(plugin.Plugin):
     def oncall(self, message, params=None, **kwargs):
         """Show who is on call (ex: .oncall [<group>])."""
         url = "%s/api/v1/escalation_policies/on_call" % self.subdomain
-        req = request.get(
-            url,
-            headers=self.api_headers,
-            params={"query": params})
+        req = request.get(url, headers=self.api_headers,
+                          params={"query": params})
 
         if request.ok(req):
             response_json = req.json()
@@ -59,23 +57,22 @@ class Ops(plugin.Plugin):
                                      level["user"]["name"],
                                      level["user"]["email"]))
         else:
-            message.dispatch("Could not get on call list: status code %d" %
-                             req.status_code)
+            message.dispatch("Unable to fetch list: %d" % req.status_code)
 
     @plugin.hook_add_command("incident")
     @utils.require_params
     @utils.spawn
     def incident(self, message, params=None, **kwargs):
-        """Incident management. Commands: create, resolve, setkey"""
-        param_split = params.split(' ')
+        """Manage incidents (ex: .incident <create|resolve|setkey>)."""
+        param_split = params.split(" ")
         command = param_split.pop(0)
         if command == "create":
-            description = ' '.join(param_split)
+            description = " ".join(param_split)
             self.create_incident(message, description)
         elif command == "resolve":
             self.resolve_incident(message)
         elif command == "setkey":
-            key = ' '.join(param_split)
+            key = " ".join(param_split)
             self.set_key(message, key)
 
     @plugin.hook_add_command("note")
@@ -85,7 +82,7 @@ class Ops(plugin.Plugin):
         """Create a note for the current incident (ex: .note <message>)."""
         number = self.get_incident_number()
         if number is None:
-            msg = "Could not get incident number for current incident"
+            msg = "Could not get incident number for current incident."
             message.dispatch(msg)
             return
 
@@ -96,27 +93,28 @@ class Ops(plugin.Plugin):
                              message.source)
             return
 
-        data = {"note": {"content": params},
-                "requester_id": user["id"]}
+        data = {
+            "note": {
+                "content": params
+            },
+            "requester_id": user["id"]
+        }
 
-        req = request.post(
-            url,
-            headers=self.api_headers,
-            json=data)
+        req = request.post(url, headers=self.api_headers, json=data)
+
         if request.ok(req):
             message.dispatch("Noted.")
         else:
-            message.dispatch("Could not create note: status code %d" %
-                             req.status_code)
+            message.dispatch("Unable to create note: %d" % req.status_code)
             message.dispatch(req.text)
 
     @plugin.hook_add_command("notes")
     @utils.spawn
     def notes(self, message, params=None, **kwargs):
-        """List all notes in current incident"""
+        """List all notes in current incident."""
         number = self.get_incident_number()
         if number is None:
-            msg = "Could not get incident number for current incident"
+            msg = "Could not get incident number for current incident."
             message.dispatch(msg)
             return
 
@@ -125,72 +123,70 @@ class Ops(plugin.Plugin):
         if request.ok(req):
             response_json = req.json()
             notes = response_json["notes"]
-            message.dispatch("There are %d notes" % len(notes))
+            message.dispatch("There are %d notes." % len(notes))
 
             for note in notes:
                 message.dispatch("%s %s - %s" % (note["created_at"],
                                                  note["user"]["name"],
                                                  note["content"]))
         else:
-            message.dispatch("Could not get notes, status code %d" %
-                             req.status_code)
+            message.dispatch("Unable to fetch notes: %d" % req.status_code)
 
     def create_incident(self, message, description):
         """Create a PagerDuty incident with specified description."""
         # would have been called url, but flake8 complains that line is 81 long
         u = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
-        data = {"service_key": self.integration_key,
-                "event_type": "trigger",
-                "description": description,
-                "incident_key": utils.datetime_now_string(),
-                "details": {"triggered by": message.source}}
+        data = {
+            "service_key": self.integration_key,
+            "event_type": "trigger",
+            "description": description,
+            "incident_key": utils.datetime_now_string(),
+            "details": {"triggered by": message.source}
+        }
 
         req = request.post(u, json=data)
         response_json = req.json()
         if request.ok(req):
             self.set_incident_key(response_json["incident_key"])
-            message.dispatch("Created incident with incident_key %s" %
+            message.dispatch("Created incident with incident_key: %s" %
                              self.get_incident_key())
         else:
-            message.dispatch("Error while creating incident: status code %d" %
-                             req.status_code)
+            message.dispatch("Error creating incident: %d" % req.status_code)
             message.dispatch(response_json["message"])
 
     def resolve_incident(self, message):
         """Close the current PagerDuty incident."""
         incident_id = self.get_incident_id()
         if incident_id is None:
-            message.dispatch("Could not find incident id for current incident")
+            message.dispatch("Could not find ID for current incident.")
             return
 
         url = "%s/api/v1/incidents/%s/resolve" % (self.subdomain, incident_id)
         user = self.find_user_like(message.source)
         if user is None:
-            message.dispatch("Could not find PagerDuty user matching: %s" %
+            message.dispatch("Could not find PagerDuty user: %s" %
                              message.source)
             return
 
         data = {"requester_id": user["id"]}
 
-        req = request.put(
-            url,
-            headers=self.api_headers,
-            json=data)
+        req = request.put(url, headers=self.api_headers, json=data)
+
         if request.ok(req):
             self.reset_current_incident()
-            message.dispatch("Resolved incident successfully")
+            message.dispatch("Resolved incident successfully.")
         else:
-            message.dispatch("Could not resolve incident: status code %d" %
+            message.dispatch("Could not resolve incident: %d" %
                              req.status_code)
             message.dispatch(req.text)
 
     def set_key(self, message, key):
-        """Set the current incident key"""
+        """Set the current incident key."""
         self.set_incident_key(key)
-        message.dispatch("Set key to %s" % key)
+        message.dispatch("Key set to: %s" % key)
 
     def get_users(self):
-        """Get PagerDuty users and fill the cache"""
+        """Get PagerDuty users and fill the cache."""
         url = "%s/api/v1/users" % self.subdomain
         req = request.get(url, headers=self.api_headers)
         if request.ok(req):
@@ -200,7 +196,7 @@ class Ops(plugin.Plugin):
             return None
 
     def find_user_like(self, query):
-        """Finds a PagerDuty user matching the query (name/email)"""
+        """Finds a PagerDuty user matching the query (name/email)."""
         # if cache is empty, fill it
         if self.user_cache is None:
             self.user_cache = self.get_users()
@@ -218,7 +214,7 @@ class Ops(plugin.Plugin):
         return None
 
     def reset_current_incident(self):
-        """Resets the current incident state"""
+        """Resets the current incident state."""
         self.current_incident = {
             "key": None,
             "number": None,
@@ -252,14 +248,13 @@ class Ops(plugin.Plugin):
         self.current_incident["id"] = new_id
 
     def find_incident_number(self):
-        """Finds incident number from the current incident key"""
+        """Finds incident number from the current incident key."""
         key = self.get_incident_key()
         if key is not None:
             url = "%s/api/v1/incidents" % self.subdomain
-            req = request.get(
-                url,
-                headers=self.api_headers,
-                params={"incident_key": key, "sort_by": "created_on:desc"})
+            params = {"incident_key": key, "sort_by": "created_on:desc"}
+            req = request.get(url, headers=self.api_headers, params=params)
+
             if request.ok(req):
                 response_json = req.json()
                 incidents = response_json["incidents"]
@@ -269,7 +264,7 @@ class Ops(plugin.Plugin):
         return None
 
     def find_incident_id(self):
-        """Finds incident id from the current incident number"""
+        """Finds incident id from the current incident number."""
         number = self.get_incident_number()
         if number is not None:
             url = "%s/api/v1/incidents/%s" % (self.subdomain, number)

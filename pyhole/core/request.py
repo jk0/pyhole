@@ -41,5 +41,5 @@ def put(url, **kwargs):
 
 
 def ok(request):
-    """Check if a request is ok (2xx)"""
+    """Check if a request is OK (2xx)."""
     return request.status_code >= 200 and request.status_code < 300

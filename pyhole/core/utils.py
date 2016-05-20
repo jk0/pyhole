@@ -20,7 +20,6 @@ import eventlet
 import multiprocessing
 import os
 import re
-import requests
 import shutil
 import sys
 import traceback

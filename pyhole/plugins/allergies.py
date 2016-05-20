@@ -1,4 +1,4 @@
-#   Copyright 2015 Jason Meridth
+#   Copyright 2015-2016 Jason Meridth
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 import datetime
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -37,7 +38,7 @@ class Allergies(plugin.Plugin):
         url = "http://saallergy.info/day/%s" % today
         headers = {"accept": "application/json"}
 
-        response = utils.fetch_url(url, headers=headers)
+        response = request.get(url, headers=headers)
         if response.status_code != 200:
                 return
 

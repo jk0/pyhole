@@ -17,6 +17,7 @@
 from BeautifulSoup import BeautifulSoup
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -29,7 +30,7 @@ class Search(plugin.Plugin):
     def urban(self, message, params=None, **kwargs):
         """Search Urban Dictionary (ex: .urban <query>)."""
         url = "http://www.urbandictionary.com/define.php"
-        response = utils.fetch_url(url, params={"term": params})
+        response = request.get(url, params={"term": params})
         if response.status_code != 200:
             return
 
@@ -52,7 +53,7 @@ class Search(plugin.Plugin):
     def wikipedia(self, message, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)."""
         url = "https://en.wikipedia.org/w/api.php"
-        response = utils.fetch_url(url, params={
+        response = request.get(url, params={
             "action": "query",
             "generator": "allpages",
             "gaplimit": 4,
