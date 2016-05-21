@@ -49,7 +49,7 @@ setuptools.setup(
         "sphinx"
     ],
     test_suite="pyhole.tests",
-    packages=["pyhole"],
+    packages=setuptools.find_packages(),
     entry_points={
         "console_scripts": [
             "pyhole = pyhole.main:Main"

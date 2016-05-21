@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
  && rm -rf /var/lib/apt/lists/*
 
 COPY . ${cwd}
-RUN python setup.py develop
+RUN python setup.py install
 
 EXPOSE 5000
 
