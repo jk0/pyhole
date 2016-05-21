@@ -34,6 +34,8 @@ class Client(irclib.SimpleIRCClient):
     def __init__(self, network):
         irclib.SimpleIRCClient.__init__(self)
 
+        logger.setup_logger(str(network))
+
         pyhole_config = utils.get_config()
         network_config = utils.get_config(network)
 

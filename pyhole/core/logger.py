@@ -21,7 +21,7 @@ import requests
 import utils
 
 
-def setup_logger(name):
+def setup_logger(name="Pyhole"):
     """Setup the logger."""
     # NOTE(jk0): Disable unnecessary requests logging.
     requests.packages.urllib3.disable_warnings()
@@ -48,5 +48,4 @@ def setup_logger(name):
 
 
 def get_logger(name="Pyhole"):
-    setup_logger(name)
     return logging.getLogger(name)
