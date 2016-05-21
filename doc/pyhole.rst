@@ -48,9 +48,9 @@ Pyhole Core Modules
     :undoc-members:
     :show-inheritance:
 
-:mod:`pyhole.core.log`
-----------------------
-.. automodule:: pyhole.core.log
+:mod:`pyhole.core.logger`
+-------------------------
+.. automodule:: pyhole.core.logger
     :noindex:
     :members:
     :undoc-members:
