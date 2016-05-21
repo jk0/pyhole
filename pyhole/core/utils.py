@@ -52,7 +52,7 @@ def require_params(func):
     """Require parameters."""
     def wrap(self, message, params, *args, **kwargs):
         if not params:
-            message.dispatch("Parameters are required.")
+            message.dispatch(wrap.__doc__)
             return
 
         return func(self, message, params, *args, **kwargs)

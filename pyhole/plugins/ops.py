@@ -14,6 +14,8 @@
 
 """Pyhole Operations Plugin"""
 
+import time
+
 from pyhole.core import plugin
 from pyhole.core import request
 from pyhole.core import utils
@@ -56,6 +58,8 @@ class Ops(plugin.Plugin):
                                      level["level"],
                                      level["user"]["name"],
                                      level["user"]["email"]))
+                # NOTE(jk0): This is needed to prevent rate-limiting.
+                time.sleep(2)
         else:
             message.dispatch("Unable to fetch list: %d" % req.status_code)
 
