@@ -32,8 +32,8 @@ LOG_DATEFMT = "%H:%M:%S"
 
 
 class PyholeFileHandler(logging.handlers.TimedRotatingFileHandler):
+    # CamelCase because superclass is like that
     def doRollover(self):
-        # CamelCase because superclass is like that
         result = super(PyholeFileHandler, self).doRollover()
         self.archive_old_logs()
         return result
@@ -45,7 +45,11 @@ class PyholeFileHandler(logging.handlers.TimedRotatingFileHandler):
         for file_path in files:
             filename = os.path.basename(file_path)
             compressed_filename = filename + ".bz2"
-            compressed_file_path = os.path.join(LOG_ARCHIVE_DIR,
+            network_name = filename[:filename.rfind('.log')]
+            archive_dir = utils.get_directory(os.path.join("logs",
+                                                           "archive",
+                                                           network_name))
+            compressed_file_path = os.path.join(archive_dir,
                                                 compressed_filename)
 
             with open(file_path, 'rb') as input:
