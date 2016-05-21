@@ -28,9 +28,9 @@ class TestLogger(unittest.TestCase):
         try:
             # NOTE(jk0): If the configuration file doesn't exist, the config
             # class will generate it and raise a SystemExit.
-            logger.setup_logger(name="test")
+            logger.setup_logger("test")
         except SystemExit:
-            logger.setup_logger(name="test")
+            logger.setup_logger("test")
 
         test_log = logger.get_logger("TEST")
 
