@@ -57,7 +57,7 @@ class Reply(Message):
             self.session.log.info("-#%s- <%s> %s: %s" % (
                 self.target,
                 self.session.nick,
-                source, msg))
+                self.source, msg))
         else:
             self.session.reply(self.target, msg)
             self.session.log.info("-#%s- <%s> %s" % (

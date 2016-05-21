@@ -1,5 +1,5 @@
-*.py[cod]
 *.egg*
+*.py[cod]
 build
 dist
 docs/_build/
