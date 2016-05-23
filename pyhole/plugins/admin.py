@@ -24,7 +24,6 @@ class Admin(plugin.Plugin):
     @plugin.hook_add_command("help")
     def help(self, message, params=None, **kwargs):
         """Learn how to use plugins (ex: .help <command>)."""
-
         if params:
             doc = _find_doc_string(params)
             if doc:

@@ -125,7 +125,6 @@ def ensure_int(param):
     """Ensure the given param is an int."""
     try:
         param = re.sub("\W", "", param)
-
         return int(param)
     except ValueError:
         return None
@@ -145,7 +144,6 @@ def build_options():
 def get_option(option):
     """Retrive an option from the command line."""
     parsed_args = build_options()
-
     return vars(parsed_args).get(option)
 
 
@@ -161,7 +159,6 @@ def get_home_directory():
     home_dir = os.getenv("HOME") + "/.pyhole/"
     if not os.path.exists(home_dir):
         os.makedirs(home_dir)
-
     return home_dir
 
 
@@ -204,7 +201,6 @@ def read_file(directory, file_name):
     try:
         with open(directory + file_name, "r") as open_file:
             data = open_file.read()
-
         return data
     except IOError:
         return None

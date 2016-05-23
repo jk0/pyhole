@@ -148,10 +148,10 @@ class Client(irclib.SimpleIRCClient):
 
     def on_disconnect(self, _connection, _event):
         """Attempt to reconnect after disconnection."""
-        self.log.info("Disconnected from %s:%d" % (self.server, self.port))
-        self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
+        self.log.info("Disconnected from %s:%d." % (self.server, self.port))
+        self.log.info("Reconnecting in %d seconds." % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
-        self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
+        self.log.info("Connecting to %s:%d as %s." % (self.server, self.port,
                       self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
                      username=self.username,
