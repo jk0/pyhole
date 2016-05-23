@@ -43,8 +43,8 @@ class Process(multiprocessing.Process):
                     from pyhole.core.irc import client
 
                 connection = client.Client(self.network)
-            except Exception, exc:
-                self.log.exception(exc)
+            except Exception as ex:
+                self.log.exception(ex)
                 self.log.error("Retrying in %d seconds" % self.reconnect_delay)
 
                 time.sleep(self.reconnect_delay)
@@ -55,7 +55,7 @@ class Process(multiprocessing.Process):
                 connection.start()
             except KeyboardInterrupt:
                 sys.exit(0)
-            except Exception, ex:
+            except Exception as ex:
                 self.log.exception(ex)
                 self.log.error("Retrying in %d seconds" % self.reconnect_delay)
 
