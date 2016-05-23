@@ -87,5 +87,4 @@ def setup_logger(name):
 
 
 def get_logger(name="Pyhole"):
-    setup_logger(name)
     return logging.getLogger(name)

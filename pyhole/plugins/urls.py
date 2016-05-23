@@ -17,6 +17,7 @@
 from BeautifulSoup import BeautifulSoup
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -58,7 +59,7 @@ class Url(plugin.Plugin):
             url = "http://" + url
 
         try:
-            response = utils.fetch_url(url)
+            response = request.get(url)
         except Exception:
             return
 

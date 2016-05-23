@@ -28,6 +28,8 @@ class Client(object):
     """A Slack Connection"""
 
     def __init__(self, network):
+        logger.setup_logger(str(network))
+
         pyhole_config = utils.get_config()
         network_config = utils.get_config(network)
 

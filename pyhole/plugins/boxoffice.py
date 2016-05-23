@@ -17,6 +17,7 @@
 from BeautifulSoup import BeautifulSoup
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -27,7 +28,7 @@ class Boxoffice(plugin.Plugin):
     @utils.spawn
     def boxoffice(self, message, params=None, **kwargs):
         """Display top box office movies"""
-        resp = utils.fetch_url("http://www.rottentomatoes.com")
+        resp = request.get("http://www.rottentomatoes.com")
         if resp.status_code != 200:
             message.dispatch("Could not fetch box office results.")
             return

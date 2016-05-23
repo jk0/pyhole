@@ -17,7 +17,6 @@
 import unittest
 
 from pyhole.core import config
-from pyhole.core import utils
 
 
 class TestConfig(unittest.TestCase):

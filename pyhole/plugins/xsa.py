@@ -19,6 +19,7 @@ import json
 from BeautifulSoup import BeautifulSoup
 
 from pyhole.core import plugin
+from pyhole.core import request
 from pyhole.core import utils
 
 
@@ -91,7 +92,7 @@ class Xsa(plugin.Plugin):
         return json.loads(data_json)
 
     def _fetch_xsa_data(self):
-        resp = utils.fetch_url(self.XSA_URL)
+        resp = request.get(self.XSA_URL)
         if resp.status_code != 200:
             print "Error fetching XSAs: %s" % resp.status_code
             return {}
