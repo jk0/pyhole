@@ -29,7 +29,6 @@ LOG_DIR = utils.get_directory("logs")
 LOG_ARCHIVE_DIR = utils.get_directory(os.path.join("logs", "archive"))
 LOG_FORMAT = "%(asctime)s [%(name)s] %(message)s"
 LOG_DATEFMT = "%H:%M:%S"
-LOG_LEVEL = logging.DEBUG if utils.debug_enabled() else logging.INFO
 
 
 class PyholeFileHandler(logging.handlers.TimedRotatingFileHandler):
@@ -68,13 +67,17 @@ def setup_logger(name):
     requests_log = logging.getLogger("requests")
     requests_log.setLevel(logging.WARNING)
 
-    logging.basicConfig(level=LOG_LEVEL,
+    debug = utils.debug_enabled()
+
+    log_level = logging.DEBUG if debug else logging.INFO
+
+    logging.basicConfig(level=log_level,
                         format=LOG_FORMAT,
                         datefmt=LOG_DATEFMT)
 
     log_file = os.path.join(LOG_DIR, name.lower() + ".log")
     log = PyholeFileHandler(log_file, "midnight")
-    log.setLevel(LOG_LEVEL)
+    log.setLevel(log_level)
     formatter = logging.Formatter(LOG_FORMAT, LOG_DATEFMT)
     log.setFormatter(formatter)
     logging.getLogger(name).addHandler(log)
