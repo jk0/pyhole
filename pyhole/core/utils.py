@@ -12,11 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Utility Library"""
+"""Pyhole Utilies"""
 
 import argparse
 import datetime
-import multiprocessing
 import os
 import re
 import shutil
@@ -26,9 +25,6 @@ from BeautifulSoup import BeautifulStoneSoup
 
 import config
 import version
-
-
-QUEUE = multiprocessing.Queue()
 
 
 def admin(func):
@@ -193,25 +189,3 @@ def prepare_config():
 def datetime_now_string():
     """ISO 8601 formatted string of the current datetime."""
     return datetime.datetime.utcnow().isoformat()
-
-
-class MessageQueue(object):
-    """Global message queue."""
-
-    def __init__(self):
-        self.queue = QUEUE
-
-    def put(self, item):
-        """Place an item in the queue."""
-        self.queue.put_nowait(item)
-
-    @spawn
-    def watch(self, session):
-        """Watch the queue for incoming messages."""
-        while True:
-            network, source, target, message = self.queue.get()
-
-            # NOTE(jk0): Right now there is no way to guarantee that the
-            # message will get delivered to the right network.
-            _msg = "New message from %s: %s" % (source, message)
-            session.reply(target, _msg)

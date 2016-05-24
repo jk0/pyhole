@@ -23,6 +23,7 @@ from irc import connection
 
 from pyhole.core import logger
 from pyhole.core import plugin
+from pyhole.core import queue
 from pyhole.core import utils
 from pyhole.core import version
 from pyhole.core.irc import message
@@ -146,8 +147,8 @@ class Client(irclib.SimpleIRCClient):
                 else:
                     connection.join(channel[0])
 
-        queue = utils.MessageQueue()
-        queue.watch(self)
+        q = queue.FIFOQueue()
+        q.watch(self)
 
     def on_disconnect(self, _connection, _event):
         """Attempt to reconnect after disconnection."""

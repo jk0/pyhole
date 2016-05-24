@@ -19,6 +19,7 @@ import time
 
 from pyhole.core import logger
 from pyhole.core import plugin
+from pyhole.core import queue
 from pyhole.core import utils
 from pyhole.core import version
 from pyhole.core.slack import message
@@ -62,8 +63,8 @@ class Client(object):
         self.client = slackclient.SlackClient(self.api_token)
         self.client.rtm_connect()
 
-        queue = utils.MessageQueue()
-        queue.watch(self)
+        q = queue.FIFOQueue()
+        q.watch(self)
 
         count = 0
         while True:

@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Configuration Library"""
+"""Pyhole Configuration Manager"""
 
 import ConfigParser
 import os

@@ -26,7 +26,7 @@ class Process(multiprocessing.Process):
         self.network = network
 
     def run(self):
-        """A network connection."""
+        """Run the network connection."""
         network_config = utils.get_config(self.network)
         if network_config.get("api_token", default=None):
             from pyhole.core.slack import client
