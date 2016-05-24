@@ -123,13 +123,14 @@ def get_home_directory():
 def get_directory(new_dir):
     """Return a directory."""
     home_dir = get_home_directory()
-    new_dir = home_dir + new_dir
+    new_dir = os.path.join(home_dir, new_dir, "")
     make_directory(new_dir)
 
-    return new_dir + "/"
+    return new_dir
 
 
 def make_directory(directory):
+    """Make the specified direectory, if it doesn't exist already."""
     if not os.path.exists(directory):
         os.makedirs(directory)
 

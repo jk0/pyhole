@@ -54,7 +54,13 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(utils.get_home_directory().endswith("/.pyhole/"))
 
     def test_get_directory(self):
-        new_dir = utils.get_home_directory() + "test_dir"
+        new_dir = utils.get_home_directory() + "test_dir/"
+        actual_dir = utils.get_directory("test_dir")
+        self.assertEqual(new_dir, actual_dir)
+        os.rmdir(new_dir)
+
+    def test_make_directory(self):
+        new_dir = utils.get_home_directory() + "test_dir/"
         self.assertFalse(os.path.exists(new_dir))
         utils.get_directory("test_dir")
         self.assertTrue(os.path.exists(new_dir))
