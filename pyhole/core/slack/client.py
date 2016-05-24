@@ -62,6 +62,9 @@ class Client(object):
         self.client = slackclient.SlackClient(self.api_token)
         self.client.rtm_connect()
 
+        queue = utils.MessageQueue()
+        queue.watch(self)
+
         count = 0
         while True:
             try:
@@ -101,9 +104,14 @@ class Client(object):
                 continue
 
     def reply(self, target, msg):
-        """Reply to a channel."""
-        channel = self.client.server.channels.find(target)
-        channel.send_message(msg)
+        """Reply to a target."""
+        try:
+            channel = self.client.server.channels.find(target)
+            channel.send_message(msg)
+        except AttributeError:
+            # NOTE(jk0): Not yet supported.
+            # user = self.client.server.users.find(target).id
+            pass
 
     def op_user(self, *args, **kwargs):
         pass
@@ -118,7 +126,4 @@ class Client(object):
         pass
 
     def part_channel(self, *args, **kwargs):
-        pass
-
-    def privmsg(self, *args, **kwargs):
         pass

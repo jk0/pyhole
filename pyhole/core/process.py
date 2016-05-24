@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Network Processes"""
+"""Pyhole Network Connections"""
 
 import multiprocessing
 
@@ -20,7 +20,7 @@ from pyhole.core import utils
 
 
 class Process(multiprocessing.Process):
-    """A network connection process."""
+    """A network connection."""
     def __init__(self, network):
         super(Process, self).__init__()
         self.network = network

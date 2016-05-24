@@ -17,7 +17,6 @@
 import cgi
 import flask
 import os
-import sys
 import time
 import uuid
 
@@ -164,14 +163,13 @@ def create_paste():
 # END PASTE API #
 
 
-@utils.subprocess
+@utils.spawn
 def run():
     """Run the flask process."""
     config = utils.get_config()
 
     kwargs = {
         "host": "0.0.0.0",
-        "threaded": True,
     }
 
     ssl_crt = config.get("api_ssl_crt", default="")
@@ -180,7 +178,4 @@ def run():
     if os.path.exists(ssl_crt) and os.path.exists(ssl_key):
         kwargs["ssl_context"] = (ssl_crt, ssl_key)
 
-    try:
-        APP.run(**kwargs)
-    except KeyboardInterrupt:
-        sys.exit(0)
+    APP.run(**kwargs)

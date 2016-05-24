@@ -16,13 +16,11 @@
 
 import argparse
 import datetime
-import eventlet
 import multiprocessing
 import os
 import re
 import shutil
-import sys
-import traceback
+import threading
 
 from BeautifulSoup import BeautifulStoneSoup
 
@@ -30,7 +28,7 @@ import config
 import version
 
 
-eventlet.monkey_patch()
+QUEUE = multiprocessing.Queue()
 
 
 def admin(func):
@@ -38,7 +36,6 @@ def admin(func):
     def wrap(self, message, *args, **kwargs):
         if message.source in self.session.admins:
             return func(self, message, *args, **kwargs)
-
         return message.dispatch("Sorry, you are not authorized to do that.")
 
     wrap.__doc__ = func.__doc__
@@ -54,7 +51,6 @@ def require_params(func):
         if not params:
             message.dispatch(wrap.__doc__)
             return
-
         return func(self, message, params, *args, **kwargs)
 
     wrap.__doc__ = func.__doc__
@@ -65,45 +61,11 @@ def require_params(func):
 
 
 def spawn(func):
-    """Greenthread-spawning decorator."""
-    def wrap(self, *args, **kwargs):
-        eventlet.spawn_n(func, self, *args, **kwargs)
-
-    wrap.__doc__ = func.__doc__
-    wrap.__name__ = func.__name__
-    wrap.__module__ = func.__module__
-
-    return wrap
-
-
-def subprocess(func):
-    """Subprocess-spawning decorator."""
-    def _subprocess(q, *args, **kwargs):
-        try:
-            ret = func(*args, **kwargs)
-        except Exception:
-            ex_type, ex_value, tb = sys.exc_info()
-            error = ex_type, ex_value, "".join(traceback.format_tb(tb))
-            ret = None
-        else:
-            error = None
-
-        q.put((ret, error))
-
+    """Thread-spawning decorator."""
     def wrap(*args, **kwargs):
-        q = multiprocessing.Queue()
-        p = multiprocessing.Process(target=_subprocess,
-                                    args=[q] + list(args), kwargs=kwargs)
-        p.start()
-        p.join()
-        ret, error = q.get()
-
-        if error:
-            ex_type, ex_value, tb_str = error
-            message = "%s (in subprocess)\n%s" % (ex_value.message, tb_str)
-            raise ex_type(message)
-
-        return ret
+        t = threading.Thread(target=func, args=args, kwargs=kwargs)
+        t.setDaemon(True)
+        t.start()
 
     wrap.__doc__ = func.__doc__
     wrap.__name__ = func.__name__
@@ -231,3 +193,25 @@ def prepare_config():
 def datetime_now_string():
     """ISO 8601 formatted string of the current datetime."""
     return datetime.datetime.utcnow().isoformat()
+
+
+class MessageQueue(object):
+    """Global message queue."""
+
+    def __init__(self):
+        self.queue = QUEUE
+
+    def put(self, item):
+        """Place an item in the queue."""
+        self.queue.put_nowait(item)
+
+    @spawn
+    def watch(self, session):
+        """Watch the queue for incoming messages."""
+        while True:
+            network, source, target, message = self.queue.get()
+
+            # NOTE(jk0): Right now there is no way to guarantee that the
+            # message will get delivered to the right network.
+            _msg = "New message from %s: %s" % (source, message)
+            session.reply(target, _msg)

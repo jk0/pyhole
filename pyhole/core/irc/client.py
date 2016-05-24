@@ -87,8 +87,8 @@ class Client(irclib.SimpleIRCClient):
         """Send a notice."""
         self.connection.notice(target, msg)
 
-    def privmsg(self, target, msg):
-        """Send a privmsg."""
+    def reply(self, target, msg):
+        """Reply to a target."""
         self.connection.privmsg(target, msg)
 
     def op_user(self, params):
@@ -136,7 +136,7 @@ class Client(irclib.SimpleIRCClient):
     def on_welcome(self, connection, _event):
         """Join channels upon successful connection."""
         if self.identify_password:
-            self.privmsg("NickServ", "IDENTIFY %s" % self.identify_password)
+            self.reply("NickServ", "IDENTIFY %s" % self.identify_password)
 
         for channel in self.channels:
             channel = channel.split(" ", 1)
@@ -145,6 +145,9 @@ class Client(irclib.SimpleIRCClient):
                     connection.join(channel[0], channel[1])
                 else:
                     connection.join(channel[0])
+
+        queue = utils.MessageQueue()
+        queue.watch(self)
 
     def on_disconnect(self, _connection, _event):
         """Attempt to reconnect after disconnection."""
