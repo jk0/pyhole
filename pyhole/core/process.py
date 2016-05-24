@@ -1,4 +1,4 @@
-#   Copyright 2010-2015 Josh Kearney
+#   Copyright 2010-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -12,13 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Network Process Class"""
+"""Network Processes"""
 
 import multiprocessing
-import sys
-import time
 
-from pyhole.core import logger
 from pyhole.core import utils
 
 
@@ -26,39 +23,15 @@ class Process(multiprocessing.Process):
     """A network connection process."""
     def __init__(self, network):
         super(Process, self).__init__()
-        self.log = logger.get_logger()
-        self.config = utils.get_config()
-
         self.network = network
-        self.reconnect_delay = self.config.get("reconnect_delay", type="int")
 
     def run(self):
         """A network connection."""
-        while True:
-            try:
-                network_config = utils.get_config(self.network)
-                if network_config.get("api_token", default=None):
-                    from pyhole.core.slack import client
-                else:
-                    from pyhole.core.irc import client
+        network_config = utils.get_config(self.network)
+        if network_config.get("api_token", default=None):
+            from pyhole.core.slack import client
+        else:
+            from pyhole.core.irc import client
 
-                connection = client.Client(self.network)
-            except Exception as ex:
-                self.log.exception(ex)
-                self.log.error("Retrying in %d seconds" % self.reconnect_delay)
-
-                time.sleep(self.reconnect_delay)
-
-                continue
-
-            try:
-                connection.start()
-            except KeyboardInterrupt:
-                sys.exit(0)
-            except Exception as ex:
-                self.log.exception(ex)
-                self.log.error("Retrying in %d seconds" % self.reconnect_delay)
-
-                time.sleep(self.reconnect_delay)
-
-                continue
+        connection = client.Client(self.network)
+        connection.start()

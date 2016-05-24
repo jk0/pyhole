@@ -14,7 +14,6 @@
 
 """pyhole - A modular IRC & Slack bot."""
 
-import sys
 import time
 
 from pyhole.core import api
@@ -28,8 +27,8 @@ def Main():
     """Main loop."""
     config = utils.get_config()
     log = logger.get_logger()
-
     networks = config.get("networks", type="list")
+
     log.info("Starting %s..." % version.version_string())
     log.info("Connecting to networks: %s" % ", ".join(networks))
 
@@ -51,6 +50,7 @@ def Main():
 
             if not procs:
                 log.info("No longer connected to any networks; shutting down.")
-                sys.exit(0)
+                raise KeyboardInterrupt
     except KeyboardInterrupt:
-        log.info("Caught KeyboardInterrupt; shutting down.")
+        for proc in procs:
+            proc.terminate()
