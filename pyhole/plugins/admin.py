@@ -24,7 +24,6 @@ class Admin(plugin.Plugin):
     @plugin.hook_add_command("help")
     def help(self, message, params=None, **kwargs):
         """Learn how to use plugins (ex: .help <command>)."""
-
         if params:
             doc = _find_doc_string(params)
             if doc:
@@ -99,9 +98,9 @@ class Admin(plugin.Plugin):
     @utils.admin
     @utils.require_params
     def say(self, message, params=None, **kwargs):
-        """Send a PRIVMSG (ex: .say <channel>|<nick> message)."""
+        """Send a reply (ex: .say <channel>|<nick> message)."""
         (target, msg) = params.split(" ", 1)
-        self.session.privmsg(target, msg)
+        self.session.reply(target, msg)
 
 
 def _find_doc_string(params):

@@ -93,12 +93,12 @@ class Reply(Message):
         for line in _reply:
             if self.session.addressed:
                 source = self.source.split("!")[0]
-                self.session.privmsg(self.target, "%s: %s" % (source, line))
+                self.session.reply(self.target, "%s: %s" % (source, line))
                 self.session.log.info("-%s- <%s> %s: %s" % (self.target,
                                                             self.session.nick,
                                                             source, line))
             else:
-                self.session.privmsg(self.target, line)
+                self.session.reply(self.target, line)
                 if irclib.is_channel(self.target):
                     self.session.log.info("-%s- <%s> %s" % (self.target,
                                                             self.session.nick,

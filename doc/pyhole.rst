@@ -72,6 +72,14 @@ Pyhole Core Modules
     :undoc-members:
     :show-inheritance:
 
+:mod:`pyhole.core.queue`
+--------------------------
+.. automodule:: pyhole.core.queue
+    :noindex:
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`pyhole.core.request`
 --------------------------
 .. automodule:: pyhole.core.request

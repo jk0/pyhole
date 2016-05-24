@@ -23,6 +23,7 @@ from irc import connection
 
 from pyhole.core import logger
 from pyhole.core import plugin
+from pyhole.core import queue
 from pyhole.core import utils
 from pyhole.core import version
 from pyhole.core.irc import message
@@ -87,8 +88,8 @@ class Client(irclib.SimpleIRCClient):
         """Send a notice."""
         self.connection.notice(target, msg)
 
-    def privmsg(self, target, msg):
-        """Send a privmsg."""
+    def reply(self, target, msg):
+        """Reply to a target."""
         self.connection.privmsg(target, msg)
 
     def op_user(self, params):
@@ -136,7 +137,7 @@ class Client(irclib.SimpleIRCClient):
     def on_welcome(self, connection, _event):
         """Join channels upon successful connection."""
         if self.identify_password:
-            self.privmsg("NickServ", "IDENTIFY %s" % self.identify_password)
+            self.reply("NickServ", "IDENTIFY %s" % self.identify_password)
 
         for channel in self.channels:
             channel = channel.split(" ", 1)
@@ -146,12 +147,15 @@ class Client(irclib.SimpleIRCClient):
                 else:
                     connection.join(channel[0])
 
+        q = queue.FIFOQueue()
+        q.watch(self)
+
     def on_disconnect(self, _connection, _event):
         """Attempt to reconnect after disconnection."""
-        self.log.info("Disconnected from %s:%d" % (self.server, self.port))
-        self.log.info("Reconnecting in %d seconds" % self.reconnect_delay)
+        self.log.info("Disconnected from %s:%d." % (self.server, self.port))
+        self.log.info("Reconnecting in %d seconds." % self.reconnect_delay)
         time.sleep(self.reconnect_delay)
-        self.log.info("Connecting to %s:%d as %s" % (self.server, self.port,
+        self.log.info("Connecting to %s:%d as %s." % (self.server, self.port,
                       self.nick))
         self.connect(self.server, self.port, self.nick, self.password,
                      username=self.username,

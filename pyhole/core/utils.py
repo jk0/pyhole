@@ -12,17 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-"""Pyhole Utility Library"""
+"""Pyhole Utilies"""
 
 import argparse
 import datetime
-import eventlet
-import multiprocessing
 import os
 import re
 import shutil
-import sys
-import traceback
+import threading
 
 from BeautifulSoup import BeautifulStoneSoup
 
@@ -30,15 +27,11 @@ import config
 import version
 
 
-eventlet.monkey_patch()
-
-
 def admin(func):
     """Require admin rights."""
     def wrap(self, message, *args, **kwargs):
         if message.source in self.session.admins:
             return func(self, message, *args, **kwargs)
-
         return message.dispatch("Sorry, you are not authorized to do that.")
 
     wrap.__doc__ = func.__doc__
@@ -54,7 +47,6 @@ def require_params(func):
         if not params:
             message.dispatch(wrap.__doc__)
             return
-
         return func(self, message, params, *args, **kwargs)
 
     wrap.__doc__ = func.__doc__
@@ -65,45 +57,11 @@ def require_params(func):
 
 
 def spawn(func):
-    """Greenthread-spawning decorator."""
-    def wrap(self, *args, **kwargs):
-        eventlet.spawn_n(func, self, *args, **kwargs)
-
-    wrap.__doc__ = func.__doc__
-    wrap.__name__ = func.__name__
-    wrap.__module__ = func.__module__
-
-    return wrap
-
-
-def subprocess(func):
-    """Subprocess-spawning decorator."""
-    def _subprocess(q, *args, **kwargs):
-        try:
-            ret = func(*args, **kwargs)
-        except Exception:
-            ex_type, ex_value, tb = sys.exc_info()
-            error = ex_type, ex_value, "".join(traceback.format_tb(tb))
-            ret = None
-        else:
-            error = None
-
-        q.put((ret, error))
-
+    """Thread-spawning decorator."""
     def wrap(*args, **kwargs):
-        q = multiprocessing.Queue()
-        p = multiprocessing.Process(target=_subprocess,
-                                    args=[q] + list(args), kwargs=kwargs)
-        p.start()
-        p.join()
-        ret, error = q.get()
-
-        if error:
-            ex_type, ex_value, tb_str = error
-            message = "%s (in subprocess)\n%s" % (ex_value.message, tb_str)
-            raise ex_type(message)
-
-        return ret
+        t = threading.Thread(target=func, args=args, kwargs=kwargs)
+        t.setDaemon(True)
+        t.start()
 
     wrap.__doc__ = func.__doc__
     wrap.__name__ = func.__name__
@@ -125,7 +83,6 @@ def ensure_int(param):
     """Ensure the given param is an int."""
     try:
         param = re.sub("\W", "", param)
-
         return int(param)
     except ValueError:
         return None
@@ -145,7 +102,6 @@ def build_options():
 def get_option(option):
     """Retrive an option from the command line."""
     parsed_args = build_options()
-
     return vars(parsed_args).get(option)
 
 
@@ -206,7 +162,6 @@ def read_file(directory, file_name):
     try:
         with open(directory + file_name, "r") as open_file:
             data = open_file.read()
-
         return data
     except IOError:
         return None

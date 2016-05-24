@@ -1,4 +1,4 @@
-#   Copyright 2011 Josh Kearney
+#   Copyright 2011-2016 Josh Kearney
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -19,16 +19,11 @@ import unittest
 
 from pyhole.core import utils
 
-# NOTE(jk0): Un-eventlet.monkey_patch() the threading module.
-import threading
-reload(threading)
-
 
 class TestUtils(unittest.TestCase):
     def setUp(self):
         utils.write_file("tests", "pyhole_test_file", "foo")
         self.new_file = utils.get_home_directory() + "tests/pyhole_test_file"
-        self.cpid = os.getpid()
 
     def tearDown(self):
         os.unlink(self.new_file)
@@ -84,11 +79,4 @@ class TestUtils(unittest.TestCase):
         self.assertTrue(os.path.exists(self.new_file))
 
     def test_read_file(self):
-        self.assertEquals(utils.read_file("tests", "pyhole_test_file"), "foo")
-
-    def test_subprocess(self):
-        @utils.subprocess
-        def test_pid():
-            return os.getpid()
-
-        self.assertNotEquals(self.cpid, test_pid())
+        self.assertEqual(utils.read_file("tests", "pyhole_test_file"), "foo")

@@ -35,7 +35,6 @@ setuptools.setup(
     ],
     install_requires=[
         "BeautifulSoup==3.2.0",
-        "Eventlet",
         "flask",
         "irc",
         "launchpadlib",
