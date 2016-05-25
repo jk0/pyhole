@@ -115,20 +115,24 @@ def debug_enabled():
 def get_home_directory():
     """Return the home directory."""
     home_dir = os.getenv("HOME") + "/.pyhole/"
-    if not os.path.exists(home_dir):
-        os.makedirs(home_dir)
+    make_directory(home_dir)
+
     return home_dir
 
 
 def get_directory(new_dir):
     """Return a directory."""
     home_dir = get_home_directory()
-    new_dir = home_dir + new_dir
+    new_dir = os.path.join(home_dir, new_dir, "")
+    make_directory(new_dir)
 
-    if not os.path.exists(new_dir):
-        os.makedirs(new_dir)
+    return new_dir
 
-    return new_dir + "/"
+
+def make_directory(directory):
+    """Make the specified direectory, if it doesn't exist already."""
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
 def get_conf_file_path():

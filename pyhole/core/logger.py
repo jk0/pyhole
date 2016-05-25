@@ -14,14 +14,53 @@
 
 """Pyhole Logging"""
 
+import bz2
+import glob
 import logging
 import logging.handlers
+import os
 import requests
+import shutil
 
 import utils
 
 
-def setup_logger(name="Pyhole"):
+LOG_DIR = utils.get_directory("logs")
+LOG_ARCHIVE_DIR = utils.get_directory(os.path.join("logs", "archive"))
+LOG_FORMAT = "%(asctime)s [%(name)s] %(message)s"
+LOG_DATEFMT = "%H:%M:%S"
+
+
+class PyholeFileHandler(logging.handlers.TimedRotatingFileHandler):
+    # CamelCase because superclass is like that
+    def doRollover(self):
+        result = super(PyholeFileHandler, self).doRollover()
+        self.archive_old_logs()
+        return result
+
+    def archive_old_logs(self):
+        # Compress uncompressed logs
+        matcher = "*.log.*[!b][!z][!2]"
+        files = glob.glob(os.path.join(LOG_DIR, matcher))
+        for file_path in files:
+            filename = os.path.basename(file_path)
+            compressed_filename = filename + ".bz2"
+            network_name = filename[:filename.rfind(".log")]
+            archive_dir = os.path.join(LOG_ARCHIVE_DIR, network_name)
+            utils.make_directory(archive_dir)
+            compressed_file_path = os.path.join(archive_dir,
+                                                compressed_filename)
+
+            with open(file_path, 'rb') as input:
+                with bz2.BZ2File(compressed_file_path,
+                                 'wb',
+                                 compresslevel=9) as output:
+                    shutil.copyfileobj(input, output)
+
+            os.remove(file_path)
+
+
+def setup_logger(name):
     """Setup the logger."""
     # NOTE(jk0): Disable unnecessary requests logging.
     requests.packages.urllib3.disable_warnings()
@@ -30,21 +69,20 @@ def setup_logger(name="Pyhole"):
 
     debug = utils.debug_enabled()
 
-    log_dir = utils.get_directory("logs")
     log_level = logging.DEBUG if debug else logging.INFO
-    log_format = "%(asctime)s [%(name)s] %(message)s"
-    log_datefmt = "%H:%M:%S"
 
-    logging.basicConfig(level=log_level, format=log_format,
-                        datefmt=log_datefmt)
+    logging.basicConfig(level=log_level,
+                        format=LOG_FORMAT,
+                        datefmt=LOG_DATEFMT)
 
-    log_file = "%s/%s.log"
-    log = logging.handlers.TimedRotatingFileHandler(log_file % (log_dir,
-                                                    name.lower()), "midnight")
+    log_file = os.path.join(LOG_DIR, name.lower() + ".log")
+    log = PyholeFileHandler(log_file, "midnight")
     log.setLevel(log_level)
-    formatter = logging.Formatter(log_format, log_datefmt)
+    formatter = logging.Formatter(LOG_FORMAT, LOG_DATEFMT)
     log.setFormatter(formatter)
     logging.getLogger(name).addHandler(log)
+
+    log.archive_old_logs()
 
 
 def get_logger(name="Pyhole"):
