@@ -22,23 +22,31 @@ import utils
 QUEUE = multiprocessing.Queue()
 
 
-class FIFOQueue(object):
+class MessageQueue(object):
     """Global message queue."""
 
     def __init__(self):
         self.queue = QUEUE
 
     def put(self, item):
-        """Place an item in the queue."""
+        """Place an item into the queue."""
         self.queue.put_nowait(item)
 
     @utils.spawn
     def watch(self, session):
         """Watch the queue for incoming messages."""
         while True:
-            network, source, target, message = self.queue.get()
+            item = self.queue.get()
 
-            # NOTE(jk0): Right now there is no way to guarantee that the
-            # message will get delivered to the right network.
-            _msg = "New message from %s: %s" % (source, message)
-            session.reply(target, _msg)
+            actual_network = session.log.name
+            intended_network = item[0]
+
+            # NOTE(jk0): If the intended network does not match the actual
+            # network, place the item back into the queue and until it gets
+            # picked up by the intended network.
+            if actual_network != intended_network:
+                self.queue.put(item)
+                continue
+
+            _msg = "New message from %s: %s" % (item[1], item[3])
+            session.reply(item[2], _msg)

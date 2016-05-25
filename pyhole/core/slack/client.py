@@ -63,7 +63,7 @@ class Client(object):
         self.client = slackclient.SlackClient(self.api_token)
         self.client.rtm_connect()
 
-        q = queue.FIFOQueue()
+        q = queue.MessageQueue()
         q.watch(self)
 
         count = 0

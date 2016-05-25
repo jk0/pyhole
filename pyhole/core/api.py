@@ -20,17 +20,42 @@ import os
 import time
 import uuid
 
-import utils
-import version
+from pyhole.core import queue
+from pyhole.core import utils
+from pyhole.core import version
 
 
 APP = flask.Flask("pyhole")
+QUEUE = queue.MessageQueue()
 
 
 @APP.route("/", methods=["GET"])
 def index():
     """Handle index requests."""
     return version.version_string(), 200
+
+
+# BEGIN MESSAGE API #
+@APP.route("/messages/send", methods=["POST"])
+def send_message():
+    """Send a message."""
+    request = flask.request.get_json()
+
+    try:
+        item = (
+            request["network"],
+            request["source"],
+            request["target"],
+            request["message"]
+        )
+    except KeyError:
+        flask.abort(422)
+
+    # NOTE(jk0): Disable until auth is implemented.
+    # QUEUE.put(item)
+
+    return "", 200
+# END MESSAGE API #
 
 
 # BEGIN PASTE API #

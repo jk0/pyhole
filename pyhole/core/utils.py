@@ -116,7 +116,6 @@ def get_home_directory():
     """Return the home directory."""
     home_dir = os.getenv("HOME") + "/.pyhole/"
     make_directory(home_dir)
-
     return home_dir
 
 
@@ -125,12 +124,11 @@ def get_directory(new_dir):
     home_dir = get_home_directory()
     new_dir = os.path.join(home_dir, new_dir, "")
     make_directory(new_dir)
-
     return new_dir
 
 
 def make_directory(directory):
-    """Make the specified direectory, if it doesn't exist already."""
+    """Make a direectory if it doesn't exist."""
     if not os.path.exists(directory):
         os.makedirs(directory)
 

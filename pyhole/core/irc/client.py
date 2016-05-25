@@ -147,7 +147,7 @@ class Client(irclib.SimpleIRCClient):
                 else:
                     connection.join(channel[0])
 
-        q = queue.FIFOQueue()
+        q = queue.MessageQueue()
         q.watch(self)
 
     def on_disconnect(self, _connection, _event):
