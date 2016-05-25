@@ -54,7 +54,7 @@ def send_message():
     # NOTE(jk0): Disable until auth is implemented.
     # QUEUE.put(item)
 
-    return "", 200
+    return item, 200
 # END MESSAGE API #
 
 
