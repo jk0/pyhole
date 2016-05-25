@@ -42,7 +42,7 @@ class MessageQueue(object):
             intended_network = item[0]
 
             # NOTE(jk0): If the intended network does not match the actual
-            # network, place the item back into the queue and until it gets
+            # network, place the item back into the queue until it gets
             # picked up by the intended network.
             if actual_network != intended_network:
                 self.queue.put(item)
