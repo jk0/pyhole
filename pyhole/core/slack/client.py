@@ -110,9 +110,32 @@ class Client(object):
             channel = self.client.server.channels.find(target)
             channel.send_message(msg)
         except AttributeError:
-            # NOTE(jk0): Not yet supported.
-            # user = self.client.server.users.find(target).id
-            pass
+            self.log.error("Unable to find channel: %s" % target)
+
+        try:
+            user = self.client.server.users.find(target).id
+            im = self._open_im(user)
+            self._send_im(im, msg)
+            self._close_im(im)
+        except AttributeError:
+            self.log.error("Unable to find user: %s" % target)
+
+    def _open_im(self, user):
+        """Open a Slack IM."""
+        return self.client.api_call("im.open", user=user)["channel"]["id"]
+
+    def _send_im(self, channel, text):
+        """Send a Slack IM."""
+        kwargs = {
+            "as_user": True,
+            "channel": channel,
+            "text": text
+        }
+        return self.client.api_call("chat.postMessage", **kwargs)
+
+    def _close_im(self, channel):
+        """Close a Slack IM."""
+        return self.client.api_call("im.close", channel=channel)
 
     def op_user(self, *args, **kwargs):
         pass
