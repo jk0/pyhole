@@ -48,5 +48,4 @@ class MessageQueue(object):
                 self.queue.put(item)
                 continue
 
-            _msg = "New message from %s: %s" % (item[1], item[3])
-            session.reply(item[2], _msg)
+            session.reply(item[1], item[2])

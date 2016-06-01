@@ -44,7 +44,6 @@ def send_message():
     try:
         item = (
             request["network"],
-            request["source"],
             request["target"],
             request["message"]
         )
@@ -184,7 +183,21 @@ def create_paste():
     file_name = str(uuid.uuid4()).replace("-", "")
     utils.write_file("pastes", file_name, paste)
 
-    return flask.redirect("%s/%s" % (flask.request.url, file_name))
+    response = "%s/%s" % (flask.request.url, file_name)
+
+    try:
+        # NOTE(jk0): If these items exist, write them to the queue.
+        item = (
+            flask.request.get_json()["network"],
+            flask.request.get_json()["target"],
+            response
+        )
+
+        QUEUE.put(item)
+    except KeyError:
+        pass
+
+    return flask.redirect(response)
 # END PASTE API #
 
 
@@ -195,6 +208,7 @@ def run():
 
     kwargs = {
         "host": "0.0.0.0",
+        "threaded": True
     }
 
     ssl_crt = config.get("api_ssl_crt", default="")
