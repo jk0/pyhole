@@ -135,13 +135,14 @@ def get_conf_file_path():
     """Return the path to the conf file."""
     paths = (
         "/etc/pyhole.conf",
-        "/etc/pyhole/pyhole.conf",
-        get_home_directory() + "pyhole.conf"
+        "/etc/pyhole/pyhole.conf"
     )
 
     for path in paths:
         if os.path.exists(path):
             return path
+
+    return get_home_directory() + "pyhole.conf"
 
 
 def get_conf_file():
