@@ -75,7 +75,6 @@ def decode_entities(html):
     html = " ".join(str(x).strip() for x in BeautifulStoneSoup(html,
                     convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
                     text=True))
-
     return filter(lambda x: ord(x) > 9 and ord(x) < 127, html)
 
 
@@ -95,7 +94,6 @@ def build_options():
                         help="specify the path to a configuration file")
     parser.add_argument("-d", "--debug", action="store_true",
                         help="show debugging output")
-
     return parser.parse_known_args()[0]
 
 
@@ -135,7 +133,15 @@ def make_directory(directory):
 
 def get_conf_file_path():
     """Return the path to the conf file."""
-    return get_home_directory() + "pyhole.conf"
+    paths = (
+        "/etc/pyhole.conf",
+        "/etc/pyhole/pyhole.conf",
+        get_home_directory() + "pyhole.conf"
+    )
+
+    for path in paths:
+        if os.path.exists(path):
+            return path
 
 
 def get_conf_file():
