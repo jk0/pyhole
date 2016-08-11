@@ -137,6 +137,7 @@ class Ops(plugin.Plugin):
             message.dispatch("Unable to fetch notes: %d" % req.status_code)
 
     @plugin.hook_add_command("lookup")
+    @utils.require_params
     @utils.spawn
     def lookup(self, message, params=None, **kwargs):
         """Lookup user's phone numbers (ex: .lookup <name>."""
