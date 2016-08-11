@@ -14,6 +14,7 @@
 
 """Pyhole Operations Plugin"""
 
+import re
 import time
 
 from pyhole.core import plugin
@@ -145,7 +146,9 @@ class Ops(plugin.Plugin):
         response = request.get(url, headers=self.api_headers).json()
         results = []
         for user in response["users"]:
-            if params in user["name"] or params in user["email"]:
+            found_user = re.search(params, user["name"], re.IGNORECASE)
+            found_email = re.search(params, user["email"], re.IGNORECASE)
+            if found_user or found_email:
                 url = "%s/api/v1/users/%s/contact_methods" % (self.subdomain,
                                                               user["id"])
                 response = request.get(url, headers=self.api_headers).json()
