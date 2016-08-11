@@ -32,14 +32,12 @@ class Ops(plugin.Plugin):
         pagerduty = utils.get_config("PagerDuty")
         self.subdomain = pagerduty.get("subdomain")
         self.api_key = pagerduty.get("api_key")
-        self.integration_key = pagerduty.get("integration_key")
 
         self.api_headers = {
             "Authorization": "Token token=%s" % self.api_key,
             "Content-Type": "application/json"
         }
         self.user_cache = None
-        self.reset_current_incident()
 
     @plugin.hook_add_command("oncall")
     @utils.spawn
@@ -64,34 +62,15 @@ class Ops(plugin.Plugin):
         else:
             message.dispatch("Unable to fetch list: %d" % req.status_code)
 
-    @plugin.hook_add_command("incident")
-    @utils.require_params
-    @utils.spawn
-    def incident(self, message, params=None, **kwargs):
-        """Manage incidents (ex: .incident <create|resolve|setkey>)."""
-        param_split = params.split(" ")
-        command = param_split.pop(0)
-        if command == "create":
-            description = " ".join(param_split)
-            self.create_incident(message, description)
-        elif command == "resolve":
-            self.resolve_incident(message)
-        elif command == "setkey":
-            key = " ".join(param_split)
-            self.set_key(message, key)
-
     @plugin.hook_add_command("note")
     @utils.require_params
     @utils.spawn
     def note(self, message, params=None, **kwargs):
-        """Create a note for the current incident (ex: .note <message>)."""
-        number = self.get_incident_number()
-        if number is None:
-            msg = "Could not get incident number for current incident."
-            message.dispatch(msg)
-            return
+        """Create a note for an incident (ex: .note <ID> <message>)."""
+        params = params.split(" ")
+        incident_id = params.pop(0)
 
-        url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, number)
+        url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, incident_id)
         user = self.find_user_like(message.source)
         if user is None:
             message.dispatch("Could not find PagerDuty user matching: %s" %
@@ -99,10 +78,10 @@ class Ops(plugin.Plugin):
             return
 
         data = {
+            "requester_id": user["id"],
             "note": {
-                "content": params
-            },
-            "requester_id": user["id"]
+                "content": " ".join(params)
+            }
         }
 
         req = request.post(url, headers=self.api_headers, json=data)
@@ -114,17 +93,13 @@ class Ops(plugin.Plugin):
             message.dispatch(req.text)
 
     @plugin.hook_add_command("notes")
+    @utils.require_params
     @utils.spawn
     def notes(self, message, params=None, **kwargs):
-        """List all notes in current incident."""
-        number = self.get_incident_number()
-        if number is None:
-            msg = "Could not get incident number for current incident."
-            message.dispatch(msg)
-            return
-
-        url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, number)
+        """List all notes an incident (ex: .note <ID>)."""
+        url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, params)
         req = request.get(url, headers=self.api_headers)
+
         if request.ok(req):
             response_json = req.json()
             notes = response_json["notes"]
@@ -142,17 +117,15 @@ class Ops(plugin.Plugin):
     @utils.spawn
     def lookup(self, message, params=None, **kwargs):
         """Lookup user's phone numbers (ex: .lookup <name>."""
-        url = "%s/api/v1/users?limit=1000" % self.subdomain
+        url = "%s/api/v1/users?include[]=contact_methods&limit=1000" % (
+            self.subdomain)
         response = request.get(url, headers=self.api_headers).json()
         results = []
         for user in response["users"]:
             found_user = re.search(params, user["name"], re.IGNORECASE)
             found_email = re.search(params, user["email"], re.IGNORECASE)
             if found_user or found_email:
-                url = "%s/api/v1/users/%s/contact_methods" % (self.subdomain,
-                                                              user["id"])
-                response = request.get(url, headers=self.api_headers).json()
-                for contact in response["contact_methods"]:
+                for contact in user["contact_methods"]:
                     if contact["type"] == "phone":
                         results.append("%s (%s)" % (user["name"],
                                                     contact["phone_number"]))
@@ -160,59 +133,6 @@ class Ops(plugin.Plugin):
             message.dispatch(", ".join(results))
         else:
             message.dispatch("No results found: %s" % params)
-
-    def create_incident(self, message, description):
-        """Create a PagerDuty incident with specified description."""
-        # would have been called url, but flake8 complains that line is 81 long
-        u = "https://events.pagerduty.com/generic/2010-04-15/create_event.json"
-        data = {
-            "service_key": self.integration_key,
-            "event_type": "trigger",
-            "description": description,
-            "incident_key": utils.datetime_now_string(),
-            "details": {"triggered by": message.source}
-        }
-
-        req = request.post(u, json=data)
-        response_json = req.json()
-        if request.ok(req):
-            self.set_incident_key(response_json["incident_key"])
-            message.dispatch("Created incident with incident_key: %s" %
-                             self.get_incident_key())
-        else:
-            message.dispatch("Error creating incident: %d" % req.status_code)
-            message.dispatch(response_json["message"])
-
-    def resolve_incident(self, message):
-        """Close the current PagerDuty incident."""
-        incident_id = self.get_incident_id()
-        if incident_id is None:
-            message.dispatch("Could not find ID for current incident.")
-            return
-
-        url = "%s/api/v1/incidents/%s/resolve" % (self.subdomain, incident_id)
-        user = self.find_user_like(message.source)
-        if user is None:
-            message.dispatch("Could not find PagerDuty user: %s" %
-                             message.source)
-            return
-
-        data = {"requester_id": user["id"]}
-
-        req = request.put(url, headers=self.api_headers, json=data)
-
-        if request.ok(req):
-            self.reset_current_incident()
-            message.dispatch("Resolved incident successfully.")
-        else:
-            message.dispatch("Could not resolve incident: %d" %
-                             req.status_code)
-            message.dispatch(req.text)
-
-    def set_key(self, message, key):
-        """Set the current incident key."""
-        self.set_incident_key(key)
-        message.dispatch("Key set to: %s" % key)
 
     def get_users(self):
         """Get PagerDuty users and fill the cache."""
@@ -240,65 +160,4 @@ class Ops(plugin.Plugin):
             for user in self.user_cache:
                 if query in user["email"]:
                     return user
-        return None
-
-    def reset_current_incident(self):
-        """Resets the current incident state."""
-        self.current_incident = {
-            "key": None,
-            "number": None,
-            "id": None
-        }
-
-    def get_incident_key(self):
-        return self.current_incident["key"]
-
-    def get_incident_number(self):
-        number = self.current_incident["number"]
-        if number is None:
-            number = self.find_incident_number()
-            self.set_incident_number(number)
-        return number
-
-    def get_incident_id(self):
-        the_id = self.current_incident["id"]
-        if the_id is None:
-            new_id = self.find_incident_id()
-            self.set_incident_id(new_id)
-        return the_id
-
-    def set_incident_key(self, key):
-        self.current_incident["key"] = key
-
-    def set_incident_number(self, number):
-        self.current_incident["number"] = number
-
-    def set_incident_id(self, new_id):
-        self.current_incident["id"] = new_id
-
-    def find_incident_number(self):
-        """Finds incident number from the current incident key."""
-        key = self.get_incident_key()
-        if key is not None:
-            url = "%s/api/v1/incidents" % self.subdomain
-            params = {"incident_key": key, "sort_by": "created_on:desc"}
-            req = request.get(url, headers=self.api_headers, params=params)
-
-            if request.ok(req):
-                response_json = req.json()
-                incidents = response_json["incidents"]
-                if len(incidents) > 0:
-                    number = incidents[0]["incident_number"]
-                    return number
-        return None
-
-    def find_incident_id(self):
-        """Finds incident id from the current incident number."""
-        number = self.get_incident_number()
-        if number is not None:
-            url = "%s/api/v1/incidents/%s" % (self.subdomain, number)
-            req = request.get(url, headers=self.api_headers)
-            if request.ok(req):
-                response_json = req.json()
-                return response_json["id"]
         return None

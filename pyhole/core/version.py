@@ -18,7 +18,7 @@ import os
 import sys
 
 
-__VERSION__ = "0.8.5"
+__VERSION__ = "0.8.6"
 
 
 def current_git_hash():
