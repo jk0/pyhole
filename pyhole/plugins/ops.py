@@ -136,6 +136,27 @@ class Ops(plugin.Plugin):
         else:
             message.dispatch("Unable to fetch notes: %d" % req.status_code)
 
+    @plugin.hook_add_command("lookup")
+    @utils.spawn
+    def lookup(self, message, params=None, **kwargs):
+        """Lookup user's phone numbers (ex: .lookup <name>."""
+        url = "%s/api/v1/users?limit=1000" % self.subdomain
+        response = request.get(url, headers=self.api_headers).json()
+        results = []
+        for user in response["users"]:
+            if params in user["name"] or params in user["email"]:
+                url = "%s/api/v1/users/%s/contact_methods" % (self.subdomain,
+                                                              user["id"])
+                response = request.get(url, headers=self.api_headers).json()
+                for contact in response["contact_methods"]:
+                    if contact["type"] == "phone":
+                        results.append("%s (%s)" % (user["name"],
+                                                    contact["phone_number"]))
+        if len(results) > 0:
+            message.dispatch(", ".join(results))
+        else:
+            message.dispatch("No results found: %s" % params)
+
     def create_incident(self, message, description):
         """Create a PagerDuty incident with specified description."""
         # would have been called url, but flake8 complains that line is 81 long
