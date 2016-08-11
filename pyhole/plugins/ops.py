@@ -117,7 +117,7 @@ class Ops(plugin.Plugin):
     @utils.spawn
     def lookup(self, message, params=None, **kwargs):
         """Lookup user's phone numbers (ex: .lookup <name>."""
-        url = "%s/api/v1/users?include[]=contact_methods&limit=1000" % (
+        url = "%s/api/v1/users?include[]=contact_methods&limit=100" % (
             self.subdomain)
         response = request.get(url, headers=self.api_headers).json()
         results = []
