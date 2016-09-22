@@ -28,9 +28,7 @@ class Ops(plugin.Plugin):
 
         pagerduty = utils.get_config("PagerDuty")
         self.api_token = pagerduty.get("api_token")
-
         self.endpoint = "https://api.pagerduty.com"
-        self.user_cache = None
 
         self.api_headers = {
             "Accept": "application/vnd.pagerduty+json;version=2",
