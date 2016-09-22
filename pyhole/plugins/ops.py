@@ -14,9 +14,6 @@
 
 """Pyhole Operations Plugin"""
 
-import re
-import time
-
 from pyhole.core import plugin
 from pyhole.core import request
 from pyhole.core import utils
@@ -30,35 +27,31 @@ class Ops(plugin.Plugin):
         self.name = self.__class__.__name__
 
         pagerduty = utils.get_config("PagerDuty")
-        self.subdomain = pagerduty.get("subdomain")
-        self.api_key = pagerduty.get("api_key")
+        self.api_token = pagerduty.get("api_token")
+
+        self.endpoint = "https://api.pagerduty.com"
+        self.user_cache = None
 
         self.api_headers = {
-            "Authorization": "Token token=%s" % self.api_key,
+            "Accept": "application/vnd.pagerduty+json;version=2",
+            "Authorization": "Token token=%s" % self.api_token,
             "Content-Type": "application/json"
         }
-        self.user_cache = None
 
     @plugin.hook_add_command("oncall")
     @utils.spawn
     def oncall(self, message, params=None, **kwargs):
-        """Show who is on call (ex: .oncall [<group>])."""
-        url = "%s/api/v1/escalation_policies/on_call" % self.subdomain
-        req = request.get(url, headers=self.api_headers,
-                          params={"query": params})
-
+        """Show who is on call (ex: .oncall)."""
+        url = "%s/oncalls" % self.endpoint
+        req = request.get(url, headers=self.api_headers)
         if request.ok(req):
             response_json = req.json()
-            for policy in response_json["escalation_policies"]:
-                message.dispatch(policy["name"])
-
-                for level in policy["on_call"]:
-                    message.dispatch("- Level %s: %s <%s>" % (
-                                     level["level"],
-                                     level["user"]["name"],
-                                     level["user"]["email"]))
-                # NOTE(jk0): This is needed to prevent rate-limiting.
-                time.sleep(2)
+            on_calls = []
+            for policy in response_json["oncalls"]:
+                if policy["schedule"]:
+                    on_calls.append("%s (%s)" % (policy["schedule"]["summary"],
+                                                 policy["user"]["summary"]))
+            message.dispatch(", ".join(on_calls))
         else:
             message.dispatch("Unable to fetch list: %d" % req.status_code)
 
@@ -70,20 +63,19 @@ class Ops(plugin.Plugin):
         params = params.split(" ")
         incident_id = params.pop(0)
 
-        url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, incident_id)
-        user = self.find_user_like(message.source)
-        if user is None:
-            message.dispatch("Could not find PagerDuty user matching: %s" %
-                             message.source)
+        users = self._find_users("josh.kearney")
+        if len(users["users"]) < 1:
+            message.dispatch("Unable to find user: %s" % message.source)
             return
 
+        self.api_headers["From"] = users["users"][0]["email"]
         data = {
-            "requester_id": user["id"],
             "note": {
                 "content": " ".join(params)
             }
         }
 
+        url = "%s/incidents/%s/notes" % (self.endpoint, incident_id)
         req = request.post(url, headers=self.api_headers, json=data)
 
         if request.ok(req):
@@ -97,7 +89,7 @@ class Ops(plugin.Plugin):
     @utils.spawn
     def notes(self, message, params=None, **kwargs):
         """List all notes an incident (ex: .note <ID>)."""
-        url = "%s/api/v1/incidents/%s/notes" % (self.subdomain, params)
+        url = "%s/incidents/%s/notes" % (self.endpoint, params)
         req = request.get(url, headers=self.api_headers)
 
         if request.ok(req):
@@ -107,7 +99,7 @@ class Ops(plugin.Plugin):
 
             for note in notes:
                 message.dispatch("%s %s - %s" % (note["created_at"],
-                                                 note["user"]["name"],
+                                                 note["user"]["summary"],
                                                  note["content"]))
         else:
             message.dispatch("Unable to fetch notes: %d" % req.status_code)
@@ -117,47 +109,23 @@ class Ops(plugin.Plugin):
     @utils.spawn
     def lookup(self, message, params=None, **kwargs):
         """Lookup user's phone numbers (ex: .lookup <name>."""
-        url = "%s/api/v1/users?include[]=contact_methods&limit=100" % (
-            self.subdomain)
-        response = request.get(url, headers=self.api_headers).json()
+        users = self._find_users(params)
+
         results = []
-        for user in response["users"]:
-            found_user = re.search(params, user["name"], re.IGNORECASE)
-            found_email = re.search(params, user["email"], re.IGNORECASE)
-            if found_user or found_email:
-                for contact in user["contact_methods"]:
-                    if contact["type"] == "phone":
-                        results.append("%s (%s)" % (user["name"],
-                                                    contact["phone_number"]))
+        for user in users["users"]:
+            for contact in user["contact_methods"]:
+                if contact["type"] == "phone_contact_method":
+                    results.append("%s (%s)" % (user["name"],
+                                                contact["address"]))
         if len(results) > 0:
             message.dispatch(", ".join(results))
         else:
             message.dispatch("No results found: %s" % params)
 
-    def get_users(self):
-        """Get PagerDuty users and fill the cache."""
-        url = "%s/api/v1/users" % self.subdomain
+    def _find_users(self, name):
+        """Find PagerDuty user account information."""
+        url = "%s/users?query=%s&include[]=contact_methods" % (self.endpoint,
+                                                               name)
         req = request.get(url, headers=self.api_headers)
         if request.ok(req):
-            response_json = req.json()
-            return response_json["users"]
-        else:
-            return None
-
-    def find_user_like(self, query):
-        """Finds a PagerDuty user matching the query (name/email)."""
-        # if cache is empty, fill it
-        if self.user_cache is None:
-            self.user_cache = self.get_users()
-
-        # if it's still empty, something's wrong
-        if self.user_cache is not None:
-            # search the names first
-            for user in self.user_cache:
-                if query in user["name"]:
-                    return user
-            # then search the emails
-            for user in self.user_cache:
-                if query in user["email"]:
-                    return user
-        return None
+            return req.json()
