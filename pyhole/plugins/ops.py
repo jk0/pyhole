@@ -61,7 +61,7 @@ class Ops(plugin.Plugin):
         params = params.split(" ")
         incident_id = params.pop(0)
 
-        users = self._find_users("josh.kearney")
+        users = self._find_users(message.source)
         if len(users["users"]) < 1:
             message.dispatch("Unable to find user: %s" % message.source)
             return
