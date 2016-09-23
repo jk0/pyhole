@@ -40,7 +40,7 @@ class Ops(plugin.Plugin):
     @utils.require_params
     @utils.spawn
     def query(self, message, params=None, **kwargs):
-        """Queryan incident (ex: .query <ID>)."""
+        """Query an incident (ex: .query <ID>)."""
         url = "%s/incidents/%s" % (self.endpoint, params)
         req = request.get(url, headers=self.api_headers)
 
@@ -53,6 +53,30 @@ class Ops(plugin.Plugin):
             message.dispatch("%s [%s]: %s" % (summary, status, link))
         else:
             message.dispatch("Unable to query incident: %d" % req.status_code)
+            message.dispatch(req.text)
+
+    @plugin.hook_add_command("ack")
+    @utils.require_params
+    @utils.spawn
+    def ack(self, message, params=None, **kwargs):
+        """Acknowledge an incident (ex: .ack <ID>)."""
+        self.api_headers["From"] = self._find_user(message.source)
+
+        data = {
+            "incidents": [{
+                "id": params,
+                "type": "incident",
+                "status": "acknowledged"
+            }]
+        }
+
+        url = "%s/incidents" % self.endpoint
+        req = request.put(url, headers=self.api_headers, json=data)
+
+        if request.ok(req):
+            message.dispatch("Acknowledged.")
+        else:
+            message.dispatch("Unable to ack incident: %d" % req.status_code)
             message.dispatch(req.text)
 
     @plugin.hook_add_command("resolve")
