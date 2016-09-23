@@ -36,22 +36,48 @@ class Ops(plugin.Plugin):
             "Content-Type": "application/json"
         }
 
-    @plugin.hook_add_command("oncall")
+    @plugin.hook_add_command("query")
+    @utils.require_params
     @utils.spawn
-    def oncall(self, message, params=None, **kwargs):
-        """Show who is on call (ex: .oncall)."""
-        url = "%s/oncalls" % self.endpoint
+    def query(self, message, params=None, **kwargs):
+        """Queryan incident (ex: .query <ID>)."""
+        url = "%s/incidents/%s" % (self.endpoint, params)
         req = request.get(url, headers=self.api_headers)
+
         if request.ok(req):
-            response_json = req.json()
-            on_calls = []
-            for policy in response_json["oncalls"]:
-                if policy["schedule"]:
-                    on_calls.append("%s (%s)" % (policy["schedule"]["summary"],
-                                                 policy["user"]["summary"]))
-            message.dispatch(", ".join(on_calls))
+            incident = req.json()["incident"]
+            summary = incident["summary"]
+            status = incident["status"]
+            link = incident["html_url"]
+
+            message.dispatch("%s [%s]: %s" % (summary, status, link))
         else:
-            message.dispatch("Unable to fetch list: %d" % req.status_code)
+            message.dispatch("Unable to query incident: %d" % req.status_code)
+            message.dispatch(req.text)
+
+    @plugin.hook_add_command("resolve")
+    @utils.require_params
+    @utils.spawn
+    def resolve(self, message, params=None, **kwargs):
+        """Resolve an incident (ex: .snooze <ID>)."""
+        self.api_headers["From"] = self._find_user(message.source)
+
+        data = {
+            "incidents": [{
+                "id": params,
+                "type": "incident",
+                "status": "resolved"
+            }]
+        }
+
+        url = "%s/incidents" % self.endpoint
+        req = request.put(url, headers=self.api_headers, json=data)
+
+        if request.ok(req):
+            message.dispatch("Resolved.")
+        else:
+            message.dispatch("Unable to resolve: %d" % req.status_code)
+            message.dispatch(req.text)
 
     @plugin.hook_add_command("note")
     @utils.require_params
@@ -61,12 +87,7 @@ class Ops(plugin.Plugin):
         params = params.split(" ")
         incident_id = params.pop(0)
 
-        users = self._find_users(message.source)
-        if len(users["users"]) < 1:
-            message.dispatch("Unable to find user: %s" % message.source)
-            return
-
-        self.api_headers["From"] = users["users"][0]["email"]
+        self.api_headers["From"] = self._find_user(message.source)
         data = {
             "note": {
                 "content": " ".join(params)
@@ -91,8 +112,7 @@ class Ops(plugin.Plugin):
         req = request.get(url, headers=self.api_headers)
 
         if request.ok(req):
-            response_json = req.json()
-            notes = response_json["notes"]
+            notes = req.json()["notes"]
             message.dispatch("There are %d notes." % len(notes))
 
             for note in notes:
@@ -101,6 +121,27 @@ class Ops(plugin.Plugin):
                                                  note["content"]))
         else:
             message.dispatch("Unable to fetch notes: %d" % req.status_code)
+            message.dispatch(req.text)
+
+    @plugin.hook_add_command("oncall")
+    @utils.spawn
+    def oncall(self, message, params=None, **kwargs):
+        """Show who is on call (ex: .oncall)."""
+        url = "%s/oncalls" % self.endpoint
+        req = request.get(url, headers=self.api_headers)
+
+        if request.ok(req):
+            response_json = req.json()
+            on_calls = []
+
+            for policy in response_json["oncalls"]:
+                if policy["schedule"]:
+                    on_calls.append("%s (%s)" % (policy["schedule"]["summary"],
+                                                 policy["user"]["summary"]))
+            message.dispatch(", ".join(on_calls))
+        else:
+            message.dispatch("Unable to fetch list: %d" % req.status_code)
+            message.dispatch(req.text)
 
     @plugin.hook_add_command("lookup")
     @utils.require_params
@@ -120,10 +161,20 @@ class Ops(plugin.Plugin):
         else:
             message.dispatch("No results found: %s" % params)
 
+    def _find_user(self, name):
+        """Find a PagerDuty user account."""
+        users = self._find_users(name)
+
+        if len(users["users"]) < 1:
+            return name
+
+        return users["users"][0]["email"]
+
     def _find_users(self, name):
-        """Find PagerDuty user account information."""
+        """Find PagerDuty user accounts."""
         url = "%s/users?query=%s&include[]=contact_methods" % (self.endpoint,
                                                                name)
         req = request.get(url, headers=self.api_headers)
+
         if request.ok(req):
             return req.json()
