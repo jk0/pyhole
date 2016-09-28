@@ -1,0 +1,14 @@
+{% extends "pagerduty_layout.html" %}
+{% block body %}
+<div id="header"><p>PagerDuty Notes</p></div>
+<div id="content">
+{% for note in notes %}
+<p>
+{{ note.created_at }} - {{ note.user.summary }} - {{ note.content }}
+</p><br />
+{% endfor %}
+{% if notes|length < 1 %}
+<p>No notes found.</p><br />
+{% endif %}
+</div>
+{% endblock %}

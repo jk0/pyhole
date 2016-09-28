@@ -1,0 +1,17 @@
+{% extends "pagerduty_layout.html" %}
+{% block body %}
+<div id="header"><p>PagerDuty Services</p></div>
+<div id="content">
+{% for service in services %}
+<p>
+[ {% if service.status == 'active' %}
+<span class="green">{{ service.status }}
+{% else %}
+<span class="red">{{ service.status }}
+{% endif %}
+</span> ]
+<a href="/pagerduty/incidents/{{ service.id }}">{{ service.name }}</a> - {{ service.description }}
+</p><br />
+{% endfor %}
+</div>
+{% endblock %}

@@ -21,6 +21,7 @@ import time
 import uuid
 
 from pyhole.core import queue
+from pyhole.core import request
 from pyhole.core import utils
 from pyhole.core import version
 
@@ -57,96 +58,65 @@ def send_message():
 # END MESSAGE API #
 
 
+# BEGIN PAGERDUTY API #
+pagerduty = utils.get_config("PagerDuty")
+api_token = pagerduty.get("api_token")
+api_endpoint = "https://api.pagerduty.com"
+
+api_headers = {
+    "Accept": "application/vnd.pagerduty+json;version=2",
+    "Authorization": "Token token=%s" % api_token,
+    "Content-Type": "application/json"
+}
+
+
+@APP.route("/pagerduty", methods=["GET"])
+def get_services():
+    """Fetch and return PagerDuty services."""
+    url = "%s/services?limit=100" % api_endpoint
+    req = request.get(url, headers=api_headers)
+
+    if not request.ok(req):
+        flask.abort(req.status_code)
+
+    return flask.render_template(
+        "pagerduty_services.html",
+        services=req.json()["services"],
+        version=version.version_string())
+
+
+@APP.route("/pagerduty/incidents/<service_id>", methods=["GET"])
+def get_incidents(service_id):
+    """Fetch and return PagerDuty incidents."""
+    url = "%s/incidents?service_ids[]=%s" % (api_endpoint, service_id)
+    req = request.get(url, headers=api_headers)
+
+    if not request.ok(req):
+        flask.abort(req.status_code)
+
+    return flask.render_template(
+        "pagerduty_incidents.html",
+        incidents=req.json()["incidents"],
+        version=version.version_string())
+
+
+@APP.route("/pagerduty/notes/<incident_id>", methods=["GET"])
+def get_notes(incident_id):
+    """Fetch and return PagerDuty notes."""
+    url = "%s/incidents/%s/notes" % (api_endpoint, incident_id)
+    req = request.get(url, headers=api_headers)
+
+    if not request.ok(req):
+        flask.abort(req.status_code)
+
+    return flask.render_template(
+        "pagerduty_notes.html",
+        notes=req.json()["notes"],
+        version=version.version_string())
+# END PAGERDUTY API #
+
+
 # BEGIN PASTE API #
-PASTE_TEMPLATE = """{% set lines = paste.split('\n') %}<html>
-<head>
-<title>{{ paste_id }} | pyhole</title>
-<style type="text/css">
-* {
-    margin: 0;
-    padding: 0;
-}
-body {
-    margin: 20px 0;
-    background-color: #fff;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-pre {
-    padding: 10px;
-    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-size: 12px;
-    color: #333;
-    letter-spacing: 0.5px;
-    line-height: 160%;
-    white-space: pre-wrap;
-}
-#paste {
-    margin: 0 auto;
-    width: 65%;
-    border-radius: 3px;
-    border: 1px solid #ddd;
-}
-#lines {
-    float: left;
-    width: 3%;
-    color: #b3b3b3;
-    text-align: right;
-    border-right: 1px solid #eee;
-}
-#snippet {
-    overflow: auto;
-}
-#header {
-    border-bottom: 1px solid #ddd;
-    padding: 15px;
-    background-color: #f7f7f7;
-    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    font-weight: bold;
-    font-size: 14px;
-    color: #4078c0;
-}
-#header p {
-    float: left;
-    width: 94%;
-}
-#header a {
-    padding: 5px 10px;
-    border: 1px solid #d5d5d5;
-    border-radius: 3px;
-    background-color: #f7f7f7;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 13px;
-    text-decoration: none;
-    color: #333;
-}
-#header a:hover {
-    background-color: #e6e6e6;
-    border: 1px solid #ccc;
-}
-#copyright {
-    padding: 20px 0 0 0;
-    font-size: 12px;
-    color: #767676;
-    text-align: center;
-}
-</style>
-</head>
-<body>
-<div id="paste">
-<div id="header">
-<p>{{ st_mtime }} / {{ st_size }} bytes</p>
-<a href="/pastes/{{ paste_id }}/raw">Raw</a>
-</div>
-<pre id="lines">{% for line in lines %}
-{{ loop.index }}{% endfor %}</pre>
-<pre id="snippet">{{ paste }}</pre>
-</div>
-<p id="copyright">{{ version }}</p>
-</body>
-</html>
-"""
-
-
 @APP.route("/pastes/<paste_id>", methods=["GET"])
 @APP.route("/pastes/<paste_id>/<raw>", methods=["GET"])
 def get_paste(paste_id, raw=None):
@@ -163,8 +133,8 @@ def get_paste(paste_id, raw=None):
     if raw:
         return flask.Response(paste, status=200, mimetype="text/plain")
 
-    return flask.render_template_string(
-        PASTE_TEMPLATE,
+    return flask.render_template(
+        "paste.html",
         paste_id=paste_id,
         paste=cgi.escape(paste),
         st_mtime=st_mtime,
