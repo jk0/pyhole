@@ -24,6 +24,7 @@ setuptools.setup(
     author_email="josh@jk0.org",
     description="A modular IRC & Slack bot.",
     url="https://github.com/jk0/pyhole",
+    include_package_data=True,
     zip_safe=True,
     classifiers=[
         "Intended Audience :: Developers",
