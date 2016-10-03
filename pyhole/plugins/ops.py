@@ -17,6 +17,7 @@
 from pyhole.core import plugin
 from pyhole.core import request
 from pyhole.core import utils
+from pyhole.core import version
 
 
 class Ops(plugin.Plugin):
@@ -184,6 +185,55 @@ class Ops(plugin.Plugin):
             message.dispatch(", ".join(results))
         else:
             message.dispatch("No results found: %s" % params)
+
+    @plugin.hook_add_command("services")
+    @utils.spawn
+    def services(self, message, params=None, **kwargs):
+        """List PagerDuty services (ex: .services)."""
+        url = "%s/services?&include[]=integrations&limit=100" % self.endpoint
+        req = request.get(url, headers=self.api_headers)
+
+        if request.ok(req):
+            response_json = req.json()
+            for service in response_json["services"]:
+                try:
+                    integration = service["integrations"][0]
+                    integration_key = integration["integration_key"]
+                    message.dispatch("%s (%s)" % (service["summary"],
+                                                  integration_key))
+                except KeyError:
+                    continue
+        else:
+            message.dispatch("Unable to fetch services: %d" % req.status_code)
+            message.dispatch(req.text)
+
+    @plugin.hook_add_command("alert")
+    @utils.require_params
+    @utils.spawn
+    def alert(self, message, params=None, **kwargs):
+        """Trigger a custom alert (ex: .alert <service_key> <description>."""
+        params = params.split(" ")
+        service_key = params.pop(0)
+        description = " ".join(params)
+
+        data = {
+            "service_key": service_key,
+            "event_type": "trigger",
+            "description": description,
+            "details": description,
+            "client": "pyhole %s" % version.version(),
+            "client_url": "https://github.com/jk0/pyhole"
+        }
+
+        events_host = "https://events.pagerduty.com/"
+        url = "%s/generic/2010-04-15/create_event.json" % events_host
+        req = request.post(url, headers=self.api_headers, json=data)
+
+        if request.ok(req):
+            message.dispatch("Triggered.")
+        else:
+            message.dispatch("Unable to trigger alert: %d" % req.status_code)
+            message.dispatch(req.text)
 
     def _find_user(self, name):
         """Find a PagerDuty user account."""
