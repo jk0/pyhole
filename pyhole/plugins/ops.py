@@ -156,10 +156,9 @@ class Ops(plugin.Plugin):
         req = request.get(url, headers=self.api_headers)
 
         if request.ok(req):
-            response_json = req.json()
             on_calls = []
 
-            for policy in response_json["oncalls"]:
+            for policy in req.json()["oncalls"]:
                 if policy["schedule"]:
                     on_calls.append("%s (%s)" % (policy["schedule"]["summary"],
                                                  policy["user"]["summary"]))
@@ -194,8 +193,7 @@ class Ops(plugin.Plugin):
         req = request.get(url, headers=self.api_headers)
 
         if request.ok(req):
-            response_json = req.json()
-            for service in response_json["services"]:
+            for service in req.json()["services"]:
                 try:
                     integration = service["integrations"][0]
                     integration_key = integration["integration_key"]
