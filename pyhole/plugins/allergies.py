@@ -14,7 +14,6 @@
 
 """Pyhole Allergies Plugin"""
 
-import datetime
 
 from pyhole.core import plugin
 from pyhole.core import request
@@ -28,22 +27,14 @@ class Allergies(plugin.Plugin):
     @utils.spawn
     def allergies(self, message, params=None, **kwargs):
         """Display current allergies in San Antonio, TX (ex: .allergies)."""
-        d = datetime.datetime.now()
-        weekend = d.isoweekday() in (6, 7)
-        if weekend:
-            message.dispatch("Unable to fetch allergy data on weekends.")
-            return
+        url = "http://txallergy.info/api/allergy/today"
 
-        today = d.strftime("%Y-%m-%d")
-        url = "http://saallergy.info/day/%s" % today
-        headers = {"accept": "application/json"}
-
-        response = request.get(url, headers=headers)
+        response = request.get(url)
         if response.status_code != 200:
                 return
 
         data = response.json()
-        text = "Allergies for %s: " % today
+        text = "Allergies for today: "
         for a in data["results"]:
             text = text + "%s - %s (%s) | " % (a["allergen"], a["level"],
                                                a["count"])
