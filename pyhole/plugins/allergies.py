@@ -31,11 +31,10 @@ class Allergies(plugin.Plugin):
 
         response = request.get(url)
         if response.status_code != 200:
-                return
+            return
 
-        data = response.json()
         text = "Allergies for today: "
-        for a in data:
+        for a in response.json():
             text = text + "%s - %s (%s) | " % (a["allergen"], a["level"],
                                                a["count"])
         text = text.rstrip(" ")
