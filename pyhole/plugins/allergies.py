@@ -35,7 +35,7 @@ class Allergies(plugin.Plugin):
 
         data = response.json()
         text = "Allergies for today: "
-        for a in data["results"]:
+        for a in data:
             text = text + "%s - %s (%s) | " % (a["allergen"], a["level"],
                                                a["count"])
         text = text.rstrip(" ")
