@@ -29,13 +29,13 @@ class Config(object):
         self.config_parser = ConfigParser.ConfigParser()
         self.section = section
 
-        try:
-            with open(self.config) as conf_file:
-                self.config_parser.readfp(conf_file)
-        except IOError:
-            print "Unable to load configuration file: %s" % self.config
-            utils.prepare_config()
-            sys.exit(1)
+        for _i in range(0, 2):
+            try:
+                with open(self.config) as conf_file:
+                    self.config_parser.readfp(conf_file)
+            except IOError:
+                print "Unable to load configuration file: %s" % self.config
+                utils.prepare_config()
 
     def __str__(self):
         """Make the config object readable for logging."""
