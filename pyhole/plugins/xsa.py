@@ -44,7 +44,7 @@ class Xsa(plugin.Plugin):
     def _make_xsa_message(self, xsa_id, data):
         try:
             xsa_info = data[xsa_id]
-        except:
+        except Exception:
             return None
         else:
             # Use ID if we don't have a link
@@ -105,20 +105,20 @@ class Xsa(plugin.Plugin):
                 continue
             try:
                 xsa_id = children[0].contents[0].string
-            except:
+            except Exception:
                 continue
             try:
                 xsa_link = "".join([self.XSA_URL,
                                     children[0].contents[0]["href"]])
-            except:
+            except Exception:
                 xsa_link = None
             try:
                 public_release = children[1].contents[0]
-            except:
+            except Exception:
                 public_release = None
             try:
                 title = children[5].contents[0]
-            except:
+            except Exception:
                 title = None
             data[xsa_id] = {"id": xsa_id,
                             "link": xsa_link,
