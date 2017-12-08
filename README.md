@@ -1,6 +1,6 @@
 # pyhole - A modular IRC & Slack bot.
 
-[![Build Status](https://travis-ci.org/jk0/pyhole.svg)](https://travis-ci.org/jk0/pyhole) [![Documentation Status](http://irc-pyhole.readthedocs.io/en/latest/?badge=latest)](http://irc-pyhole.readthedocs.io/en/latest/)
+[![Build Status](https://travis-ci.org/jk0/pyhole.svg)](https://travis-ci.org/jk0/pyhole) [![Documentation Status](https://readthedocs.org/projects/irc-pyhole/badge/?version=latest)](http://irc-pyhole.readthedocs.io/en/latest/)
 
 ## Installation
 
