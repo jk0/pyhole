@@ -5,7 +5,8 @@
 ## Installation
 
 ````
-git clone https://github.com/jk0/pyhole.git && cd pyhole
+git clone https://github.com/jk0/pyhole.git
+cd pyhole
 ````
 
 ### Source
