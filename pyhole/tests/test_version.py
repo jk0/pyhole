@@ -20,9 +20,6 @@ from pyhole.core import version
 
 
 class TestVersion(unittest.TestCase):
-    def test_current_git_hash(self):
-        self.assertEqual(len(version.current_git_hash()), 5)
-
     def test_version_string(self):
         self.assertTrue(version.version_string().startswith("pyhole v"))
 
