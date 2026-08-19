@@ -58,4 +58,4 @@ tests/            no-network unit tests
 
 ## License
 
-Apache License 2.0. See `LICENSE` and `AUTHORS`.
+Apache License 2.0. See `LICENSE`.
