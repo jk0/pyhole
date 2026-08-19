@@ -1,200 +1,221 @@
-#   Copyright 2010-2016 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2010-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole "Utilities"""
+"""Pyhole utilities."""
+
+from __future__ import annotations
 
 import argparse
-import datetime
+import functools
 import os
 import re
 import shutil
 import threading
+from collections.abc import Callable
+from datetime import UTC, datetime
+from html import unescape
+from importlib import resources
+from pathlib import Path
+from typing import Any, TypeVar
 
-from BeautifulSoup import BeautifulStoneSoup
+from bs4 import BeautifulSoup
 
-import config
-import version
+from pyhole.core import config, version
+
+F = TypeVar("F", bound=Callable[..., Any])
+
+_CLI_ARGS: argparse.Namespace | None = None
 
 
-def admin(func):
+def admin(func: F) -> F:
     """Require admin rights."""
-    def wrap(self, message, *args, **kwargs):
+
+    @functools.wraps(func)
+    def wrap(self: Any, message: Any, *args: Any, **kwargs: Any) -> Any:
         if message.source in self.session.admins:
             return func(self, message, *args, **kwargs)
         return message.dispatch("Sorry, you are not authorized to do that.")
 
-    wrap.__doc__ = func.__doc__
-    wrap.__name__ = func.__name__
-    wrap.__module__ = func.__module__
-
-    return wrap
+    return wrap  # type: ignore[return-value]
 
 
-def require_params(func):
+def require_params(func: F) -> F:
     """Require parameters."""
-    def wrap(self, message, params, *args, **kwargs):
+
+    @functools.wraps(func)
+    def wrap(self: Any, message: Any, params: str | None, *args: Any, **kwargs: Any) -> Any:
         if not params:
             message.dispatch(wrap.__doc__)
-            return
+            return None
         return func(self, message, params, *args, **kwargs)
 
-    wrap.__doc__ = func.__doc__
-    wrap.__name__ = func.__name__
-    wrap.__module__ = func.__module__
-
-    return wrap
+    return wrap  # type: ignore[return-value]
 
 
-def spawn(func):
-    """Thread-spawning decorator."""
-    def wrap(*args, **kwargs):
-        t = threading.Thread(target=func, args=args, kwargs=kwargs)
-        t.setDaemon(True)
-        t.start()
+def spawn(func: F) -> F:
+    """Run the wrapped function in a daemon thread."""
 
-    wrap.__doc__ = func.__doc__
-    wrap.__name__ = func.__name__
-    wrap.__module__ = func.__module__
+    @functools.wraps(func)
+    def wrap(*args: Any, **kwargs: Any) -> None:
+        thread = threading.Thread(target=func, args=args, kwargs=kwargs, daemon=True)
+        thread.start()
 
-    return wrap
+    return wrap  # type: ignore[return-value]
 
 
-def decode_entities(html):
-    """Strip HTML entities from a string and make it printable."""
-    html = " ".join(str(x).strip() for x in BeautifulStoneSoup(html,
-                    convertEntities=BeautifulStoneSoup.HTML_ENTITIES).findAll(
-                    text=True))
-    return filter(lambda x: ord(x) > 9 and ord(x) < 127, html)
+def decode_entities(html: str) -> str:
+    """Strip HTML tags/entities and keep printable ASCII."""
+    text = BeautifulSoup(html, "html.parser").get_text(" ", strip=True)
+    text = unescape(text)
+    return "".join(ch for ch in text if 9 < ord(ch) < 127)
 
 
-def ensure_int(param):
-    """Ensure the given param is an int."""
+def ensure_int(param: str | None) -> int | None:
+    """Ensure the given param is an int, stripping non-word characters."""
+    if param is None:
+        return None
     try:
-        param = re.sub("\W", "", param)
-        return int(param)
+        return int(re.sub(r"\W", "", param))
     except ValueError:
         return None
 
 
-def build_options():
-    """Generate command line options."""
-    parser = argparse.ArgumentParser(version=version.version_string())
-    parser.add_argument("-c", "--config", default=get_conf_file_path(),
-                        help="specify the path to a configuration file")
-    parser.add_argument("-d", "--debug", action="store_true",
-                        help="show debugging output")
-    return parser.parse_known_args()[0]
-
-
-def get_option(option):
-    """Retrive an option from the command line."""
-    parsed_args = build_options()
-    return vars(parsed_args).get(option)
-
-
-def debug_enabled():
-    """Return whether or not debug mode is enabled."""
-    debug_option = get_option("debug")
-    debug_config = get_config().get("debug", type="bool")
-    return debug_option or debug_config
-
-
-def get_home_directory():
-    """Return the home directory."""
-    home_dir = os.getenv("HOME") + "/.pyhole/"
-    make_directory(home_dir)
-    return home_dir
-
-
-def get_directory(new_dir):
-    """Return a directory."""
-    home_dir = get_home_directory()
-    new_dir = os.path.join(home_dir, new_dir, "")
-    make_directory(new_dir)
-    return new_dir
-
-
-def make_directory(directory):
-    """Make a direectory if it doesn't exist."""
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-
-def get_conf_file_path():
-    """Return the path to the conf file."""
-    paths = (
-        "/etc/pyhole.conf",
-        "/etc/pyhole/pyhole.conf"
+def build_options(argv: list[str] | None = None) -> argparse.Namespace:
+    """Parse command line options."""
+    parser = argparse.ArgumentParser(prog="pyhole", description="A modular IRC and Slack bot.")
+    parser.add_argument(
+        "-c",
+        "--config",
+        default=None,
+        help="path to a configuration file",
     )
+    parser.add_argument("-d", "--debug", action="store_true", help="show debugging output")
+    parser.add_argument("-V", "--version", action="version", version=version.version_string())
+    return parser.parse_args(argv)
 
-    for path in paths:
-        if os.path.exists(path):
+
+def set_cli_args(args: argparse.Namespace) -> None:
+    """Record parsed CLI args so helpers do not re-parse sys.argv."""
+    global _CLI_ARGS
+    _CLI_ARGS = args
+
+
+def get_option(option: str) -> Any:
+    """Retrieve an option from the command line."""
+    global _CLI_ARGS
+    if _CLI_ARGS is None:
+        _CLI_ARGS = build_options([])
+    return getattr(_CLI_ARGS, option, None)
+
+
+def debug_enabled() -> bool:
+    """Return whether debug mode is enabled."""
+    if get_option("debug"):
+        return True
+    try:
+        return bool(get_config().get("debug", type="bool", default=False))
+    except config.ConfigError:
+        return False
+
+
+def get_home_directory() -> Path:
+    """Return the pyhole home directory, creating it if needed."""
+    env_home = os.environ.get("PYHOLE_HOME")
+    home = Path(env_home).expanduser() if env_home else Path.home() / ".pyhole"
+    make_directory(home)
+    return home
+
+
+def get_directory(new_dir: str) -> Path:
+    """Return a subdirectory of the pyhole home directory."""
+    path = get_home_directory() / new_dir
+    make_directory(path)
+    return path
+
+
+def make_directory(directory: str | Path) -> Path:
+    """Make a directory if it does not exist."""
+    path = Path(directory)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def get_conf_file_path() -> Path:
+    """Return the default path to the conf file."""
+    for path in (Path("/etc/pyhole.conf"), Path("/etc/pyhole/pyhole.conf")):
+        if path.is_file():
             return path
-
-    return get_home_directory() + "pyhole.conf"
-
-
-def get_conf_file():
-    """Return the path to the conf file."""
-    return get_option("config") or get_conf_file_path()
+    return get_home_directory() / "pyhole.conf"
 
 
-def get_config(section="Pyhole"):
-    """Return the default config object."""
+def get_conf_file() -> Path:
+    """Return the path to the conf file, honoring --config."""
+    cli = get_option("config")
+    if cli:
+        return Path(cli).expanduser()
+    return get_conf_file_path()
+
+
+def get_config(section: str = "Pyhole") -> config.Config:
+    """Return a Config object for ``section``."""
     return config.Config(get_conf_file(), section)
 
 
-def write_file(directory, file_name, data):
-    """Write data to file."""
-    directory = get_directory(directory)
-    with open(directory + file_name, "w") as open_file:
-        open_file.write(str(data).strip())
+def write_file(directory: str, file_name: str, data: Any) -> Path:
+    """Write data to a file under the pyhole home directory."""
+    path = get_directory(directory) / file_name
+    path.write_text(str(data).strip(), encoding="utf-8")
+    return path
 
 
-def read_file(directory, file_name):
-    """Read and return the data in file."""
-    directory = get_directory(directory)
+def read_file(directory: str, file_name: str) -> str | None:
+    """Read a file under the pyhole home directory."""
+    path = get_directory(directory) / file_name
     try:
-        with open(directory + file_name, "r") as open_file:
-            data = open_file.read()
-        return data
-    except IOError:
+        return path.read_text(encoding="utf-8")
+    except OSError:
         return None
 
 
-def list_files(directory):
-    """List files in a directory."""
-    directory = get_directory(directory)
-    return os.listdir(directory)
+def list_files(directory: str) -> list[str]:
+    """List files in a directory under the pyhole home directory."""
+    path = get_directory(directory)
+    return [entry.name for entry in path.iterdir() if entry.is_file()]
 
 
-def prepare_config():
-    """Prepare a sample configuration file."""
-    conf_file = get_conf_file()
-    if os.path.exists(conf_file):
-        return
-
+def sample_config_path() -> Path | None:
+    """Return the packaged sample config, if it can be located."""
     try:
-        print "Copying sample configuration file to: %s" % conf_file
-        shutil.copyfile("pyhole.conf.sample", conf_file)
-        print "Done. Please edit before running again."
-    except IOError:
-        # NOTE(jk0): Could not locate sample configuration file. This should
-        # only happen when Read the Docs generates the documentation.
+        ref = resources.files("pyhole.data").joinpath("pyhole.conf.sample")
+        with resources.as_file(ref) as path:
+            if path.is_file():
+                return path
+    except (FileNotFoundError, ModuleNotFoundError, TypeError):
         pass
+    repo_sample = Path(__file__).resolve().parents[2] / "pyhole.conf.sample"
+    if repo_sample.is_file():
+        return repo_sample
+    return None
 
 
-def datetime_now_string():
-    """ISO 8601 formatted string of the current datetime."""
-    return datetime.datetime.utcnow().isoformat()
+def prepare_config() -> bool:
+    """Copy a sample configuration file into place if missing.
+
+    Returns True if a new file was written.
+    """
+    conf_file = get_conf_file()
+    if conf_file.exists():
+        return False
+    sample = sample_config_path()
+    if sample is None:
+        return False
+    make_directory(conf_file.parent)
+    shutil.copyfile(sample, conf_file)
+    print(f"Copied sample configuration file to: {conf_file}")
+    print("Please edit it before running again.")
+    return True
+
+
+def datetime_now_string() -> str:
+    """ISO 8601 UTC timestamp."""
+    return datetime.now(UTC).isoformat()

@@ -1,24 +1,17 @@
-FROM ubuntu:xenial
+FROM python:3.12-slim
 
-ENV cwd /opt/pyhole
+WORKDIR /opt/pyhole
 
-WORKDIR ${cwd}
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    ca-certificates \
-    libffi-dev \
-    libssl-dev \
-    python-dev \
-    python-setuptools \
-    python-virtualenv \
- && rm -rf /var/lib/apt/lists/*
+COPY . /opt/pyhole
+RUN pip install --no-cache-dir .
 
-COPY . ${cwd}
-
-RUN virtualenv venv && . venv/bin/activate
-RUN python setup.py develop
+ENV PYHOLE_HOME=/data
+VOLUME ["/data"]
 
 EXPOSE 5000
 
-CMD . venv/bin/activate && pyhole
+CMD ["pyhole"]

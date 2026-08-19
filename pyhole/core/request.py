@@ -1,45 +1,40 @@
-#   Copyright 2016 Patrick Tsai
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2010-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Request Manager"""
+"""Pyhole HTTP client."""
+
+from __future__ import annotations
+
+from typing import Any
 
 import requests
 
-import version
+from pyhole.core import version
 
+DEFAULT_TIMEOUT = 15
 
 session = requests.Session()
-session.headers.update({
-    "User-Agent": "pyhole/%s" % version.version()
-})
+session.headers.update({"User-Agent": f"pyhole/{version.version()}"})
 
 
-def get(url, **kwargs):
-    """GET a URL."""
+def get(url: str, **kwargs: Any) -> requests.Response:
+    """GET a URL with a default timeout."""
+    kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
     return session.get(url, **kwargs)
 
 
-def post(url, **kwargs):
-    """POST to a URL."""
+def post(url: str, **kwargs: Any) -> requests.Response:
+    """POST to a URL with a default timeout."""
+    kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
     return session.post(url, **kwargs)
 
 
-def put(url, **kwargs):
-    """PUT to a URL."""
+def put(url: str, **kwargs: Any) -> requests.Response:
+    """PUT to a URL with a default timeout."""
+    kwargs.setdefault("timeout", DEFAULT_TIMEOUT)
     return session.put(url, **kwargs)
 
 
-def ok(request):
-    """Check if a request is OK (2xx)."""
-    return request.status_code >= 200 and request.status_code < 300
+def ok(response: requests.Response) -> bool:
+    """Check if a response is 2xx."""
+    return 200 <= response.status_code < 300

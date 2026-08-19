@@ -7,29 +7,39 @@ reconnect_delay = 60
 rejoin_delay = 5
 debug = False
 api_enabled = False
+api_host = 127.0.0.1
+api_port = 5000
+# Optional bearer token for POST /pastes, /messages/send, and PagerDuty pages.
+# api_auth_token = change-me
 # api_ssl_crt = /home/ubuntu/.pyhole/ssl.crt
 # api_ssl_key = /home/ubuntu/.pyhole/ssl.key
-plugins = admin
-networks = FreeNode, EFnet, SlackNetwork
+plugins = admin, weather, stocks, search, urls, kernel
+networks = FreeNode, SlackNetwork
 
 [GoogleMaps]
-key = abcd1234
+# Optional. Used by the distance plugin.
+# key = abcd1234
 
 [Jira]
-auth_server = auth.jira.example.com
-domain = jira.example.com
-username = abcd1234
-password = pass1234
+# Optional. Leave commented to skip the plugin.
+# auth_server = https://auth.jira.example.com
+# domain = https://jira.example.com
+# username = abcd1234
+# password = pass1234
+# verify_ssl = True
 
 [PagerDuty]
-api_token = abcd1234
+# Optional.
+# api_token = abcd1234
 
 [Redmine]
-domain = redmine.example.com
-key = abcd1234
+# Optional.
+# domain = redmine.example.com
+# key = abcd1234
 
-[Wunderground]
-key = abcd1234
+[TMDB]
+# Optional. Used by the boxoffice plugin.
+# key = abcd1234
 
 [XSA]
 notify = #channel1, #channel2
@@ -37,29 +47,20 @@ notify = #channel1, #channel2
 # Network Configuration
 
 [FreeNode]
-server = verne.freenode.net
+server = irc.libera.chat
 username =
 password =
-port = 7000
+port = 6697
 ssl = True
-ipv6 = True
-bind_to = fe80::1
-nick = mynick
-identify_password = abcd1234
-channels = #mychannel key, #mychannel2
-
-[EFnet]
-server = irc.efnet.net
-username =
-password =
-port = 6667
-ssl = False
+ssl_verify = True
 ipv6 = False
 bind_to =
 nick = mynick
 identify_password =
-channels = #mychannel key, #mychannel2
+channels = #mychannel, #mychannel2
 
 [SlackNetwork]
-api_token = abcd1234
+# Bot token (xoxb-...) and app-level token (xapp-...) for Socket Mode.
+api_token = xoxb-abcd1234
+app_token = xapp-abcd1234
 nick = mynick

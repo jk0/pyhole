@@ -1,7 +1,13 @@
 *.egg*
 *.py[cod]
-build
-dist
+.coverage
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+build/
+dist/
 docs/_build/
-sdist
-venv
+htmlcov/
+sdist/
+venv/

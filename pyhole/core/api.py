@@ -1,190 +1,158 @@
-#   Copyright 2016 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2016-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole RESTful API"""
+"""Pyhole HTTP API (pastebin + optional PagerDuty views)."""
 
-import cgi
-import flask
+from __future__ import annotations
+
 import os
 import time
 import uuid
+from pathlib import Path
 
-from pyhole.core import queue
-from pyhole.core import request
-from pyhole.core import utils
-from pyhole.core import version
+import flask
 
+from pyhole.core import queue, request, utils, version
 
-APP = flask.Flask("pyhole")
+TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
+APP = flask.Flask("pyhole", template_folder=str(TEMPLATE_DIR))
 QUEUE = queue.MessageQueue()
 
 
+def _require_api_auth() -> None:
+    token = utils.get_config().get("api_auth_token", default="")
+    if not token:
+        return
+    header = flask.request.headers.get("Authorization", "")
+    if header != f"Bearer {token}":
+        flask.abort(401)
+
+
+def _pagerduty_headers() -> dict[str, str]:
+    pagerduty = utils.get_config("PagerDuty")
+    api_token = pagerduty.get("api_token", default="")
+    if not api_token:
+        flask.abort(503)
+    return {
+        "Accept": "application/vnd.pagerduty+json;version=2",
+        "Authorization": f"Token token={api_token}",
+        "Content-Type": "application/json",
+    }
+
+
 @APP.route("/", methods=["GET"])
-def index():
-    """Handle index requests."""
+def index() -> tuple[str, int]:
     return version.version_string(), 200
 
 
-# BEGIN MESSAGE API #
 @APP.route("/messages/send", methods=["POST"])
-def send_message():
-    """Send a message."""
-    request = flask.request.get_json()
-
+def send_message() -> tuple[str, int]:
+    _require_api_auth()
+    payload = flask.request.get_json(silent=True) or {}
     try:
-        item = (
-            request["network"],
-            request["target"],
-            request["message"]
-        )
+        item = (payload["network"], payload["target"], payload["message"])
     except KeyError:
         flask.abort(422)
-
-    # NOTE(jk0): Disable until auth is implemented.
-    # QUEUE.put(item)
-
+    QUEUE.put(item)
     return str(item), 200
-# END MESSAGE API #
-
-
-# BEGIN PAGERDUTY API #
-pagerduty = utils.get_config("PagerDuty")
-api_token = pagerduty.get("api_token")
-api_endpoint = "https://api.pagerduty.com"
-
-api_headers = {
-    "Accept": "application/vnd.pagerduty+json;version=2",
-    "Authorization": "Token token=%s" % api_token,
-    "Content-Type": "application/json"
-}
 
 
 @APP.route("/pagerduty", methods=["GET"])
-def get_services():
-    """Fetch and return PagerDuty services."""
-    url = "%s/services?limit=100" % api_endpoint
-    req = request.get(url, headers=api_headers)
-
+def get_services() -> str:
+    _require_api_auth()
+    url = "https://api.pagerduty.com/services?limit=100"
+    req = request.get(url, headers=_pagerduty_headers())
     if not request.ok(req):
         flask.abort(req.status_code)
-
     return flask.render_template(
         "pagerduty_services.html",
         services=req.json()["services"],
-        version=version.version_string())
+        version=version.version_string(),
+    )
 
 
 @APP.route("/pagerduty/incidents/<service_id>", methods=["GET"])
-def get_incidents(service_id):
-    """Fetch and return PagerDuty incidents."""
-    url = "%s/incidents?service_ids[]=%s" % (api_endpoint, service_id)
-    req = request.get(url, headers=api_headers)
-
+def get_incidents(service_id: str) -> str:
+    _require_api_auth()
+    url = f"https://api.pagerduty.com/incidents?service_ids[]={service_id}"
+    req = request.get(url, headers=_pagerduty_headers())
     if not request.ok(req):
         flask.abort(req.status_code)
-
     return flask.render_template(
         "pagerduty_incidents.html",
         incidents=req.json()["incidents"],
-        version=version.version_string())
+        version=version.version_string(),
+    )
 
 
 @APP.route("/pagerduty/notes/<incident_id>", methods=["GET"])
-def get_notes(incident_id):
-    """Fetch and return PagerDuty notes."""
-    url = "%s/incidents/%s/notes" % (api_endpoint, incident_id)
-    req = request.get(url, headers=api_headers)
-
+def get_notes(incident_id: str) -> str:
+    _require_api_auth()
+    url = f"https://api.pagerduty.com/incidents/{incident_id}/notes"
+    req = request.get(url, headers=_pagerduty_headers())
     if not request.ok(req):
         flask.abort(req.status_code)
-
     return flask.render_template(
         "pagerduty_notes.html",
         notes=req.json()["notes"],
-        version=version.version_string())
-# END PAGERDUTY API #
+        version=version.version_string(),
+    )
 
 
-# BEGIN PASTE API #
 @APP.route("/pastes/<paste_id>", methods=["GET"])
 @APP.route("/pastes/<paste_id>/<raw>", methods=["GET"])
-def get_paste(paste_id, raw=None):
-    """Fetch and return a paste."""
-    stats = os.stat(utils.get_directory("pastes") + paste_id)
-    st_mtime = time.ctime(stats.st_mtime)
-    st_size = stats.st_size
-
-    paste = utils.read_file("pastes", paste_id)
-
-    if not paste:
+def get_paste(paste_id: str, raw: str | None = None) -> flask.Response | str:
+    paste_path = utils.get_directory("pastes") / paste_id
+    try:
+        stats = os.stat(paste_path)
+    except OSError:
         flask.abort(404)
-
+    paste = utils.read_file("pastes", paste_id)
+    if paste is None:
+        flask.abort(404)
     if raw:
         return flask.Response(paste, status=200, mimetype="text/plain")
-
     return flask.render_template(
         "paste.html",
         paste_id=paste_id,
-        paste=cgi.escape(paste),
-        st_mtime=st_mtime,
-        st_size=st_size,
-        version=version.version_string())
+        paste=paste,
+        st_mtime=time.ctime(stats.st_mtime),
+        st_size=stats.st_size,
+        version=version.version_string(),
+    )
 
 
 @APP.route("/pastes", methods=["POST"])
-def create_paste():
-    """Create a new paste."""
+def create_paste() -> flask.Response:
+    _require_api_auth()
+    payload = flask.request.get_json(silent=True) or {}
     try:
-        paste = flask.request.get_json()["paste"]
+        paste = payload["paste"]
     except KeyError:
         flask.abort(422)
 
-    file_name = str(uuid.uuid4()).replace("-", "")
+    file_name = uuid.uuid4().hex
     utils.write_file("pastes", file_name, paste)
+    response_url = f"{flask.request.url}/{file_name}"
 
-    response = "%s/%s" % (flask.request.url, file_name)
+    network = payload.get("network")
+    target = payload.get("target")
+    if network and target:
+        QUEUE.put((network, target, response_url))
 
-    try:
-        # NOTE(jk0): If these items exist, write them to the queue.
-        item = (
-            flask.request.get_json()["network"],
-            flask.request.get_json()["target"],
-            response
-        )
-
-        QUEUE.put(item)
-    except KeyError:
-        pass
-
-    return flask.redirect(response)
-# END PASTE API #
+    return flask.redirect(response_url)
 
 
 @utils.spawn
-def run():
-    """Run the flask process."""
-    config = utils.get_config()
-
-    kwargs = {
-        "host": "0.0.0.0",
-        "threaded": True
+def run() -> None:
+    conf = utils.get_config()
+    kwargs: dict = {
+        "host": conf.get("api_host", default="127.0.0.1"),
+        "port": conf.get("api_port", type="int", default=5000),
+        "threaded": True,
     }
-
-    ssl_crt = config.get("api_ssl_crt", default="")
-    ssl_key = config.get("api_ssl_key", default="")
-
-    if os.path.exists(ssl_crt) and os.path.exists(ssl_key):
+    ssl_crt = conf.get("api_ssl_crt", default="")
+    ssl_key = conf.get("api_ssl_key", default="")
+    if ssl_crt and ssl_key and os.path.exists(ssl_crt) and os.path.exists(ssl_key):
         kwargs["ssl_context"] = (ssl_crt, ssl_key)
-
     APP.run(**kwargs)

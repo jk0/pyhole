@@ -1,36 +1,23 @@
-#   Copyright 2010-2016 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2010-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Redmine Plugin"""
+"""Redmine plugin."""
 
-from pyhole.core import plugin
-from pyhole.core import request
-from pyhole.core import utils
+from __future__ import annotations
+
+from pyhole.core import plugin, request, utils
 
 
 class Redmine(plugin.Plugin):
-    """Provide access to the Redmine API."""
+    """Redmine bug lookup."""
 
     def __init__(self, session):
-        self.session = session
-        self.name = self.__class__.__name__
-
-        self.redmine = utils.get_config("Redmine")
-        self.redmine_domain = self.redmine.get("domain")
-        self.redmine_key = self.redmine.get("key")
-        self.redmine_url = "https://%s:password@%s" % (
-            self.redmine_key, self.redmine_domain)
+        super().__init__(session)
+        redmine = utils.get_config("Redmine")
+        self.domain = redmine.get("domain")
+        self.key = redmine.get("key")
+        self.base_url = f"https://{self.domain}"
+        self.headers = {"X-Redmine-API-Key": self.key}
 
     @plugin.hook_add_command("rbugs")
     @utils.require_params
@@ -39,93 +26,78 @@ class Redmine(plugin.Plugin):
         """Redmine bugs for a user (ex: .rbugs <login>)."""
         login = params.split(" ", 1)[0]
         user_id = self._find_user(login)
-
-        i = 0
-        issues = self._find_issues(user_id)
+        if not user_id:
+            message.dispatch(f"No Redmine bugs found: '{login}'")
+            return
+        issues = self._find_issues(user_id) or []
+        if not issues:
+            message.dispatch(f"No Redmine bugs found: '{login}'")
+            return
         for i, issue in enumerate(issues):
             if i <= 4:
                 self._find_issue(message, issue["id"])
             else:
-                message.dispatch("[...] truncated last %d bugs" % (
-                                 len(issues) - i))
+                message.dispatch(f"[...] truncated last {len(issues) - i} bugs")
                 break
-        else:
-            if i <= 0:
-                message.dispatch("No Redmine bugs found: '%s'" % login)
 
     @plugin.hook_add_keyword("rm")
     @utils.require_params
     @utils.spawn
     def keyword_rm(self, message, params=None, **kwargs):
         """Retrieve Redmine bug information (ex: RM12345)."""
-        params = utils.ensure_int(params)
-        if params:
-            self._find_issue(message, params)
+        issue_id = utils.ensure_int(params)
+        if issue_id:
+            self._find_issue(message, issue_id)
 
-    @plugin.hook_add_msg_regex("https?:\/\/redmine\..*/issues")
+    @plugin.hook_add_msg_regex(r"https?://redmine\..*/issues")
     def regex_match_rm_bug_url(self, message, params=None, **kwargs):
         """Watch for Redmine bug URLs."""
         try:
-            line = message.message.split("/")
-            for i, word in enumerate(line):
-                if word == "issues":
-                    bug_id = line[i + 1].split(" ", 1)[0]
-                    self.keyword_rm(bug_id)
-        except TypeError:
+            parts = message.message.split("/")
+            for i, word in enumerate(parts):
+                if word == "issues" and i + 1 < len(parts):
+                    bug_id = parts[i + 1].split(" ", 1)[0]
+                    self.keyword_rm(message, bug_id)
+        except (TypeError, IndexError):
             return
 
     def _find_issues(self, user_id):
-        """Find all issues for a Redmine user."""
-        url = "%s/issues.json?assigned_to_id=%s" % (
-              self.redmine_url, user_id)
-        response = request.get(url)
+        url = f"{self.base_url}/issues.json?assigned_to_id={user_id}"
+        response = request.get(url, headers=self.headers)
         if response.status_code != 200:
-                return
-
-        return response.json()["issues"]
+            return []
+        return response.json().get("issues", [])
 
     def _find_user(self, login):
-        """Find a specific Redmine user."""
-        for user in self._find_users():
-            if login == user["login"]:
-                return user["id"]
-
-        for user in self._find_users(100):
-            if login == user["login"]:
-                return user["id"]
+        for offset in (None, 100):
+            for user in self._find_users(offset):
+                if login == user.get("login"):
+                    return user.get("id")
+        return None
 
     def _find_users(self, offset=None):
-        """Find all Redmine users."""
         if offset:
-            url = "%s/users.json?limit=100&offset=%d" % (
-                  self.redmine_url, offset)
+            url = f"{self.base_url}/users.json?limit=100&offset={offset}"
         else:
-            url = "%s/users.json?limit=100" % self.redmine_url
-        response = request.get(url)
+            url = f"{self.base_url}/users.json?limit=100"
+        response = request.get(url, headers=self.headers)
         if response.status_code != 200:
-                return
+            return []
+        return response.json().get("users", [])
 
-        return response.json()["users"]
-
-    def _find_issue(self, message, issue_id):
-        """Find and display a Redmine issue."""
-        url = "%s/issues/%s.json" % (self.redmine_url, issue_id)
-        response = request.get(url)
+    def _find_issue(self, message, issue_id) -> None:
+        url = f"{self.base_url}/issues/{issue_id}.json"
+        response = request.get(url, headers=self.headers)
         if response.status_code != 200:
-                return
-
+            return
         try:
             issue = response.json()["issue"]
         except Exception:
             return
-
-        msg = "RM %s #%s: %s [Status: %s, Priority: %s, Assignee: %s]" % (
-            issue["tracker"]["name"],
-            issue["id"],
-            issue["subject"],
-            issue["status"]["name"],
-            issue["priority"]["name"],
-            issue.get("assigned_to", {}).get("name", "N/A"))
-        url = "https://%s/issues/%s" % (self.redmine_domain, issue["id"])
-
-        message.dispatch("%s %s" % (msg, url))
+        msg = (
+            f"RM {issue['tracker']['name']} #{issue['id']}: {issue['subject']} "
+            f"[Status: {issue['status']['name']}, Priority: {issue['priority']['name']}, "
+            f"Assignee: {issue.get('assigned_to', {}).get('name', 'N/A')}]"
+        )
+        url = f"{self.base_url}/issues/{issue['id']}"
+        message.dispatch(f"{msg} {url}")

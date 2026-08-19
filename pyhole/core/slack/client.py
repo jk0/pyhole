@@ -1,41 +1,37 @@
-#   Copyright 2015-2016 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2015-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Slack Client Class"""
+"""Slack client (Socket Mode)."""
 
-import slackclient
+from __future__ import annotations
+
 import time
+from typing import Any
 
-from pyhole.core import logger
-from pyhole.core import plugin
-from pyhole.core import queue
-from pyhole.core import utils
-from pyhole.core import version
+from slack_sdk.socket_mode import SocketModeClient
+from slack_sdk.socket_mode.request import SocketModeRequest
+from slack_sdk.socket_mode.response import SocketModeResponse
+from slack_sdk.web import WebClient
+
+from pyhole.core import logger, plugin, queue, utils, version
 from pyhole.core.slack import message
 
 
-class Client(object):
-    """A Slack Connection"""
+class Client:
+    """A Slack Socket Mode connection."""
 
-    def __init__(self, network):
+    def __init__(self, network: str) -> None:
         logger.setup_logger(str(network))
 
         pyhole_config = utils.get_config()
         network_config = utils.get_config(network)
 
         self.addressed = False
-        self.client = None
+        self.web: WebClient | None = None
+        self.socket: SocketModeClient | None = None
+        self._users: dict[str, str] = {}
+        self._channels: dict[str, str] = {}
+        self.bot_user_id: str | None = None
 
         self.log = logger.get_logger(str(network))
         self.version = version.version_string()
@@ -44,110 +40,118 @@ class Client(object):
         self.command_prefix = pyhole_config.get("command_prefix")
 
         self.api_token = network_config.get("api_token")
+        self.app_token = network_config.get("app_token", default="")
         self.nick = network_config.get("nick")
+
+        if not self.app_token:
+            raise RuntimeError(
+                f"Slack network [{network}] needs app_token (xapp-...) for Socket Mode"
+            )
 
         self.load_plugins()
 
-    def load_plugins(self, reload_plugins=False):
-        """Load plugins and their commands respectively."""
+    def load_plugins(self, reload_plugins: bool = False) -> None:
         if reload_plugins:
             plugin.reload_plugins(session=self)
         else:
             plugin.load_plugins(session=self)
-
-        self.log.info("Loaded Plugins: %s" % plugin.active_plugins())
+        self.log.info("Loaded Plugins: %s", plugin.active_plugins())
         plugin.run_hook_polls(self)
 
-    def start(self):
-        """Run the Slack network connection."""
-        self.client = slackclient.SlackClient(self.api_token)
-        self.client.rtm_connect()
+    def start(self) -> None:
+        self.web = WebClient(token=self.api_token)
+        auth = self.web.auth_test()
+        self.bot_user_id = auth.get("user_id")
+        if auth.get("user"):
+            self.nick = auth["user"]
 
-        q = queue.MessageQueue()
-        q.watch(self)
+        self.socket = SocketModeClient(app_token=self.app_token, web_client=self.web)
+        self.socket.socket_mode_request_listeners.append(self._on_request)
 
-        count = 0
+        queue.MessageQueue().watch(self)
+        self.log.info("Connecting to Slack as %s", self.nick)
+        self.socket.connect()
         while True:
-            try:
-                for response in self.client.rtm_read():
-                    self.log.debug(response)
+            time.sleep(1)
 
-                    if all(x in response for x in ("text", "channel", "user")):
-                        if count == 0:
-                            # NOTE(jk0): rtm_read() often times comes back with
-                            # old messages after reconnecting. Let's attempt to
-                            # ignore them here.
-                            count += 1
-                            break
+    def _on_request(self, client: SocketModeClient, req: SocketModeRequest) -> None:
+        client.send_socket_mode_response(SocketModeResponse(envelope_id=req.envelope_id))
+        if req.type != "events_api":
+            return
+        event = req.payload.get("event") or {}
+        if event.get("type") != "message" or event.get("subtype"):
+            return
+        if event.get("user") == self.bot_user_id:
+            return
+        if event.get("bot_id") and not event.get("user"):
+            return
 
-                        r_channel = response["channel"]
-                        r_user = response["user"]
+        channel_id = event.get("channel", "")
+        user_id = event.get("user", "")
+        text = event.get("text") or ""
+        channel = self._channel_name(channel_id)
+        user = self._user_name(user_id)
+        self.log.info("-#%s- <%s> %s", channel, user, text)
+        wrapped = message.Reply(self, text, user, channel)
+        plugin.poll_messages(self, wrapped)
 
-                        try:
-                            channel = self.client.server.channels.find(
-                                r_channel).name
-                            user = self.client.server.users.find(r_user).name
-                        except AttributeError:
-                            continue
-
-                        msg = response["text"]
-
-                        self.log.info("-#%s- <%s> %s" % (channel, user, msg))
-
-                        _msg = message.Reply(self, msg, user, channel)
-                        plugin.poll_messages(self, _msg)
-
-                time.sleep(1)
-            except Exception:
-                # NOTE(jk0): Disconnected? Try to reconnect.
-                # https://github.com/slackhq/python-slackclient/issues/36
-                self.client.rtm_connect()
-                continue
-
-    def reply(self, target, msg):
-        """Reply to a target."""
+    def _channel_name(self, channel_id: str) -> str:
+        if channel_id in self._channels:
+            return self._channels[channel_id]
+        name = channel_id
         try:
-            channel = self.client.server.channels.find(target)
-            channel.send_message(msg)
-        except AttributeError:
-            self.log.error("Unable to find channel: %s" % target)
+            info = self.web.conversations_info(channel=channel_id)  # type: ignore[union-attr]
+            name = info["channel"].get("name") or channel_id
+        except Exception:
+            self.log.debug("Could not resolve channel %s", channel_id, exc_info=True)
+        self._channels[channel_id] = name
+        return name
 
+    def _user_name(self, user_id: str) -> str:
+        if user_id in self._users:
+            return self._users[user_id]
+        name = user_id
         try:
-            user = self.client.server.users.find(target).id
-            im = self._open_im(user)
-            self._send_im(im, msg)
-            self._close_im(im)
-        except AttributeError:
-            self.log.error("Unable to find user: %s" % target)
+            info = self.web.users_info(user=user_id)  # type: ignore[union-attr]
+            name = info["user"].get("name") or user_id
+        except Exception:
+            self.log.debug("Could not resolve user %s", user_id, exc_info=True)
+        self._users[user_id] = name
+        return name
 
-    def _open_im(self, user):
-        """Open a Slack IM."""
-        return self.client.api_call("im.open", user=user)["channel"]["id"]
+    def reply(self, target: str, msg: str) -> None:
+        if self.web is None:
+            self.log.error("Slack client is not connected")
+            return
+        channel_id = self._resolve_target(target)
+        try:
+            self.web.chat_postMessage(channel=channel_id, text=msg)
+        except Exception:
+            self.log.exception("Unable to send Slack message to %s", target)
 
-    def _send_im(self, channel, text):
-        """Send a Slack IM."""
-        kwargs = {
-            "as_user": True,
-            "channel": channel,
-            "text": text
-        }
-        return self.client.api_call("chat.postMessage", **kwargs)
+    def notice(self, target: str, msg: str) -> None:
+        self.reply(target, msg)
 
-    def _close_im(self, channel):
-        """Close a Slack IM."""
-        return self.client.api_call("im.close", channel=channel)
+    def _resolve_target(self, target: str) -> str:
+        for channel_id, name in self._channels.items():
+            if name == target or channel_id == target:
+                return channel_id
+        for user_id, name in self._users.items():
+            if name == target or user_id == target:
+                return user_id
+        return target
 
-    def op_user(self, *args, **kwargs):
-        pass
+    def op_user(self, *args: Any, **kwargs: Any) -> None:
+        return None
 
-    def deop_user(self, *args, **kwargs):
-        pass
+    def deop_user(self, *args: Any, **kwargs: Any) -> None:
+        return None
 
-    def set_nick(self, *args, **kwargs):
-        pass
+    def set_nick(self, *args: Any, **kwargs: Any) -> None:
+        return None
 
-    def join_channel(self, *args, **kwargs):
-        pass
+    def join_channel(self, *args: Any, **kwargs: Any) -> None:
+        return None
 
-    def part_channel(self, *args, **kwargs):
-        pass
+    def part_channel(self, *args: Any, **kwargs: Any) -> None:
+        return None

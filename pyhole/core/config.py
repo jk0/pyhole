@@ -1,68 +1,85 @@
-#   Copyright 2010-2011 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2010-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Configuration Manager"""
+"""Pyhole configuration manager."""
 
-import ConfigParser
-import os
-import sys
+from __future__ import annotations
 
-import utils
+import configparser
+from pathlib import Path
+from typing import Any, Literal, overload
+
+GetType = Literal["str", "int", "bool", "list"]
+_MISSING = object()
 
 
-class Config(object):
-    """A configuration object."""
+class ConfigError(Exception):
+    """Raised when a required configuration value is missing or invalid."""
 
-    def __init__(self, config, section):
-        self.config = os.path.abspath(config)
-        self.config_parser = ConfigParser.ConfigParser()
+
+class Config:
+    """A configuration object for one INI section."""
+
+    def __init__(self, config: str | Path, section: str) -> None:
+        self.config = Path(config).expanduser().resolve()
+        self.config_parser = configparser.ConfigParser()
         self.section = section
+        self._load()
 
-        for _i in range(0, 2):
-            try:
-                with open(self.config) as conf_file:
-                    self.config_parser.readfp(conf_file)
-            except IOError:
-                print "Unable to load configuration file: %s" % self.config
-                utils.prepare_config()
+    def _load(self) -> None:
+        if not self.config.is_file():
+            raise ConfigError(f"Unable to load configuration file: {self.config}")
+        with self.config.open(encoding="utf-8") as conf_file:
+            self.config_parser.read_file(conf_file)
 
-    def __str__(self):
-        """Make the config object readable for logging."""
+    def __str__(self) -> str:
         return self.section
 
-    def sections(self):
-        """Return a list of sections."""
+    def sections(self) -> list[str]:
         return self.config_parser.sections()
 
-    def get(self, option, **kwargs):
-        """Retrieve configuration values."""
-        _type = kwargs.get("type", "str")
+    def has_section(self, section: str) -> bool:
+        return self.config_parser.has_section(section)
+
+    @overload
+    def get(self, option: str, *, type: Literal["str"] = "str", default: str) -> str: ...
+    @overload
+    def get(self, option: str, *, type: Literal["int"], default: int) -> int: ...
+    @overload
+    def get(self, option: str, *, type: Literal["bool"], default: bool) -> bool: ...
+    @overload
+    def get(self, option: str, *, type: Literal["list"], default: list[str]) -> list[str]: ...
+    @overload
+    def get(self, option: str, *, type: GetType = "str", default: Any = _MISSING) -> Any: ...
+
+    def get(self, option: str, **kwargs: Any) -> Any:
+        """Retrieve a configuration value.
+
+        ``type`` is one of ``str`` (default), ``int``, ``bool``, or ``list``.
+        Lists are comma-separated and stripped. Missing options raise
+        ConfigError unless ``default`` is provided.
+        """
+        value_type: GetType = kwargs.get("type", "str")
+        default = kwargs.get("default", _MISSING)
 
         try:
-            if _type == "int":
+            if value_type == "int":
                 return self.config_parser.getint(self.section, option)
-            elif _type == "bool":
+            if value_type == "bool":
                 return self.config_parser.getboolean(self.section, option)
-            elif _type == "list":
-                return self.config_parser.get(self.section, option).split(", ")
-            else:
-                return self.config_parser.get(self.section, option)
-        except ConfigParser.NoOptionError:
-            if "default" in kwargs:
-                return kwargs["default"]
-
-            print "Unable to locate '%s' in %s" % (option, self.config)
-            print "[%s]" % self.section
-            print "%s: value" % option
-            sys.exit(1)
+            raw = self.config_parser.get(self.section, option)
+            if value_type == "list":
+                if not raw.strip():
+                    return []
+                return [item.strip() for item in raw.split(",") if item.strip()]
+            return raw
+        except (configparser.NoOptionError, configparser.NoSectionError):
+            if default is not _MISSING:
+                return default
+            raise ConfigError(
+                f"Unable to locate '{option}' in {self.config} [{self.section}]"
+            ) from None
+        except ValueError as exc:
+            raise ConfigError(
+                f"Invalid {value_type} for '{option}' in [{self.section}]: {exc}"
+            ) from exc

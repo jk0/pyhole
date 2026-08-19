@@ -1,21 +1,11 @@
-#   Copyright 2010-2016 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2010-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Administration Plugin"""
+"""Pyhole administration plugin."""
 
-from pyhole.core import plugin
-from pyhole.core import utils
+from __future__ import annotations
+
+from pyhole.core import plugin, utils
 
 
 class Admin(plugin.Plugin):
@@ -26,26 +16,22 @@ class Admin(plugin.Plugin):
         """Learn how to use plugins (ex: .help <command>)."""
         if params:
             doc = _find_doc_string(params)
-            if doc:
-                message.dispatch(doc)
-            else:
-                message.dispatch("No help available: %s" % params)
-        else:
-            active_commands = plugin.active_commands()
-            active_keywords = plugin.active_keywords()
-            active_patterns = plugin.active_msg_regexs()
-            active_pollers = plugin.active_polls()
+            message.dispatch(doc if doc else f"No help available: {params}")
+            return
 
-            message.dispatch(self.help.__doc__)
-
-            if len(active_commands) > 0:
-                message.dispatch("Active Commands: %s" % active_commands)
-            if len(active_keywords) > 0:
-                message.dispatch("Active Keywords: %s" % active_keywords)
-            if len(active_patterns) > 0:
-                message.dispatch("Active Patterns: %s" % active_patterns)
-            if len(active_pollers) > 0:
-                message.dispatch("Active Pollers: %s" % active_pollers)
+        message.dispatch(self.help.__doc__)
+        commands = plugin.active_commands()
+        keywords = plugin.active_keywords()
+        patterns = plugin.active_msg_regexes()
+        pollers = plugin.active_polls()
+        if commands:
+            message.dispatch(f"Active Commands: {commands}")
+        if keywords:
+            message.dispatch(f"Active Keywords: {keywords}")
+        if patterns:
+            message.dispatch(f"Active Patterns: {patterns}")
+        if pollers:
+            message.dispatch(f"Active Pollers: {pollers}")
 
     @plugin.hook_add_command("version")
     def version(self, message, params=None, **kwargs):
@@ -57,7 +43,7 @@ class Admin(plugin.Plugin):
     def reload(self, message, params=None, **kwargs):
         """Reload all plugins."""
         self.session.load_plugins(reload_plugins=True)
-        message.dispatch("Loaded Plugins: %s" % plugin.active_plugins())
+        message.dispatch(f"Loaded Plugins: {plugin.active_plugins()}")
 
     @plugin.hook_add_command("op")
     @utils.admin
@@ -99,22 +85,21 @@ class Admin(plugin.Plugin):
     @utils.require_params
     def say(self, message, params=None, **kwargs):
         """Send a reply (ex: .say <channel>|<nick> message)."""
-        (target, msg) = params.split(" ", 1)
+        target, _, msg = params.partition(" ")
+        if not msg:
+            message.dispatch(self.say.__doc__)
+            return
         self.session.reply(target, msg)
 
 
-def _find_doc_string(params):
-    """Find the doc string for a plugin, command or keyword hook."""
-    for p in plugin.active_plugin_classes():
-        if p.__name__.upper() == params.upper():
-            return p.__doc__
-
+def _find_doc_string(params: str) -> str | None:
+    for plugin_cls in plugin.active_plugin_classes():
+        if plugin_cls.__name__.upper() == params.upper():
+            return plugin_cls.__doc__
     for _, cmd_hook, cmd in plugin.hook_get_commands():
-        if cmd.upper() == params.upper():
+        if str(cmd).upper() == params.upper():
             return cmd_hook.__doc__
-
     for _, kw_hook, kw in plugin.hook_get_keywords():
-        if kw.upper() == params.upper():
+        if str(kw).upper() == params.upper():
             return kw_hook.__doc__
-
     return None

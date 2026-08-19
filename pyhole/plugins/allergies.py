@@ -1,46 +1,29 @@
-#   Copyright 2015-2016 Jason Meridth
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2015-2026 Jason Meridth and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Allergies Plugin"""
+"""Allergy plugin."""
 
+from __future__ import annotations
 
-from pyhole.core import plugin
-from pyhole.core import request
-from pyhole.core import utils
+from pyhole.core import plugin, request, utils
 
 
 class Allergies(plugin.Plugin):
-    """Provide access to current allergy data."""
+    """Current allergy data for San Antonio, TX."""
 
     @plugin.hook_add_command("allergies")
     @utils.spawn
     def allergies(self, message, params=None, **kwargs):
         """Display current allergies in San Antonio, TX (ex: .allergies)."""
-        url = "http://txallergy.info/api/allergy/today"
-
-        response = request.get(url)
-        if response.status_code != 200:
+        try:
+            response = request.get("http://txallergy.info/api/allergy/today")
+            data = response.json()
+        except Exception:
             return
-
-        text = "Allergies for today: "
-        for a in response.json():
-            text = text + "%s - %s (%s) | " % (a["allergen"], a["level"],
-                                               a["count"])
-        text = text.rstrip(" ")
-        text = text.rstrip("|")
-
-        message.dispatch(text)
+        if response.status_code != 200 or not isinstance(data, list):
+            return
+        parts = [f"{row['allergen']} - {row['level']} ({row['count']})" for row in data]
+        message.dispatch("Allergies for today: " + " | ".join(parts))
 
     @plugin.hook_add_command("pollen")
     def alias_pollen(self, message, params=None, **kwargs):

@@ -1,1 +1,6 @@
+include LICENSE
+include README.md
+include AUTHORS
+include pyhole.conf.sample
 recursive-include pyhole/templates *
+recursive-include pyhole/data *

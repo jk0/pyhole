@@ -1,71 +1,62 @@
-#   Copyright 2010-2016 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2010-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Search Plugin"""
+"""Search plugins (Urban Dictionary JSON API + Wikipedia OpenSearch)."""
 
-from BeautifulSoup import BeautifulSoup
+from __future__ import annotations
 
-from pyhole.core import plugin
-from pyhole.core import request
-from pyhole.core import utils
+from pyhole.core import plugin, request, utils
 
 
 class Search(plugin.Plugin):
-    """Provide access to search engines."""
+    """Search engines."""
 
     @plugin.hook_add_command("urban")
     @utils.require_params
     @utils.spawn
     def urban(self, message, params=None, **kwargs):
         """Search Urban Dictionary (ex: .urban <query>)."""
-        url = "http://www.urbandictionary.com/define.php"
-        response = request.get(url, params={"term": params})
-        if response.status_code != 200:
-            return
-
-        soup = BeautifulSoup(response.content)
-
         try:
-            meaning = soup.find("div", {"class": "meaning"}).text
-            example = soup.find("div", {"class": "example"}).text
-        except AttributeError:
-            message.dispatch("No results found: '%s'" % params)
-
-        meaning = utils.decode_entities(meaning)
-        example = utils.decode_entities(example)
-
-        message.dispatch("%s (ex: %s)" % (meaning, example))
+            resp = request.get(
+                "https://api.urbandictionary.com/v0/define",
+                params={"term": params},
+            )
+            listing = (resp.json().get("list") or [None])[0]
+        except Exception:
+            message.dispatch(f"No results found: '{params}'")
+            return
+        if not listing:
+            message.dispatch(f"No results found: '{params}'")
+            return
+        meaning = utils.decode_entities(listing.get("definition") or "")
+        example = utils.decode_entities(listing.get("example") or "")
+        if example:
+            message.dispatch(f"{meaning} (ex: {example})")
+        else:
+            message.dispatch(meaning)
 
     @plugin.hook_add_command("wikipedia")
     @utils.require_params
     @utils.spawn
     def wikipedia(self, message, params=None, **kwargs):
         """Search Wikipedia (ex: .wikipedia <query>)."""
-        url = "https://en.wikipedia.org/w/api.php"
-        response = request.get(url, params={
-            "action": "query",
-            "generator": "allpages",
-            "gaplimit": 4,
-            "gapfrom": params,
-            "format": "json"
-        })
-
-        if response.status_code != 200:
+        try:
+            resp = request.get(
+                "https://en.wikipedia.org/w/api.php",
+                params={
+                    "action": "opensearch",
+                    "search": params,
+                    "limit": 4,
+                    "namespace": 0,
+                    "format": "json",
+                },
+            )
+            data = resp.json()
+            urls = data[3] if len(data) > 3 else []
+        except Exception:
             return
-
-        pages = response.json()["query"]["pages"]
-        for page in pages.values():
-            title = page["title"]
-            title = title.replace(" ", "_")
-            message.dispatch("http://en.wikipedia.org/wiki/%s" % title)
+        if not urls:
+            message.dispatch(f"No results found: '{params}'")
+            return
+        for url in urls:
+            message.dispatch(url)

@@ -1,61 +1,51 @@
-#   Copyright 2011-2016 Josh Kearney
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2010-2026 Josh Kearney and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Version Handling"""
+"""Pyhole version handling."""
 
-import os
-import sys
+from __future__ import annotations
+
+import shutil
+import subprocess
+from pathlib import Path
+
+__VERSION__ = "1.0.0"
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
-__VERSION__ = "0.8.9"
+def current_git_hash() -> str | None:
+    """Return a short git hash for this checkout, if available."""
+    git = shutil.which("git")
+    if git is None or not (_REPO_ROOT / ".git").exists():
+        return None
+    try:
+        result = subprocess.run(
+            [git, "-C", str(_REPO_ROOT), "rev-parse", "--short=7", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return result.stdout.strip() or None
 
 
-def current_git_hash():
-    """Return the current git hash."""
-    git_file = ".git/refs/heads/master"
-    git_path = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
-                                os.pardir, os.pardir, git_file))
-
-    if not os.path.exists(git_path):
-        git_path = os.getcwd() + "/" + git_file
-        if not os.path.exists(git_path):
-            git_path = os.getcwd() + "/../" + git_file
-            if not os.path.exists(git_path):
-                return None
-
-    with open(git_path, "r") as git:
-        git_hash = git.read()
-
-    return git_hash[0:5]
-
-
-def version_string():
-    """Return the full version."""
+def version_string() -> str:
+    """Return the human-readable version banner."""
     git_hash = current_git_hash()
     if git_hash:
-        return "pyhole v%s (%s) - https://github.com/jk0/pyhole" % (
-            __VERSION__, git_hash)
-
-    return "pyhole v%s - https://github.com/jk0/pyhole" % __VERSION__
+        return f"pyhole v{__VERSION__} ({git_hash}) - https://github.com/jk0/pyhole"
+    return f"pyhole v{__VERSION__} - https://github.com/jk0/pyhole"
 
 
-def version_hash():
-    """Return the current version with git hash."""
+def version_hash() -> str:
+    """Return version plus git hash, if known."""
     git_hash = current_git_hash()
-    return "%s-%s" % (__VERSION__, git_hash)
+    if git_hash:
+        return f"{__VERSION__}-{git_hash}"
+    return __VERSION__
 
 
-def version():
+def version() -> str:
     """Return the current version."""
     return __VERSION__

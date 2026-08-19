@@ -1,127 +1,100 @@
-#   Copyright 2015-2016 Rick Harris
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2015-2026 Rick Harris and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Xen Security Advisory (XSA) Plugin"""
+"""Xen Security Advisory plugin."""
+
+from __future__ import annotations
 
 import json
 
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
-from pyhole.core import plugin
-from pyhole.core import request
-from pyhole.core import utils
+from pyhole.core import plugin, request, utils
 
 
 class Xsa(plugin.Plugin):
-    """Display information regarding Xen Security Advisories (XSAs)."""
-    XSA_URL = "http://xenbits.xen.org/xsa/"
+    """Xen Security Advisories."""
+
+    XSA_URL = "https://xenbits.xen.org/xsa/"
 
     @plugin.hook_add_keyword("xsa")
     @utils.require_params
     @utils.spawn
     def keyword_xsa(self, message, params=None, **kwargs):
         """Retrieve XSA information (ex: xsa123 or xsa-123)."""
-        # abs is needed in case we get 'xsa-123', that would be -123
-        xsa_num = abs(utils.ensure_int(params))
-        xsa_id = "XSA-%d" % xsa_num
-        data = self._load_cached_xsa_data()
-        msg = self._make_xsa_message(xsa_id, data)
-        if not msg:
-            msg = "Unable to find matching XSA."
-        message.dispatch(msg)
+        xsa_num = abs(utils.ensure_int(params) or 0)
+        xsa_id = f"XSA-{xsa_num}"
+        msg = self._make_xsa_message(xsa_id, self._load_cached_xsa_data())
+        message.dispatch(msg or "Unable to find matching XSA.")
 
-    def _make_xsa_message(self, xsa_id, data):
-        try:
-            xsa_info = data[xsa_id]
-        except Exception:
+    def _make_xsa_message(self, xsa_id: str, data: dict) -> str | None:
+        info = data.get(xsa_id)
+        if not info:
             return None
-        else:
-            # Use ID if we don't have a link
-            if not xsa_info["link"]:
-                xsa_info["link"] = xsa_info["id"]
-            return ("%(link)s: %(title)s (Public Release: %(public_release)s)"
-                    % xsa_info)
+        if not info.get("link"):
+            info = {**info, "link": info.get("id")}
+        return f"{info['link']}: {info['title']} (Public Release: {info['public_release']})"
 
     @plugin.hook_add_poll("poll_xsa_list", poll_timer=300)
     def poll_xsa_list(self, message, params=None, **kwargs):
         old_data = self._load_cached_xsa_data()
-
         new_data = self._fetch_xsa_data()
         if not new_data:
             return
+        utils.write_file(self.name, "xsas.json", json.dumps(new_data))
+        old_ids = set(old_data)
+        added = set(new_data) - old_ids
+        if old_ids and added:
+            self._notify_new_xsas(added, new_data)
 
-        new_data_json = json.dumps(new_data)
-        utils.write_file(self.name, "xsas.json", new_data_json)
-
-        # Notify subscribed channels on new XSAs
-        old_xsa_ids = set(old_data.keys())
-        new_xsa_ids = set(new_data.keys())
-        added_xsa_ids = new_xsa_ids - old_xsa_ids
-        if old_xsa_ids and added_xsa_ids:
-            self._notify_new_xsas(added_xsa_ids, new_data)
-
-    def _notify_new_xsas(self, added_xsa_ids, new_data):
-        xsa_config = utils.get_config("XSA")
-        try:
-            notify_str = xsa_config.get("notify")
-        except Exception:
+    def _notify_new_xsas(self, added_xsa_ids, new_data) -> None:
+        notify_str = utils.get_config("XSA").get("notify", default="")
+        if not notify_str:
             return
-
-        channels = notify_str.split(",")
+        channels = [item.strip() for item in notify_str.split(",") if item.strip()]
         for xsa_id in added_xsa_ids:
             msg = self._make_xsa_message(xsa_id, new_data)
+            if not msg:
+                continue
             for channel in channels:
-                channel = channel.strip()
-                self.irc.notice(channel, msg)
+                self.session.notice(channel, msg)
 
-    def _load_cached_xsa_data(self):
+    def _load_cached_xsa_data(self) -> dict:
         data_json = utils.read_file(self.name, "xsas.json")
         if data_json is None:
             return {}
-        return json.loads(data_json)
-
-    def _fetch_xsa_data(self):
-        resp = request.get(self.XSA_URL)
-        if resp.status_code != 200:
-            print "Error fetching XSAs: %s" % resp.status_code
+        try:
+            return json.loads(data_json)
+        except json.JSONDecodeError:
             return {}
-        soup = BeautifulSoup(resp.text)
-        rows = soup.findAll("tr")
-        data = {}
-        for row in rows:
-            children = row.findChildren("td")
+
+    def _fetch_xsa_data(self) -> dict:
+        try:
+            resp = request.get(self.XSA_URL)
+        except Exception:
+            return {}
+        if resp.status_code != 200:
+            return {}
+        soup = BeautifulSoup(resp.text, "html.parser")
+        data: dict = {}
+        for row in soup.find_all("tr"):
+            children = row.find_all("td")
             if not children:
                 continue
             try:
-                xsa_id = children[0].contents[0].string
+                xsa_id = children[0].get_text(strip=True)
             except Exception:
                 continue
-            try:
-                xsa_link = "".join([self.XSA_URL,
-                                    children[0].contents[0]["href"]])
-            except Exception:
-                xsa_link = None
-            try:
-                public_release = children[1].contents[0]
-            except Exception:
-                public_release = None
-            try:
-                title = children[5].contents[0]
-            except Exception:
-                title = None
-            data[xsa_id] = {"id": xsa_id,
-                            "link": xsa_link,
-                            "public_release": public_release,
-                            "title": title}
+            link = None
+            anchor = children[0].find("a")
+            if anchor and anchor.get("href"):
+                link = self.XSA_URL + anchor["href"]
+            public_release = children[1].get_text(strip=True) if len(children) > 1 else None
+            title = children[5].get_text(strip=True) if len(children) > 5 else None
+            data[xsa_id] = {
+                "id": xsa_id,
+                "link": link,
+                "public_release": public_release,
+                "title": title,
+            }
         return data

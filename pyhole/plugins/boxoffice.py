@@ -1,49 +1,39 @@
-#   Copyright 2015-2016 Rick Harris
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
+# Copyright 2015-2026 Rick Harris and contributors
+# SPDX-License-Identifier: Apache-2.0
 
-"""Pyhole Box Office Plugin"""
+"""Now-playing movies via TMDB (optional API key)."""
 
-from BeautifulSoup import BeautifulSoup
+from __future__ import annotations
 
-from pyhole.core import plugin
-from pyhole.core import request
-from pyhole.core import utils
+from pyhole.core import plugin, request, utils
 
 
 class Boxoffice(plugin.Plugin):
-    """Display top box office movies."""
+    """Movies currently in theaters."""
 
     @plugin.hook_add_command("boxoffice")
     @utils.spawn
     def boxoffice(self, message, params=None, **kwargs):
-        """Display top box office movies"""
-        resp = request.get("http://www.rottentomatoes.com")
-        if resp.status_code != 200:
+        """Display movies currently in theaters."""
+        key = utils.get_config("TMDB").get("key", default="")
+        if not key:
+            message.dispatch("No TMDB API key set. Add [TMDB] key=... to pyhole.conf.")
+            return
+        try:
+            resp = request.get(
+                "https://api.themoviedb.org/3/movie/now_playing",
+                params={"api_key": key, "language": "en-US", "page": 1},
+            )
+            results = resp.json().get("results") or []
+        except Exception:
             message.dispatch("Could not fetch box office results.")
             return
-
-        message.dispatch("Top 10 at the Box Office")
-        message.dispatch("=" * 64)
-        soup = BeautifulSoup(resp.text)
-        rows = soup.findAll("table", id="Top-Box-Office")[0].findAll("tr")
-        for row in rows:
-            children = row.findAll("td")
-            try:
-                score = row("span", **{"class": "tMeterScore"})[0].contents[0]
-                title = children[1].find("a").string
-                take = children[2].string.strip()
-            except Exception:
-                pass
-            msg = "%s %s%s" % (score.rjust(3), title.ljust(40), take.rjust(10))
-            message.dispatch(msg)
+        if not results:
+            message.dispatch("No now-playing results.")
+            return
+        message.dispatch("Now playing")
+        for movie in results[:10]:
+            title = movie.get("title", "Unknown")
+            date = movie.get("release_date", "")
+            score = movie.get("vote_average", "")
+            message.dispatch(f"{title} ({date})  {score}")
