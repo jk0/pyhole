@@ -9,7 +9,6 @@ This branch is the **C11 port**. Slack, Flask, PagerDuty, and the other optional
 Needs a C11 compiler, libcurl, and OpenSSL.
 
 ```bash
-cd c
 make
 make test
 ```
@@ -23,7 +22,6 @@ make OPENSSL_PREFIX=/opt/homebrew/opt/openssl@3
 ## Run
 
 ```bash
-cd c
 ./pyhole -c pyhole.conf.sample   # edit a real copy first
 ./pyhole                         # copies ~/.pyhole/pyhole.conf on first run
 ./pyhole -d                      # debug logging
@@ -33,7 +31,7 @@ cd c
 
 ## Config
 
-See [`c/pyhole.conf.sample`](c/pyhole.conf.sample). IRC only: `server`, `nick`, `channels`, optional `ssl` / `ssl_verify` / `identify_password`. `plugins` is a comma-separated list of built-in modules.
+See [`pyhole.conf.sample`](pyhole.conf.sample). IRC only: `server`, `nick`, `channels`, optional `ssl` / `ssl_verify` / `identify_password`. `plugins` is a comma-separated list of built-in modules.
 
 ## Plugins
 
@@ -51,11 +49,11 @@ Admin commands require `nick!ident` in `admins`.
 ## Layout
 
 ```
-c/include/pyhole/   public headers
-c/src/              core (config, IRC, HTTP, hooks)
-c/src/plugins/      compiled-in plugins
-c/src/vendor/       cJSON
-c/tests/            no-network unit tests
+include/pyhole/   public headers
+src/              core (config, IRC, HTTP, hooks)
+src/plugins/      compiled-in plugins
+src/vendor/       cJSON
+tests/            no-network unit tests
 ```
 
 ## License

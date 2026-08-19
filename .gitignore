@@ -6,7 +6,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .venv/
-c/pyhole
-c/tests/test_config
-c/tests/test_util
-c/tests/test_hooks
+/pyhole
+/tests/test_config
+/tests/test_util
+/tests/test_hooks

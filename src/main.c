@@ -57,7 +57,6 @@ static char *default_conf(void)
 static int copy_sample(const char *dest)
 {
     const char *candidates[] = {
-        "c/pyhole.conf.sample",
         "pyhole.conf.sample",
         NULL,
     };
