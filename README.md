@@ -1,5 +1,7 @@
 # pyhole
 
+A C port of the IRC core lives in [`c/`](c/README.md) (branch `c-port`): no Slack, no HTTP API.
+
 A modular IRC and Slack bot. Commands, keywords, regex watchers, and background polls are plugins; each network runs in its own process.
 
 This tree is a Python 3.12+ rewrite of the original 2010–2016 pyhole. Plugin hook names (`hook_add_command`, `hook_add_keyword`, `hook_add_msg_regex`, `hook_add_poll`) are unchanged.

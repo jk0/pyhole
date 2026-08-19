@@ -1,0 +1,6 @@
+*.o
+*.dSYM/
+/pyhole
+/tests/test_config
+/tests/test_util
+/tests/test_hooks
